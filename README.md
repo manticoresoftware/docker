@@ -106,4 +106,4 @@ searchd
 
 # Issues
 
-For reporting issues, please use the [issue tracker](http://github.com/manticore-search/docker).
+For reporting issues, please use the [issue tracker](https://github.com/manticoresoftware/docker/issues).
