@@ -25,9 +25,7 @@ RUN mkdir /build && cd /build \
     -D CONFFILEDIR=/etc/sphinxsearch \
     -D SPHINX_TAG=release .. \
 && make -j4 searchd indexer indextool
-COPY mk.sh .
 COPY sphinx.conf /build/manticore/build/src/
-RUN /bin/sh mk.sh
 FROM alpine
 RUN apk add --no-cache \
     mariadb-libs \

@@ -33,20 +33,23 @@ owners.
 
 Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
 
-mysql> show tables;
-+-------+------+
-| Index | Type |
-+-------+------+
-| demo  | rt   |
-+-------+------+
+mysql> SHOW TABLES;
++--------+------+
+| Index  | Type |
++--------+------+
+| testrt | rt   |
++--------+------+
 1 row in set (0,00 sec)
 
-mysql> select * from demo;
-+------+------+-------+---------+
-| id   | gid  | title | content |
-+------+------+-------+---------+
-|    1 |   10 | Hello | world   |
-+------+------+-------+---------+
+mysql> INSERT INTO testrt(id,title,content,gid) VALUES(1,'Hello','World',10);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> SELECT * FROM testrt;
++------+------+
+| id   | gid  |
++------+------+
+|    1 |   10 |
++------+------+
 1 row in set (0,00 sec)
 ```
 
@@ -63,8 +66,10 @@ Index files are located at `/var/lib/manticore/data` and logs at `/var/lib/manti
 For persistence, mount these points to your local folders.
 
 ```
-docker run --name manticore -v /path/to/config/:/etc/sphinxsearch/ -v /path/to/data/:/var/lib/manticore/data -v /path/to/logs/:/var/lib/manticore/log -p 9306:9306 -d manticoresearch/manticore
+docker run --name manticore -v ~/manticore/etc/:/etc/sphinxsearch/ -v ~/manticore/data/:/var/lib/manticore/data -v ~/manticore/logs/:/var/lib/manticore/log -p 9306:9306 -d manticoresearch/manticore
 ```
+    
+In `~/manticore/` you need to create the `etc/`,`data/` and `logs/` folders, as well as add a valid  [sphinx.conf](https://github.com/manticoresoftware/docker/blob/master/sphinx.conf)   in `~/manticore/etc/`.  
 
 ## Rotating indexes
 
@@ -74,15 +79,14 @@ docker exec -it manticore indexer --all --rotate
 
 ## Default configuration
 
-```index demo
+```
+index testrt
 {
     type            = rt
     rt_mem_limit    = 128M
-    path            = /var/lib/manticore/data/demo
+    path            = /var/lib/manticore/data/testrt
     rt_field        = title
     rt_field        = content
-    rt_attr_string  = title
-    rt_attr_string  = content
     rt_attr_uint    = gid
 }
 
@@ -107,3 +111,4 @@ searchd
 # Issues
 
 For reporting issues, please use the [issue tracker](https://github.com/manticoresoftware/docker/issues).
+
