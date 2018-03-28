@@ -12,7 +12,7 @@ RUN apk add --no-cache \
     mariadb-client
 RUN mkdir /build && cd /build \
 && git clone https://github.com/manticoresoftware/manticore.git --single-branch \
-&& cd manticore && git checkout tags/2.6.2 \
+&& cd manticore && git checkout tags/2.6.3 \
 && mkdir -p build && cd build \
 && cmake \
     -D SPLIT_SYMBOLS=1 \
