@@ -6,7 +6,7 @@ Manticore Search is an open source full-text search server. The image use Alpine
 
 The searchd daemon runs in nodetach mode. Default configuration includes includes a simple Real-Time index and listen on the default ports ( `9306`  for SphinxQL and `9312` for SphinxAPI).
 
-The image comes with MySQL  and PostgreSQL client libraries for indexing data from these databases.
+The image comes with MySQL  and PostgreSQL client libraries for indexing data from these databases as well as expat library for indexing data from XML files.
 
 
 # How to run this image
