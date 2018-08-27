@@ -1,4 +1,4 @@
-FROM alpine as builder
+FROM alpine:3.6 as builder
 
 RUN apk add --no-cache \
     git \
@@ -27,7 +27,7 @@ RUN mkdir /build && cd /build \
     -D SPHINX_TAG=release .. \
 && make -j4 searchd indexer indextool
 COPY sphinx.conf /build/manticore/build/src/
-FROM alpine
+FROM alpine:3.6
 RUN apk add --no-cache \
     mariadb-libs \
     mariadb-client-libs \
