@@ -107,6 +107,20 @@ searchd
 }
 ```
 
+## Logging
+
+searchd runs with ``--no-detach`` option, sending it's log to `/dev/stdout`, which can be seen with 
+
+```
+  docker logs manticore
+```
+
+You can also send the query logs to `/dev/stdout` to be viewed using `docker logs`.
+Alternative, you can monitor the query log directly by doing 
+
+```
+  docker exec -it manticore tail -f /var/lib/manticore/log/query.log
+```
 
 # Issues
 
