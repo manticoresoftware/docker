@@ -40,6 +40,7 @@ COPY --from=builder /build/manticore/build/src/searchd /usr/bin/
 COPY --from=builder /build/manticore/build/src/sphinx.conf /etc/sphinxsearch/sphinx.conf
 VOLUME /var/lib/manticore /etc/sphinxsearch
 EXPOSE 9306
+EXPOSE 9308
 EXPOSE 9312
 CMD [ "/usr/bin/searchd", "--nodetach" ]
 
