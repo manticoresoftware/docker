@@ -14,7 +14,7 @@ RUN apk add --no-cache \
     boost-dev libressl-dev
 RUN mkdir /build && cd /build \
 && git clone https://github.com/manticoresoftware/manticore.git  \
-&& cd manticore && git checkout manticore-2.8.1 \
+&& cd manticore && git checkout manticore-2.8.2 \
 && mkdir -p build && cd build \
 && cmake \
     -D SPLIT_SYMBOLS=1 \
