@@ -1,4 +1,4 @@
-FROM alpine:3.6 as builder
+FROM alpine as builder
 
 RUN apk add --no-cache \
     git \
@@ -10,7 +10,8 @@ RUN apk add --no-cache \
     mariadb-dev \
     postgresql-dev \
     expat-dev \
-    mariadb-client
+    mariadb-client \
+    boost-dev libressl-dev
 RUN mkdir /build && cd /build \
 && git clone https://github.com/manticoresoftware/manticore.git  \
 && cd manticore && git checkout manticore-2.8.1 \
@@ -27,12 +28,12 @@ RUN mkdir /build && cd /build \
     -D SPHINX_TAG=release .. \
 && make -j4 searchd indexer indextool
 COPY sphinx.conf /build/manticore/build/src/
-FROM alpine:3.6
+FROM alpine
 RUN apk add --no-cache \
     mariadb-libs \
     mariadb-client-libs \
     postgresql-libs \
-    expat \
+    expat libressl \
 && mkdir -p /var/lib/manticore/log && mkdir -p /var/lib/manticore/data/
 COPY --from=builder /build/manticore/build/src/indexer /usr/bin/
 COPY --from=builder /build/manticore/build/src/indextool /usr/bin/
