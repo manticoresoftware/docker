@@ -33,6 +33,7 @@ RUN apk add --no-cache \
     mariadb-connector-c-dev \
     postgresql-libs \
     expat libressl \
+    libstdc++ \
 && mkdir -p /var/lib/manticore/log && mkdir -p /var/lib/manticore/data/
 COPY --from=builder /build/manticore/build/src/indexer /usr/bin/
 COPY --from=builder /build/manticore/build/src/indextool /usr/bin/
