@@ -21,8 +21,8 @@ ADD cmake-3.14.0-Linux-x86_64.tar.gz /
 ENV PATH $PATH:/cmake-3.14.0-Linux-x86_64/bin
 
 
-RUN cd /tmp && git clone https://gitlab+deploy-token-27973:EtVhrENpenisWGy48xZp@gitlab.com/manticoresearch/dev.git manticore \
-&& cd manticore && mkdir build && cd build
+RUN cd /tmp && git clone https://github.com/manticoresoftware/manticore.git manticore \
+&& cd manticore && git checkout manticore-2.8.2 && mkdir build && cd build
 
 RUN cd /tmp/manticore/build && cmake \
     -D SPLIT_SYMBOLS=1 \
@@ -38,10 +38,7 @@ RUN cd /tmp/manticore/build && cmake \
 
 
 FROM ubuntu:bionic
-RUN apt-get update && apt-get install -y mysql-client \
-    php-cli \
-    curl \
-    mysql-client
+RUN apt-get update && apt-get install -y mysql-client curl
 
 
 COPY --from=builder /bin/indexer /usr/bin/
@@ -57,5 +54,7 @@ VOLUME /var/lib/manticore /etc/sphinxsearch
 EXPOSE 9306
 EXPOSE 9308
 EXPOSE 9312
+EXPOSE 9315
+EXPOSE 9316
 CMD ["/usr/bin/searchd", "--nodetach", "--logreplication"]
 
