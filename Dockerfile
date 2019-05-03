@@ -54,7 +54,6 @@ VOLUME /var/lib/manticore /etc/sphinxsearch
 EXPOSE 9306
 EXPOSE 9308
 EXPOSE 9312
-EXPOSE 9315
-EXPOSE 9316
+EXPOSE 9315-9325
 CMD ["/usr/bin/searchd", "--nodetach", "--logreplication"]
 
