@@ -22,7 +22,7 @@ ENV PATH $PATH:/cmake-3.14.0-Linux-x86_64/bin
 
 
 RUN cd /tmp && git clone https://github.com/manticoresoftware/manticore.git manticore \
-&& cd manticore && git checkout manticore-2.8.2 && mkdir build && cd build
+&& cd manticore && git checkout master && mkdir build && cd build
 
 RUN cd /tmp/manticore/build && cmake \
     -D SPLIT_SYMBOLS=1 \
