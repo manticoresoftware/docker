@@ -2,7 +2,7 @@
 
 This is the official repository of the [Docker image](https://hub.docker.com/r/manticoresearch/manticore/) for [Manticore Search](https://github.com/manticoresoftware/manticore).
 
-Manticore Search is an open source full-text search server. The image use Alpine as operating system.
+Manticore Search is an open source full-text search server. The image use Ubuntu as the operating system.
 
 The searchd daemon runs in nodetach mode. Default configuration includes includes a simple Real-Time index and listen on the default ports ( `9306`  for SphinxQL and `9312` for SphinxAPI).
 
