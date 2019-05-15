@@ -38,7 +38,7 @@ RUN cd /tmp/manticore/build && cmake \
 
 
 FROM ubuntu:bionic
-RUN apt-get update && apt-get install -y mysql-client curl
+RUN apt-get update && apt-get install -y mysql-client curl libmysqlclient20 libodbc1 libpq5 libexpat1
 
 
 COPY --from=builder /bin/indexer /usr/bin/
