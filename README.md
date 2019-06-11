@@ -122,6 +122,41 @@ Alternative, you can monitor the query log directly by doing
   docker exec -it manticore tail -f /var/lib/manticore/log/query.log
 ```
 
+## Replication
+
+To create a PQ replication cluster we need to create a docker network first.
+
+```
+docker network create manticorepl
+```
+Next we launch 2 docker instaces with SphinxQL port exposed:
+
+```
+docker run --name manti1--network=manticorepl -p 11906:9306 manticoresearch/manticore
+```
+
+```
+docker run --name manti2 --network=manticorepl -p 11907:9306 manticoresearch/manticore
+```
+On first instance we login, create the cluster and add the sample `pq` percolate index to it:
+
+```
+mysql -P11906 -h0
+
+mysql> CREATE CLUSTER posts;
+mysql> ALTER CLUSTER posts ADD pq;
+```
+
+And on second instance we join it to the cluster:
+
+```
+mysql -P11907 -h0
+
+mysql> JOIN CLUSTER posts AT 'manti1:9312';
+```
+
+At this point we can start adding queries in any instance and they will be replicated across the cluster.
+
 # Issues
 
 For reporting issues, please use the [issue tracker](https://github.com/manticoresoftware/docker/issues).
