@@ -16,7 +16,7 @@ RUN set -x \
 	&& gosu nobody true \
 	&& apt-get purge -y --auto-remove ca-certificates wget
 
-ENV MANTICORE_VERSION 3.0.2
+ENV MANTICORE_VERSION 3.1.0
 	
 RUN set -x \
 	\
