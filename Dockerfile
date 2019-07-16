@@ -58,7 +58,7 @@ RUN set -x \
 
 COPY sphinx.conf /etc/sphinxsearch/
 RUN mkdir -p /var/run/manticore && chown -R manticore:manticore /var/run/manticore && chmod 2777 /var/run/manticore \
-    && mkdir /var/lib/manticore &&  mkdir /var/lib/manticore/replication &&  mkdir /var/lib/manticore/data &&  mkdir /var/lib/manticore/log && chown -R manticore:manticore /var/lib/manticore && chmod 777 /var/lib/manticore
+    && mkdir -p /var/lib/manticore &&  mkdir -p /var/lib/manticore/replication &&  mkdir -p /var/lib/manticore/data &&  mkdir -p /var/lib/manticore/log && chown -R manticore:manticore /var/lib/manticore && chmod 777 /var/lib/manticore
 	
 
 COPY docker-entrypoint.sh /usr/local/bin/
