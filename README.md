@@ -71,10 +71,12 @@ docker run --name manticore -v ~/manticore/etc/:/etc/sphinxsearch/ -v ~/manticor
     
 In `~/manticore/` you need to create the `etc/`,`data/` and `logs/` folders, as well as add a valid  [sphinx.conf](https://github.com/manticoresoftware/docker/blob/master/sphinx.conf)   in `~/manticore/etc/`.  
 
+`searchd` daemon runs under `manticore`, performing operations on index files (like creating or rotation plain indexes) should be made under `manticore` user (otherwise files will be created under `root` and `searchd` can't manipulate them).
+
 ## Rotating indexes
 
 ```
-docker exec -it manticore indexer --all --rotate
+docker exec -it manticore gosu manticore indexer --all --rotate
 ```
 
 ## Default configuration
