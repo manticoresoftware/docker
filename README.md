@@ -2,7 +2,7 @@
 
 This is the official repository of the [Docker image](https://hub.docker.com/r/manticoresearch/manticore/) for [Manticore Search](https://github.com/manticoresoftware/manticore).
 
-Manticore Search is an open source full-text search server. The image use Ubuntu as the operating system.
+Manticore Search is an open source full-text search server. The image use currently Debian Stretch as the operating system.
 
 The searchd daemon runs in nodetach mode. Default configuration includes includes a simple Real-Time index and listen on the default ports ( `9306`  for SphinxQL and `9312` for SphinxAPI).
 
@@ -62,11 +62,11 @@ To shutdown the daemon:
 ## Mounting points
 
 The configuration folder inside the image is the usual `/etc/sphinxseach`. 
-Index files are located at `/var/lib/manticore/data` and logs at `/var/lib/manticore/log`.
+Index files are located at `/var/lib/manticore/data` and logs at `/var/log/manticore`.
 For persistence, mount these points to your local folders.
 
 ```
-docker run --name manticore -v ~/manticore/etc/:/etc/sphinxsearch/ -v ~/manticore/data/:/var/lib/manticore/data -v ~/manticore/logs/:/var/lib/manticore/log -p 9306:9306 -d manticoresearch/manticore
+docker run --name manticore -v ~/manticore/etc/:/etc/sphinxsearch/ -v ~/manticore/data/:/var/lib/manticore/data -v ~/manticore/logs/:/var/log/manticore -p 9306:9306 -d manticoresearch/manticore
 ```
     
 In `~/manticore/` you need to create the `etc/`,`data/` and `logs/` folders, as well as add a valid  [sphinx.conf](https://github.com/manticoresoftware/docker/blob/master/sphinx.conf)   in `~/manticore/etc/`.  
@@ -96,11 +96,11 @@ searchd
 {
     listen          = 9312
     listen          = 9306:mysql41
-    log             = /var/lib/manticore/log/searchd.log
-    query_log       = /var/lib/manticore/log/query.log
+    log             = /var/log/manticore/searchd.log
+    query_log       = /var/log/manticore/query.log
     read_timeout    = 5
     max_children    = 30
-    pid_file        = /var/run/searchd.pid
+    pid_file        = /var/run/manticore/searchd.pid
     seamless_rotate = 1
     preopen_indexes = 1
     unlink_old      = 1
