@@ -27,7 +27,7 @@ COPY sphinx.conf /etc/sphinxsearch/
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["docker-entrypoint.sh"]
-VOLUME /var/lib/manticore /etc/sphinxsearch
+VOLUME /var/lib/manticore /etc/sphinxsearch /var/log/manticore
 EXPOSE 9306
 EXPOSE 9308
 EXPOSE 9312
