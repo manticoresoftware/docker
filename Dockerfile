@@ -15,7 +15,7 @@ RUN set -x \
 	
 ENV MANTICORE_VERSION 3.1.2
 	
-RUN  wget  https://github.com/manticoresoftware/manticoresearch/releases/download/3.1.2/manticore_3.1.2-190822-47b6bc2c-release_stretch_amd64-bin.deb
+RUN  wget  https://github.com/manticoresoftware/manticoresearch/releases/download/3.1.2/manticore_3.1.2-190822-47b6bc2c-release_stretch_amd64-bin.deb \
     && dpkg -i manticore_3.1.2-190822-47b6bc2c-release_stretch_amd64-bin.deb \
     && mkdir -p /var/run/manticore && mkdir -p /var/lib/manticore/replication \
     && apt-get purge -y --auto-remove ca-certificates wget \
