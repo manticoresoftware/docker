@@ -159,6 +159,19 @@ mysql> JOIN CLUSTER posts AT 'manti1:9312';
 
 At this point we can start adding queries in any instance and they will be replicated across the cluster.
 
+# Memory locking and limits
+
+For best performance, index components can be mlocked into memory. When Manticore is run under Docker, the instance requires additional privileges to allow memory locking. The following options must be added when running the instance:
+
+```
+  --cap-add=IPC_LOCK --ulimit memlock=-1:-1 
+```
+In addition, if the search instance loads a lot of indexes or has a high number of connections, the default file descriptor limits may be reached.  In these case the limit for file descriptors must be set:
+
+```
+--ulimit nofile=65536:65536
+```
+
 # Issues
 
 For reporting issues, please use the [issue tracker](https://github.com/manticoresoftware/docker/issues).
