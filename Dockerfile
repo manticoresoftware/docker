@@ -13,14 +13,14 @@ RUN set -x \
 	&& chmod +x /usr/local/bin/gosu \
 	&& gosu nobody true 
 	
-ENV MANTICORE_VERSION 3.1.2
+ENV MANTICORE_VERSION 3.2.0
 	
-RUN  wget  https://github.com/manticoresoftware/manticoresearch/releases/download/3.1.2/manticore_3.1.2-190822-47b6bc2c-release_stretch_amd64-bin.deb \
-    && dpkg -i manticore_3.1.2-190822-47b6bc2c-release_stretch_amd64-bin.deb \
+RUN  wget  https://github.com/manticoresoftware/manticoresearch/releases/download/3.2.0/manticore_3.2.0-191017-e526a014-release.stretch_amd64-bin.deb \
+    && dpkg -i manticore_3.2.0-191017-e526a014-release.stretch_amd64-bin.deb \
     && mkdir -p /var/run/manticore && mkdir -p /var/lib/manticore/replication \
     && apt-get purge -y --auto-remove ca-certificates wget \
     && apt-get update && apt install -y  libmariadbclient-dev-compat libexpat1 libodbc1 libpq5 openssl libcrypto++6\
-    && rm -rf /var/lib/apt/lists/*  &&  rm -f manticore_3.1.2-190822-47b6bc2c-release_stretch_amd64-bin.deb
+    && rm -rf /var/lib/apt/lists/*  &&  rm -f manticore_3.2.0-191017-e526a014-release.stretch_amd64-bin.deb
 
 COPY sphinx.conf /etc/sphinxsearch/
 
