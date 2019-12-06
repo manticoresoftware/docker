@@ -38,12 +38,12 @@ RUN cd /tmp/manticore/build && cmake \
 
 
 FROM ubuntu:bionic
-RUN apt-get update && apt-get install -y mysql-client curl
+RUN apt-get update && apt-get install -y libexpat1 libodbc1 libpq5 openssl libcrypto++6  libmysqlclient20 libicu60
 
 
-COPY --from=builder /bin/indexer /usr/bin/
-COPY --from=builder /bin/indextool /usr/bin/
-COPY --from=builder /bin/searchd /usr/bin/
+COPY --from=builder /usr/bin/indexer /usr/bin/
+COPY --from=builder /usr/bin/indextool /usr/bin/
+COPY --from=builder /usr/bin/searchd /usr/bin/
 COPY --from=builder /usr/lib/libgalera_manticore.so.31 /usr/lib/
 
 RUN cd /var/lib/ && mkdir -p manticore/replication && mkdir -p manticore/log && mkdir manticore/data 
@@ -55,5 +55,5 @@ EXPOSE 9306
 EXPOSE 9308
 EXPOSE 9312
 EXPOSE 9315-9325
-CMD ["/usr/bin/searchd", "--nodetach", "--logreplication"]
+CMD ["/usr/bin/searchd", "--nodetach"]
 
