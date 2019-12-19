@@ -61,15 +61,15 @@ To shutdown the daemon:
 
 ## Mounting points
 
-The configuration folder inside the image is the usual `/etc/sphinxseach`. 
+The configuration folder inside the image is the usual `/etc/manticoresearch`. 
 Index files are located at `/var/lib/manticore/data` and logs at `/var/log/manticore`.
 For persistence, mount these points to your local folders.
 
 ```
-docker run --name manticore -v ~/manticore/etc/:/etc/sphinxsearch/ -v ~/manticore/data/:/var/lib/manticore/data -v ~/manticore/logs/:/var/log/manticore -p 9306:9306 -d manticoresearch/manticore
+docker run --name manticore -v ~/manticore/etc/:/etc/manticoresearch/ -v ~/manticore/data/:/var/lib/manticore/data -v ~/manticore/logs/:/var/log/manticore -p 9306:9306 -d manticoresearch/manticore
 ```
     
-In `~/manticore/` you need to create the `etc/`,`data/` and `logs/` folders, as well as add a valid  [sphinx.conf](https://github.com/manticoresoftware/docker/blob/master/sphinx.conf)   in `~/manticore/etc/`.  
+In `~/manticore/` you need to create the `etc/`,`data/` and `logs/` folders, as well as add a valid  [manticore.conf](https://github.com/manticoresoftware/docker/blob/master/manticore.conf)   in `~/manticore/etc/`.  
 
 `searchd` daemon runs under `manticore`, performing operations on index files (like creating or rotation plain indexes) should be made under `manticore` user (otherwise files will be created under `root` and `searchd` can't manipulate them).
 

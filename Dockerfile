@@ -13,21 +13,21 @@ RUN set -x \
 	&& chmod +x /usr/local/bin/gosu \
 	&& gosu nobody true 
 	
-ENV MANTICORE_VERSION 3.2.0
+ENV MANTICORE_VERSION 3.2.2
 	
-RUN  wget  https://github.com/manticoresoftware/manticoresearch/releases/download/3.2.0/manticore_3.2.0-191017-e526a014-release.stretch_amd64-bin.deb \
-    && dpkg -i manticore_3.2.0-191017-e526a014-release.stretch_amd64-bin.deb \
+RUN  wget  https://github.com/manticoresoftware/manticoresearch/releases/download/3.2.3/manticore_3.2.2-191219-633bb96a-release.stretch_amd64-bin.deb \
+    && dpkg -i manticore_3.2.2-191219-633bb96a-release.stretch_amd64-bin.deb \
     && mkdir -p /var/run/manticore && mkdir -p /var/lib/manticore/replication \
     && apt-get purge -y --auto-remove ca-certificates wget \
     && apt-get update && apt install -y  libmariadbclient-dev-compat libexpat1 libodbc1 libpq5 openssl libcrypto++6\
-    && rm -rf /var/lib/apt/lists/*  &&  rm -f manticore_3.2.0-191017-e526a014-release.stretch_amd64-bin.deb
+    && rm -rf /var/lib/apt/lists/*  &&  rm -f manticore_3.2.2-191219-633bb96a-release.stretch_amd64-bin.deb
 
-COPY sphinx.conf /etc/sphinxsearch/
+COPY manticore.conf /etc/manticoresearch/
 
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["docker-entrypoint.sh"]
-VOLUME /var/lib/manticore /etc/sphinxsearch /var/log/manticore
+VOLUME /var/lib/manticore /etc/manticore /var/log/manticore
 EXPOSE 9306
 EXPOSE 9308
 EXPOSE 9312
