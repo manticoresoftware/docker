@@ -19,7 +19,7 @@ RUN  wget  https://github.com/manticoresoftware/manticoresearch/releases/downloa
     && dpkg -i manticore_3.2.2-191226-afd60463-release.stretch_amd64-bin.deb \
     && mkdir -p /var/run/manticore && mkdir -p /var/lib/manticore/replication \
     && apt-get purge -y --auto-remove ca-certificates wget \
-    && apt-get update && apt install -y  libmariadbclient-dev-compat libexpat1 libodbc1 libpq5 openssl libcrypto++6\
+    && apt-get update && apt install -y  libmariadbclient-dev-compat libexpat1 libodbc1 libpq5 openssl libcrypto++6 mariadb-client\
     && rm -rf /var/lib/apt/lists/*  &&  rm -f manticore_3.2.2-191226-afd60463-release.stretch_amd64-bin.deb
 
 COPY manticore.conf /etc/manticoresearch/
