@@ -23,6 +23,7 @@ RUN  wget  https://github.com/manticoresoftware/manticoresearch/releases/downloa
     && rm -rf /var/lib/apt/lists/*  &&  rm -f manticore_3.2.2-191226-afd60463-release.stretch_amd64-bin.deb
 
 COPY manticore.conf /etc/manticoresearch/
+RUN mkdir -p /var/run/mysqld/ && chown manticore:manticore /var/run/mysqld/
 
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh
@@ -33,4 +34,3 @@ EXPOSE 9308
 EXPOSE 9312
 EXPOSE 9315-9325
 CMD ["searchd", "--nodetach"]
-
