@@ -13,22 +13,23 @@ RUN set -x \
 	&& chmod +x /usr/local/bin/gosu \
 	&& gosu nobody true 
 	
-ENV MANTICORE_VERSION 3.3.0
+ENV MANTICORE_VERSION 3.3.1
 	
-RUN  wget  https://github.com/manticoresoftware/manticoresearch/releases/download/3.3.0/manticore_3.3.0-200204-01fc8ad1-release.stretch_amd64-bin.deb \
-    && dpkg -i manticore_3.3.0-200204-01fc8ad1-release.stretch_amd64-bin.deb \
+RUN  wget  http://dev.manticoresearch.com/downloads/stretch/manticore_3.3.1-200224-ac7bace5-release~stretch_amd64-bin.deb \
+    && dpkg -i manticore_3.3.1-200224-ac7bace5-release~stretch_amd64-bin.deb \
     && mkdir -p /var/run/manticore && mkdir -p /var/lib/manticore/replication \
     && apt-get purge -y --auto-remove ca-certificates wget \
     && apt-get update && apt install -y  libmariadbclient-dev-compat libexpat1 libodbc1 libpq5 openssl libcrypto++6 mariadb-client\
-    && rm -rf /var/lib/apt/lists/*  &&  rm -f manticore_3.3.0-200204-01fc8ad1-release.stretch_amd64-bin.deb
+    && rm -rf /var/lib/apt/lists/*  &&  rm -f manticore_3.3.1-200224-ac7bace5-release~stretch_amd64-bin.deb
 
 COPY manticore.conf /etc/manticoresearch/
+COPY sandbox.sql /sandbox.sql
 RUN mkdir -p /var/run/mysqld/ && chown manticore:manticore /var/run/mysqld/
+VOLUME /var/lib/manticore
 
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["docker-entrypoint.sh"]
-VOLUME /var/lib/manticore /etc/manticoresearch /var/log/manticore
 EXPOSE 9306
 EXPOSE 9308
 EXPOSE 9312
