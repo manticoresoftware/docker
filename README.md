@@ -1,33 +1,21 @@
 # Manticore Search Docker image
 
-This is the official repository of the [Docker image](https://hub.docker.com/r/manticoresearch/manticore/) for [Manticore Search](https://github.com/manticoresoftware/manticore).
+This is the git repo of official [Docker image](https://hub.docker.com/r/manticoresearch/manticore/) for [Manticore Search](https://manticoresearch.com/).
 
-Manticore Search is an open source full-text search server. The image use currently Debian Stretch as the operating system.
+Manticore Search is a powerful free open source search engine with a focus on low latency and high throughput full-text search and high volume stream filtering. It helps thousands of companies from small to large, such as Craigslist, to search and filter petabytes of text data on a single or hundreds of nodes, do stream full-text filtering, add auto-complete, spell correction, more-like-this, faceting and other search-related technologies to their sites.
 
-The searchd daemon runs in nodetach mode. Default configuration includes includes a simple Real-Time index and listen on the default ports ( `9306`  for SphinxQL and `9312` for SphinxAPI).
+The default configuration includes a sample Real-Time index and listens on the default ports ( `9306` to connect with a MySQL client, `9308` - to connect via HTTP and `9312` - to connect via a binary protocol).
 
-The image comes with MySQL  and PostgreSQL client libraries for indexing data from these databases as well as expat library for indexing data from XML files.
-
+The image comes with libraries for easy indexing data from MySQL, PostgreSQL XML and CSV files.
 
 # How to run this image
 
 ## Quick usage
 
-Start a container with Manticore Search: 
+Start a container with Manticore Search and log in to it via mysql client:
   
- ```
-	docker run --name manticore -p 9306:9306 -d manticoresearch/manticore
-  ```
-  
-If you have the mysql client installed on the host you can use it to connect to Manticore:
-  
-  ```
-  $ mysql -h0 -P9306
 ```
-Otherwise the Manticore image comes with the mysql client, just run an `exec` to login inside the manticore container:
-
-```
-    docker exec -it manticore mysql 
+docker run --name manticore -d manticoresearch/manticore && docker exec -it manticore mysql -w
 ```
 
 By default, the image is shipped with a sample index:
@@ -55,7 +43,7 @@ mysql> SELECT * FROM testrt;
 To shutdown the daemon:
 
 ```
-  docker stop manticore
+docker stop manticore
 ```
 
 # Composing
