@@ -21,26 +21,18 @@ _searchd_want_help() {
 }
 
 docker_setup_env() {
-  if [ -n "$QUERYTOLOG" ]; then
+  if [ -n "$QUERY_LOG_TO_STDOUT" ]; then
     sed -i 's/\/var\/log\/manticore\/query.log/\/dev\/stdout' /etc/manticoresearch/manticore.conf
   fi
-  declare -g SANDBOX
-  if [ -z "$(ls -A /var/lib/manticore/data)" ] && [ -z "$LEGACYMODE" ]; then
-    SANDBOX='true'
-  fi
+
 }
 _main() {
   # first arg is `h` or some `--option`
   if [ "${1#-}" != "$1" ]; then
-    set -- searchd "$@"
+    set -- searchd  "$@"
   fi
   if [ "$1" = 'searchd' ] && ! _searchd_want_help "@"; then
     docker_setup_env "$@"
-    if [ -n "$SANDBOX" ]; then
-      searchd
-      mysql -P9306 -h0 </sandbox.sql
-      searchd --stopwait
-    fi
     # allow the container to be started with `--user`
     if [ "$(id -u)" = '0' ]; then
       find /var/lib/manticore /var/log/manticore /var/run/manticore /etc/manticoresearch \! -user manticore -exec chown manticore '{}' +

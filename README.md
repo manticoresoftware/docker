@@ -15,35 +15,37 @@ The image comes with libraries for easy indexing data from MySQL, PostgreSQL XML
 Start a container with Manticore Search and log in to it via mysql client:
   
 ```
-docker run --name manticore -d manticoresearch/manticore && docker exec -it manticore mysql -w
+docker run --name manticore -d manticoresearch/manticore && docker exec -it manticore mysql
 ```
 
-By default, the image is shipped with a sample index:
+The image comes with a sample index found in a sql file:
+
+
+```
+	mysql> source /sandbox.sql
 ```
 
-mysql> SHOW TABLES;
-+--------+------+
-| Index  | Type |
-+--------+------+
-| testrt | rt   |
-+--------+------+
-1 row in set (0,00 sec)
-
-
-mysql> SELECT * FROM testrt;
-+---------------------+------+-------------+-----------------------------------------------------------------------------------------------------------------------------+
-| id                  | gid  | title       | content                                                                                                                     |
-+---------------------+------+-------------+-----------------------------------------------------------------------------------------------------------------------------+
-|                   1 |    1 | Hello World | Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. |
-+---------------------+------+-------------+-----------------------------------------------------------------------------------------------------------------------------+
-1 row in set (0,00 sec)
-```
+Also the mysql client has in history several sample queries executed on the index found in the sandbox.sql.
 
 
 To shutdown the daemon:
 
 ```
 docker stop manticore
+```
+
+
+## Production use 
+
+
+## Mounting points
+
+The image comes with a volume at `/var/lib/manticore/data`, which can be mounted to local folder for persistence.
+To use a custom configuration file, mount `/etc/manticoresearch/manticore.conf`. 
+The SQL port is 9306 and HTTP port is 9308
+
+```
+docker run --name manticore -v ~/manticore/etc/manticore.conf:/etc/manticoresearch/manticore.conf -v ~/manticore/data/:/var/lib/manticore/data -p 9306:9306 -p 9308:9308 -d manticoresearch/manticore
 ```
 
 # Composing
@@ -56,7 +58,7 @@ version: '2.2'
 services:
 
   manticore:
-    image: manticoresearch/manticore:nodemode
+    image: manticoresearch/manticore
     restart: always
     ulimits:
       nproc: 65535
@@ -70,38 +72,41 @@ services:
 
 Run `docker-compose -f stack.yml up` and connect with `docker exec -it docker_manticore_1 mysql`
 
+## HTTP protocol
 
-
-## Mounting points
-
-The image comes with a volume at `/var/lib/manticore/data`, which can be mounted to local folder for persistence.
-To use a custom configuration file, mount `/etc/manticoresearch/manticore.conf`.
+HTTP protocol is exposed on port 9308. You can map the port locally and connect with curl:
 
 ```
-docker run --name manticore -v ~/manticore/etc/manticore.conf:/etc/manticoresearch/manticore.conf -v ~/manticore/data/:/var/lib/manticore/data -p 9306:9306 -d manticoresearch/manticore
+docker run --name manticore   -p 9308:9308  -d manticoresearch/manticore:
 ```
 
+Create a table:
+```
+curl -X POST 'http://127.0.0.1:9308/sql' -d 'mode=raw&query=CREATE TABLE testrt ( title text, content text, gid integer)'
+```
+Insert a document:
+
+```
+curl -X POST 'http://127.0.0.1:9308/json/insert' -d'{"index":"testrt","id":1,"doc":{"title":"Hello","content":"world","gid":1}}'
+```
+
+Perform a simple search:
+
+```
+curl -X POST 'http://127.0.0.1:9308/json/search' -d '{"index":"testrt","query":{"match":{"*":"hello world"}}}'
+```
 
 ## Logging
 
-searchd runs with ``--no-detach`` option, sending it's log to `/dev/stdout`, which can be seen with 
+By default, the daemon is set to send it's logging to `/dev/stdout`, which can be viewed from the host with:
+
 
 ```
   docker logs manticore
 ```
 
-The query log can be diverted to Docker log by passing variable `QUERY_LOG_TO_STD=true`.
+The query log can be diverted to Docker log by passing variable `QUERY_LOG_TO_STDOUT=true`.
 
-# Environment Variables
-
-Several variables can be passed to adjust configuration of the Manticore instance:
-
-### QUERY_LOG_TO_STD
- When set, it will divert the query logging to `/dev/stdout`
- 
-###  LEGACYMODE
-
-This needs to be set when using old searchd way of having indexes defined in the configuration file.
 
 
 ## Multi-node cluster with replication
@@ -114,7 +119,7 @@ version: '2.2'
 services:
 
   manticore-1:
-    image: manticoresearch/manticore:nodemode
+    image: manticoresearch/manticore
     restart: always
     ulimits:
       nproc: 65535
@@ -127,7 +132,7 @@ services:
     networks:
       - manticore
   manticore-2:
-    image: manticoresearch/manticore:nodemode
+    image: manticoresearch/manticore
     restart: always
     ulimits:
       nproc: 65535
@@ -148,6 +153,8 @@ Next, we need to create the cluster: we enter on the first instance and defined 
 
 ```
 $ docker exec -it docker_manticore-1_1 mysql
+
+mysql> CREATE TABLE testrt ( title text, content text, gid integer);
 
 mysql> CREATE CLUSTER posts;
 Query OK, 0 rows affected (0.24 sec)
@@ -182,7 +189,7 @@ mysql> select * from testrt;
 
 ```
 
-# Memory locking and limits
+## Memory locking and limits
 
 It's recommended to overwrite the default ulimits of docker for the Manticore instance:
 
@@ -198,14 +205,16 @@ For best performance, index components can be mlocked into memory. When Manticor
 ```
 
 
-# Legacy mode
+## config mode
 
-Legacy mode which support plain indexes and indexes defined in the configuration can be used with this instance.
-In this case, the `manticore.conf` needs to be mounted and variable `LEGACYMODE=true` passed to the container.
+If you want to run Manticore in config mode - where indexes are defined in the configuration mode - you will need to mount the configuration to the instance:
+
 ```
-docker run --name manticore -v ~/manticore/etc/manticore.conf:/etc/manticoresearch/manticore.conf -v ~/manticore/data/:/var/lib/manticore/data -e LEGACYMODE=true -p 9306:9306 -d manticoresearch/manticore
+docker run --name manticore -v ~/manticore/etc/manticore.conf:/etc/manticoresearch/manticore.conf -v ~/manticore/data/:/var/lib/manticore/data -p 9306:9306 -d manticoresearch/manticore
 ```
-`searchd` daemon runs under `manticore`, performing operations on index files (like creating or rotation plain indexes) should be made under `manticore` user (otherwise files will be created under `root` and `searchd` can't manipulate them).
+
+`searchd` daemon runs under `manticore`, performing operations on index files (like creating or rotation plain indexes) should be made under `manticore` user (otherwise files will be created under `root` and `searchd` can't manipulate them):
+
 ```
 docker exec -it manticore gosu manticore indexer --all --rotate
 ```

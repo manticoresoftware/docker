@@ -24,6 +24,7 @@ RUN  wget  http://dev.manticoresearch.com/downloads/stretch/manticore_3.3.1-2002
 
 COPY manticore.conf /etc/manticoresearch/
 COPY sandbox.sql /sandbox.sql
+COPY .mysql_history /root/.mysql_history
 RUN mkdir -p /var/run/mysqld/ && chown manticore:manticore /var/run/mysqld/
 VOLUME /var/lib/manticore
 
