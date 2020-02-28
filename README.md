@@ -22,7 +22,7 @@ The image comes with a sample index found in a sql file:
 
 
 ```
-	mysql> source /sandbox.sql
+mysql> source /sandbox.sql
 ```
 
 Also the mysql client has in history several sample queries executed on the index found in the sandbox.sql.
@@ -48,7 +48,7 @@ The SQL port is 9306 and HTTP port is 9308
 docker run --name manticore -v ~/manticore/etc/manticore.conf:/etc/manticoresearch/manticore.conf -v ~/manticore/data/:/var/lib/manticore/data -p 9306:9306 -p 9308:9308 -d manticoresearch/manticore
 ```
 
-# Composing
+## Composing
 
 Create a stack.yml
 
@@ -77,7 +77,7 @@ Run `docker-compose -f stack.yml up` and connect with `docker exec -it docker_ma
 HTTP protocol is exposed on port 9308. You can map the port locally and connect with curl:
 
 ```
-docker run --name manticore   -p 9308:9308  -d manticoresearch/manticore:
+docker run --name manticore   -p 9308:9308  -d manticoresearch/manticore
 ```
 
 Create a table:
@@ -102,7 +102,7 @@ By default, the daemon is set to send it's logging to `/dev/stdout`, which can b
 
 
 ```
-  docker logs manticore
+docker logs manticore
 ```
 
 The query log can be diverted to Docker log by passing variable `QUERY_LOG_TO_STDOUT=true`.
@@ -194,7 +194,7 @@ mysql> select * from testrt;
 It's recommended to overwrite the default ulimits of docker for the Manticore instance:
 
 ```
---ulimit nofile=65536:65536
+ --ulimit nofile=65536:65536
 ```
 
 
