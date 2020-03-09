@@ -210,7 +210,7 @@ For best performance, index components can be mlocked into memory. When Manticor
 If you want to run Manticore in config mode - where indexes are defined in the configuration mode - you will need to mount the configuration to the instance:
 
 ```
-docker run --name manticore -v ~/manticore/etc/manticore.conf:/etc/manticoresearch/manticore.conf -v ~/manticore/data/:/var/lib/manticore/data -p 9306:9306 -d manticoresearch/manticore
+docker run --name manticore -v ~/manticore/etc/manticore.conf:/etc/manticoresearch/manticore.conf -v ~/manticore/:/var/lib/manticore -p 9306:9306 -d manticoresearch/manticore
 ```
 
 `searchd` daemon runs under `manticore`, performing operations on index files (like creating or rotation plain indexes) should be made under `manticore` user (otherwise files will be created under `root` and `searchd` can't manipulate them):
