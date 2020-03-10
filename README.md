@@ -36,19 +36,24 @@ Also the mysql client has in history several sample queries that you can run on 
 ## Production use 
 
 
-### Mounting points
+### Ports and mounting points
 
 The image comes with a volume at `/var/lib/manticore/`, which can be mounted to local folder for persistence.
 To use a custom configuration file, mount `/etc/manticoresearch/manticore.conf`. 
 The ports are 9306/9308/9312 for SQL/HTTP/Binary, expose them depending on how you are going to use Manticore. For example:
+```
+docker run --name manticore -v $(pwd)/data:/var/lib/manticore -p 127.0.0.1:9306:9306 -p 127.0.0.1:9308:9308  manticoresearch/manticore
+```
 
 ```
-docker run --name manticore -v ~/manticore/etc/manticore.conf:/etc/manticoresearch/manticore.conf -v ~/manticore/data/:/var/lib/manticore -p 9306:9306 -p 9308:9308 -d manticoresearch/manticore
+docker run --name manticore -v $(pwd)/manticore.conf:/etc/manticoresearch/manticore.conf -v $(pwd)/data:/var/lib/manticore/data/ -p 127.0.0.1:9306:9306 -p 127.0.0.1:9308:9308 -d manticoresearch/manticore
 ```
+
+Make sure to remove `127.0.0.1:` if you want the ports to be available for external hosts.
 
 ### Docker-compose
 
-In many cases you might want to use Manticore together with other images specified in a docker-compose YAML file. Here is the minimal recommend specification for Manticore Search in docker-compose.yml:
+In many cases you might want to use Manticore together with other images specified in a docker-compose YAML file. Here is the minimal recommended specification for Manticore Search in docker-compose.yml:
 
 ```
 version: '2.2'
@@ -58,6 +63,9 @@ services:
     container_name: manticore
     image: manticoresearch/manticore
     restart: always
+    ports:
+      - 127.0.0.1:9306:9306
+      - 127.0.0.1:9308:9308
     ulimits:
       nproc: 65535
       nofile:
@@ -67,11 +75,11 @@ services:
         soft: -1
         hard: -1
     volumes:
-      - ~/data:/var/lib/manticore
-#      - manticore.conf:/etc/manticoresearch/manticore.conf # uncommment if you use a custom config
+      - ./data:/var/lib/manticore
+#      - ./manticore.conf:/etc/manticoresearch/manticore.conf # uncommment if you use a custom config
 ```
 
-You can connect to it by running `docker-compose exec manticore mysql`.
+Besides using the exposed ports 9306 and 9308 you can log into the instance by running `docker-compose exec manticore mysql`.
 
 ### HTTP protocol
 
@@ -112,7 +120,7 @@ The query log can be diverted to Docker log by passing variable `QUERY_LOG_TO_ST
 
 ### Multi-node cluster with replication
 
-A simple `stack.yml` for defining a two node cluster:
+Here is a simple `docker-compose.yml` for defining a two node cluster:
 
 ```
 version: '2.2'
@@ -149,46 +157,50 @@ networks:
   manticore:
     driver: bridge
 ```
-We start it with `docker-compose -f stack.yml up` .
-Next, we need to create the cluster: we enter on the first instance and defined the cluster and attach the sample index to it:
+* Start it: `docker-compose up`
+* Create a cluster: 
+  ```
+  $ docker-compose exec manticore-1 mysql
 
-```
-$ docker exec -it docker_manticore-1_1 mysql
+  mysql> CREATE TABLE testrt ( title text, content text, gid integer);
 
-mysql> CREATE TABLE testrt ( title text, content text, gid integer);
+  mysql> CREATE CLUSTER posts;
+  Query OK, 0 rows affected (0.24 sec)
 
-mysql> CREATE CLUSTER posts;
-Query OK, 0 rows affected (0.24 sec)
+  mysql> ALTER CLUSTER posts ADD testrt;
+  Query OK, 0 rows affected (0.07 sec)
+  
+  MySQL [(none)]> exit
+  Bye
+  ```
+* Join to the the cluster on the 2nd instance
+  ```
+  $ docker-compose exec manticore-2 mysql
 
-mysql> ALTER CLUSTER posts ADD testrt;
-Query OK, 0 rows affected (0.07 sec)
+  mysql> JOIN CLUSTER posts AT 'manticore-1:9312';
+  mysql> INSERT INTO posts:testrt(title,content,gid)  VALUES('hello','world',1);
+  Query OK, 1 row affected (0.00 sec)
+  
+  MySQL [(none)]> exit
+  Bye
+  ```
+  
+* If you now go back to the first instance you'll see the new record:
+  ```
+  $ docker-compose exec manticore-1 mysql
 
-```
-
-And on second instance we join it to the cluster:
-
-```
-$ docker exec -it docker_manticore-2_1 mysql
-
-mysql> JOIN CLUSTER posts AT 'docker_manticore-1_1:9312';
-mysql> INSERT INTO posts:testrt(title,content,gid)  VALUES('hello','world',1);
-Query OK, 1 row affected (0.00 sec)
-```
-
-If we go back to the first instance we'll see the new record:
-```
-$ docker exec -it docker_manticore-1_1 mysql
-
-mysql> select * from testrt;
-+---------------------+------+-------------+-----------------------------------------------------------------------------------------------------------------------------+
+  mysql> select * from testrt;
+  +---------------------+------+-------------+-----------------------------------------------------------------------------------------------------------------------------+
 | id                  | gid  | title       | content                                                                                                                     |
 +---------------------+------+-------------+-----------------------------------------------------------------------------------------------------------------------------+
 |                   1 |    1 | Hello World | Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. |
 | 3891545739431510017 |    1 | hello       | world                                                                                                                       |
 +---------------------+------+-------------+-----------------------------------------------------------------------------------------------------------------------------+
-2 rows in set (0.00 sec)
-
-```
+  2 rows in set (0.00 sec)
+  
+  MySQL [(none)]> exit
+  Bye
+  ```
 
 ## Memory locking and limits
 
@@ -198,23 +210,21 @@ It's recommended to overwrite the default ulimits of docker for the Manticore in
  --ulimit nofile=65536:65536
 ```
 
-
 For best performance, index components can be mlocked into memory. When Manticore is run under Docker, the instance requires additional privileges to allow memory locking. The following options must be added when running the instance:
 
 ```
   --cap-add=IPC_LOCK --ulimit memlock=-1:-1 
 ```
 
-
 ## Custom config
 
-If you want to run Manticore with your custom config, where indexes are defined in the configuration mode - you will need to mount the configuration to the instance:
+If you want to run Manticore with your custom config containing indexes definition you will need to mount the configuration to the instance:
 
 ```
-docker run --name manticore -v ~/manticore/etc/manticore.conf:/etc/manticoresearch/manticore.conf -v ~/manticore/:/var/lib/manticore -p 9306:9306 -d manticoresearch/manticore
+docker run --name manticore -v $(pwd)/manticore.conf:/etc/manticoresearch/manticore.conf -v $(pwd)/data/:/var/lib/manticore -p 127.0.0.1:9306:9306 -d manticoresearch/manticore
 ```
 
-`searchd` daemon runs under `manticore`, performing operations on index files (like creating or rotation plain indexes) should be made under `manticore` user (otherwise files will be created under `root` and `searchd` can't manipulate them):
+Take into account that Manticore search inside the container is run under user `manticore`. Performing operations with index files (like creating or rotating plain indexes) should be also done under `manticore`. Ootherwise the files will be created under `root` and the search daemon won't have rights to open them. For example here is how you can rotate all indexes:
 
 ```
 docker exec -it manticore gosu manticore indexer --all --rotate
@@ -223,4 +233,3 @@ docker exec -it manticore gosu manticore indexer --all --rotate
 # Issues
 
 For reporting issues, please use the [issue tracker](https://github.com/manticoresoftware/docker/issues).
-
