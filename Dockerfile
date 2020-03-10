@@ -1,5 +1,7 @@
 FROM debian:stretch-slim
 
+RUN groupadd -r manticore && useradd -r -g manticore manticore
+
 ENV GOSU_VERSION 1.11
 RUN set -x \
 	&& apt-get update && apt-get install -y --no-install-recommends ca-certificates wget gnupg dirmngr && rm -rf /var/lib/apt/lists/* \
