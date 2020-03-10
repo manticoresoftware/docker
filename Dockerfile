@@ -30,6 +30,7 @@ VOLUME /var/lib/manticore
 
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh
+WORKDIR /var/lib/manticore
 ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 9306
 EXPOSE 9308

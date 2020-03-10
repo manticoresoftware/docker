@@ -22,7 +22,7 @@ _searchd_want_help() {
 
 docker_setup_env() {
   if [ -n "$QUERY_LOG_TO_STDOUT" ]; then
-    sed -i 's/\/var\/log\/manticore\/query.log/\/dev\/stdout' /etc/manticoresearch/manticore.conf
+	ln -sf /dev/stdout /var/log/manticore/query.log
   fi
 
 }
