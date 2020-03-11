@@ -26,7 +26,7 @@ When you exit from the mysql client it stops and removes the container, so use i
 The image comes with a sample index which can be loaded like this:
 
 ```
-mysql> source sandbox.sql
+mysql> source /sandbox.sql
 ```
 
 Also the mysql client has in history several sample queries that you can run on the above index, just use Up/Down arrows in the client to see and run them.
