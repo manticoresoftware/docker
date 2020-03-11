@@ -18,9 +18,7 @@ The image comes with libraries for easy indexing data from MySQL, PostgreSQL XML
 The below is the simplest way to start Manticore in a container and log in to it via mysql client:
   
 ```
-docker run --name manticore --rm -d manticoresearch/manticore \
-&& docker exec -it manticore mysql -w \
-&& docker stop manticore
+docker run --name manticore --rm -d manticoresearch/manticore && docker exec -it manticore mysql -w && docker stop manticore
 ```
 
 When you exit from the mysql client it stops and removes the container, so use it only for testing / sandboxing purposes. See below how to use it in production.
