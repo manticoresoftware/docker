@@ -40,7 +40,7 @@ The image comes with a volume at `/var/lib/manticore/`, which can be mounted to 
 To use a custom configuration file, mount `/etc/manticoresearch/manticore.conf`. 
 The ports are 9306/9308/9312 for SQL/HTTP/Binary, expose them depending on how you are going to use Manticore. For example:
 ```
-docker run --name manticore -v $(pwd)/data:/var/lib/manticore -p 127.0.0.1:9306:9306 -p 127.0.0.1:9308:9308  manticoresearch/manticore
+docker run --name manticore -v $(pwd)/data:/var/lib/manticore -p 127.0.0.1:9306:9306 -p 127.0.0.1:9308:9308 -d manticoresearch/manticore
 ```
 
 ```
