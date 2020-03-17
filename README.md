@@ -36,9 +36,12 @@ Also the mysql client has in history several sample queries that you can run on 
 
 ### Ports and mounting points
 
-The image comes with a volume at `/var/lib/manticore/`, which can be mounted to local folder for persistence.
-To use a custom configuration file, mount `/etc/manticoresearch/manticore.conf`. 
+For data persistence the  folder `/var/lib/manticore/` should be mounted to local storage or other desired storage engine. 
+
+Configuration file inside the instance is located at  `/etc/manticoresearch/manticore.conf`. For custom settings, this file should be mounted to own configuration file.
+
 The ports are 9306/9308/9312 for SQL/HTTP/Binary, expose them depending on how you are going to use Manticore. For example:
+
 ```
 docker run --name manticore -v $(pwd)/data:/var/lib/manticore -p 127.0.0.1:9306:9306 -p 127.0.0.1:9308:9308 -d manticoresearch/manticore
 ```
@@ -113,7 +116,6 @@ docker logs manticore
 ```
 
 The query log can be diverted to Docker log by passing variable `QUERY_LOG_TO_STDOUT=true`.
-
 
 
 ### Multi-node cluster with replication

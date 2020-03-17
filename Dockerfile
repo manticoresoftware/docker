@@ -32,8 +32,6 @@ COPY manticore.conf /etc/manticoresearch/
 COPY sandbox.sql /sandbox.sql
 COPY .mysql_history /root/.mysql_history
 
-VOLUME /var/lib/manticore
-
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh
 WORKDIR /var/lib/manticore
