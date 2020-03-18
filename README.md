@@ -29,7 +29,7 @@ The image comes with a sample index which can be loaded like this:
 mysql> source /sandbox.sql
 ```
 
-Also the mysql client has in history several sample queries that you can run on the above index, just use Up/Down arrows in the client to see and run them.
+Also the mysql client has in history several sample queries that you can run on the above index, just use Up/Down keys in the client to see and run them.
 
 ## Production use 
 
