@@ -24,8 +24,6 @@ RUN set -x \
         && rm -rf /var/lib/apt/lists/*  &&  rm -f manticore_3.4.0-200326-0686d9f0-release.stretch_amd64-bin.deb \
         && rm -f /usr/bin/mariabackup /usr/bin/mysqldump /usr/bin/mysqlslap /usr/bin/mysqladmin /usr/bin/mysqlimport /usr/bin/mysqlshow /usr/bin/mbstream /usr/bin/mysql_waitpid /usr/bin/innotop /usr/bin/mysqlaccess /usr/bin/mytop /usr/bin/mysqlreport /usr/bin/mysqldumpslow /usr/bin/mysql_find_rows /usr/bin/mysql_fix_extensions /usr/bin/mysql_embedded /usr/bin/mysqlcheck \
         && rm -f /usr/bin/spelldump /usr/bin/wordbreaker \
-        && rm -f /usr/bin/perl* \
-        && rm -fr /usr/share/perl/ \
         && mkdir -p /var/run/mysqld/ && chown manticore:manticore /var/run/mysqld/ 
 
 COPY manticore.conf /etc/manticoresearch/
