@@ -25,7 +25,7 @@ RUN set -x \
         && rm -f /usr/bin/mariabackup /usr/bin/mysqldump /usr/bin/mysqlslap /usr/bin/mysqladmin /usr/bin/mysqlimport /usr/bin/mysqlshow /usr/bin/mbstream /usr/bin/mysql_waitpid /usr/bin/innotop /usr/bin/mysqlaccess /usr/bin/mytop /usr/bin/mysqlreport /usr/bin/mysqldumpslow /usr/bin/mysql_find_rows /usr/bin/mysql_fix_extensions /usr/bin/mysql_embedded /usr/bin/mysqlcheck \
         && rm -f /usr/bin/spelldump /usr/bin/wordbreaker \
         && mkdir -p /var/run/mysqld/ && chown manticore:manticore /var/run/mysqld/ \
-        && echo "\n[mysql]\nsilent\nwait\n" >> /etc/mysql/my.cnf 
+        && echo "\n[mysql]\nsilent\nwait\ntable\n" >> /etc/mysql/my.cnf 
 
 COPY manticore.conf /etc/manticoresearch/
 COPY sandbox.sql /sandbox.sql
