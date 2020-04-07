@@ -1,8 +1,8 @@
-FROM ubuntu:bionic as builder
+FROM debian:stretch-slim as builder
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && apt-get install -y \
-    libmysqlclient-dev \
+     libmariadbclient-dev-compat  \
     libexpat-dev \
     libpq-dev \
     unixodbc-dev \
@@ -24,34 +24,19 @@ ENV PATH $PATH:/cmake-3.14.0-Linux-x86_64/bin
 RUN cd /tmp && git clone https://github.com/manticoresoftware/manticore.git manticore \
 && cd manticore && git checkout master && mkdir build && cd build
 
+RUN cd /tmp/manticore/build && cmake -D DISTR_BUILD=bionic .. && make -j4 package
 
-RUN cd /tmp/manticore/build && cmake \
-    -D SPLIT_SYMBOLS=1 \
-    -D WITH_MYSQL=ON \
-    -D WITH_PGSQL=ON \
-    -D WITH_RE2=ON \
-    -D WITH_STEMMER=ON \
-    -D DISABLE_TESTING=ON \
-    -D CMAKE_INSTALL_PREFIX=/ \
-    -D CONFFILEDIR=/etc/manticoresearch \
-    -D SPHINX_TAG=release .. \
-&& make -j4 install
+RUN find . -type f -name '*-bin.deb' -exec sh -c 'x="{}"; mv "$x" manticore_latest.deb' \;
 
+FROM debian:stretch-slim
+RUN apt-get update && apt-get install -y libmariadbclient-dev-compat libexpat1 libodbc1 libpq5 openssl libcrypto++6
 
-FROM ubuntu:bionic
-RUN apt-get update && apt-get install -y libexpat1 libodbc1 libpq5 openssl libcrypto++6  libmysqlclient20 libicu60
+COPY --from=builder /manticore_latest.deb manticore_latest.deb
 
+RUN  dpkg -i manticore_latest.deb && rm -rf manticore_latest.deb
+RUN mkdir -p /var/run/manticore
+COPY manticore.conf /etc/manticoresearch/
 
-COPY --from=builder /usr/bin/indexer /usr/bin/
-COPY --from=builder /usr/bin/indextool /usr/bin/
-COPY --from=builder /usr/bin/searchd /usr/bin/
-COPY --from=builder /usr/lib/libgalera_manticore.so.31 /usr/lib/
-
-RUN cd /var/lib/ && mkdir -p manticore/replication && mkdir -p manticore/log && mkdir manticore/data 
-
-COPY manticore.conf /etc/manticoresearch/manticore.conf
-
-VOLUME /var/lib/manticore /etc/manticoresearch
 EXPOSE 9306
 EXPOSE 9308
 EXPOSE 9312
