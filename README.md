@@ -1,6 +1,6 @@
 # Manticore Search Docker image
 
-This is the git repo of official [Docker image](https://hub.docker.com/r/manticoresearch/manticore/) for [Manticore Search](https://manticoresearch.com/).
+This is the git repo of official [Docker image](https://hub.docker.com/r/manticoresearch/manticore/) for [Manticore Search](https://github.com/manticoresoftware/manticoresearch).
 
 Manticore Search is a powerful free open source search engine with a focus on low latency and high throughput full-text search and high volume stream filtering. It helps thousands of companies from small to large, such as Craigslist, to search and filter petabytes of text data on a single or hundreds of nodes, do stream full-text filtering, add auto-complete, spell correction, more-like-this, faceting and other search-related technologies to their sites.
 
@@ -17,7 +17,7 @@ The image comes with libraries for easy indexing data from MySQL, PostgreSQL XML
 
 The below is the simplest way to start Manticore in a container and log in to it via mysql client:
   
-```
+```bash
 docker run --name manticore --rm -d manticoresearch/manticore && docker exec -it manticore mysql && docker stop manticore
 ```
 
@@ -25,7 +25,7 @@ When you exit from the mysql client it stops and removes the container, so use i
 
 The image comes with a sample index which can be loaded like this:
 
-```
+```mysql
 mysql> source /sandbox.sql
 ```
 
@@ -42,11 +42,11 @@ Configuration file inside the instance is located at  `/etc/manticoresearch/mant
 
 The ports are 9306/9308/9312 for SQL/HTTP/Binary, expose them depending on how you are going to use Manticore. For example:
 
-```
+```bash
 docker run --name manticore -v $(pwd)/data:/var/lib/manticore -p 127.0.0.1:9306:9306 -p 127.0.0.1:9308:9308 -d manticoresearch/manticore
 ```
 
-```
+```bash
 docker run --name manticore -v $(pwd)/manticore.conf:/etc/manticoresearch/manticore.conf -v $(pwd)/data:/var/lib/manticore/data/ -p 127.0.0.1:9306:9306 -p 127.0.0.1:9308:9308 -d manticoresearch/manticore
 ```
 
@@ -56,7 +56,7 @@ Make sure to remove `127.0.0.1:` if you want the ports to be available for exter
 
 In many cases you might want to use Manticore together with other images specified in a docker-compose YAML file. Here is the minimal recommended specification for Manticore Search in docker-compose.yml:
 
-```
+```yaml
 version: '2.2'
 
 services:
@@ -86,23 +86,23 @@ Besides using the exposed ports 9306 and 9308 you can log into the instance by r
 
 HTTP protocol is exposed on port 9308. You can map the port locally and connect with curl:
 
-```
+```bash
 docker run --name manticore -p 9308:9308 -d manticoresearch/manticore
 ```
 
 Create a table:
-```
+```JSON
 curl -X POST 'http://127.0.0.1:9308/sql' -d 'mode=raw&query=CREATE TABLE testrt ( title text, content text, gid integer)'
 ```
 Insert a document:
 
-```
+```JSON
 curl -X POST 'http://127.0.0.1:9308/json/insert' -d'{"index":"testrt","id":1,"doc":{"title":"Hello","content":"world","gid":1}}'
 ```
 
 Perform a simple search:
 
-```
+```JSON
 curl -X POST 'http://127.0.0.1:9308/json/search' -d '{"index":"testrt","query":{"match":{"*":"hello world"}}}'
 ```
 
@@ -111,7 +111,7 @@ curl -X POST 'http://127.0.0.1:9308/json/search' -d '{"index":"testrt","query":{
 By default, the daemon is set to send it's logging to `/dev/stdout`, which can be viewed from the host with:
 
 
-```
+```bash
 docker logs manticore
 ```
 
@@ -122,7 +122,7 @@ The query log can be diverted to Docker log by passing variable `QUERY_LOG_TO_ST
 
 Here is a simple `docker-compose.yml` for defining a two node cluster:
 
-```
+```yaml
 version: '2.2'
 
 services:
@@ -159,7 +159,7 @@ networks:
 ```
 * Start it: `docker-compose up`
 * Create a cluster: 
-  ```
+  ```mysql
   $ docker-compose exec manticore-1 mysql
 
   mysql> CREATE TABLE testrt ( title text, content text, gid integer);
@@ -174,7 +174,7 @@ networks:
   Bye
   ```
 * Join to the the cluster on the 2nd instance
-  ```
+  ```mysql
   $ docker-compose exec manticore-2 mysql
 
   mysql> JOIN CLUSTER posts AT 'manticore-1:9312';
@@ -186,7 +186,7 @@ networks:
   ```
   
 * If you now go back to the first instance you'll see the new record:
-  ```
+  ```mysql
   $ docker-compose exec manticore-1 mysql
 
   MySQL [(none)]> select * from testrt;
@@ -205,13 +205,13 @@ networks:
 
 It's recommended to overwrite the default ulimits of docker for the Manticore instance:
 
-```
+```bash
  --ulimit nofile=65536:65536
 ```
 
 For best performance, index components can be mlocked into memory. When Manticore is run under Docker, the instance requires additional privileges to allow memory locking. The following options must be added when running the instance:
 
-```
+```bash
   --cap-add=IPC_LOCK --ulimit memlock=-1:-1 
 ```
 
@@ -219,13 +219,13 @@ For best performance, index components can be mlocked into memory. When Manticor
 
 If you want to run Manticore with your custom config containing indexes definition you will need to mount the configuration to the instance:
 
-```
+```bash
 docker run --name manticore -v $(pwd)/manticore.conf:/etc/manticoresearch/manticore.conf -v $(pwd)/data/:/var/lib/manticore -p 127.0.0.1:9306:9306 -d manticoresearch/manticore
 ```
 
 Take into account that Manticore search inside the container is run under user `manticore`. Performing operations with index files (like creating or rotating plain indexes) should be also done under `manticore`. Otherwise the files will be created under `root` and the search daemon won't have rights to open them. For example here is how you can rotate all indexes:
 
-```
+```bash
 docker exec -it manticore gosu manticore indexer --all --rotate
 ```
  
