@@ -11,7 +11,7 @@ The default configuration includes a sample Real-Time index and listens on the d
 
 The image comes with libraries for easy indexing data from MySQL, PostgreSQL XML and CSV files.
 
-# How to run this image
+# How to run Manticore Search Docker image
 
 ## Quick usage
 
