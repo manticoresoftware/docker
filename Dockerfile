@@ -3,7 +3,6 @@ FROM debian:buster-slim
 RUN groupadd -r manticore && useradd -r -g manticore manticore
 
 ENV GOSU_VERSION 1.11
-ENV MANTICORE_VERSION 3.4.2
 
 RUN set -x \
 	&& apt-get update && apt-get install -y --no-install-recommends ca-certificates wget gnupg dirmngr && rm -rf /var/lib/apt/lists/* \
@@ -15,10 +14,13 @@ RUN set -x \
 	&& { command -v gpgconf > /dev/null && gpgconf --kill all || :; } \
 	&& rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
 	&& chmod +x /usr/local/bin/gosu \
-	&& gosu nobody true \
-        && wget  https://github.com/manticoresoftware/manticoresearch/releases/download/3.4.2/manticore_3.4.2-200410-69033058-release.buster_amd64-bin.deb \
-        && dpkg -i manticore_3.4.2-200410-69033058-release.buster_amd64-bin.deb \
-        && mkdir -p /var/run/manticore && mkdir -p /var/lib/manticore/replication \
+	&& gosu nobody true
+
+RUN wget https://repo.manticoresearch.com/manticore-repo.noarch.deb \
+    && dpkg -i manticore-repo.noarch.deb \
+    && apt update && apt install -y manticore-bin
+
+RUN mkdir -p /var/run/manticore && mkdir -p /var/lib/manticore/replication \
         && apt-get update && apt install -y libmariadbclient-dev-compat libexpat1 libodbc1 libpq5 openssl libcrypto++6 mariadb-client \
         && wget http://security.debian.org/debian-security/pool/updates/main/o/openssl/libssl1.0.0_1.0.1t-1+deb8u12_amd64.deb \
         && wget https://downloads.mariadb.com/Connectors/c/connector-c-3.1.7/mariadb-connector-c-3.1.7-linux-x86_64.tar.gz \
