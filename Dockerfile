@@ -16,8 +16,8 @@ RUN set -x \
 	&& chmod +x /usr/local/bin/gosu \
 	&& gosu nobody true
 
-RUN wget https://repo.manticoresearch.com/manticore-repo.noarch.deb \
-    && dpkg -i manticore-repo.noarch.deb \
+RUN wget https://repo.manticoresearch.com/manticore-dev-repo.noarch.deb \
+    && dpkg -i manticore-dev-repo.noarch.deb \
     && apt update && apt install -y manticore-bin
 
 RUN mkdir -p /var/run/manticore && mkdir -p /var/lib/manticore/replication \
