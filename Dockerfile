@@ -17,7 +17,7 @@ RUN set -x \
 	&& gosu nobody true \
 	&& wget https://repo.manticoresearch.com/manticore-dev-repo.noarch.deb \
     && dpkg -i manticore-dev-repo.noarch.deb \
-    && apt update && apt install -y manticore-bin \
+    && apt update && apt install -y manticore \
     && mkdir -p /var/run/manticore && mkdir -p /var/lib/manticore/replication \
     && apt-get update && apt install -y libmariadbclient-dev-compat libexpat1 libodbc1 libpq5 openssl libcrypto++6 mariadb-client \
     && wget http://security.debian.org/debian-security/pool/updates/main/o/openssl/libssl1.0.0_1.0.1t-1+deb8u12_amd64.deb \
