@@ -27,7 +27,7 @@ RUN set -x \
     && rm -rf mariadb-connector-c-3.1.7-linux-x86_64.tar.gz mariadb-connector-c-3.1.7-linux-x86_64/  \
     && apt-get purge -y --auto-remove ca-certificates wget \
     && dpkg --force-all -i libssl1.0.0_1.0.1t-1+deb8u12_amd64.deb  && rm -rf libssl1.0.0_1.0.1t-1+deb8u12_amd64.deb\
-    && rm -rf /var/lib/apt/lists/*  &&  rm -f manticore_3.4.2-200410-69033058-release.buster_amd64-bin.deb \
+    && rm -rf /var/lib/apt/lists/*  \
     && rm -f /usr/bin/mariabackup /usr/bin/mysqldump /usr/bin/mysqlslap /usr/bin/mysqladmin /usr/bin/mysqlimport /usr/bin/mysqlshow /usr/bin/mbstream /usr/bin/mysql_waitpid /usr/bin/innotop /usr/bin/mysqlaccess /usr/bin/mytop /usr/bin/mysqlreport /usr/bin/mysqldumpslow /usr/bin/mysql_find_rows /usr/bin/mysql_fix_extensions /usr/bin/mysql_embedded /usr/bin/mysqlcheck \
     && rm -f /usr/bin/spelldump /usr/bin/wordbreaker \
     && mkdir -p /var/run/mysqld/ && chown manticore:manticore /var/run/mysqld/ \
