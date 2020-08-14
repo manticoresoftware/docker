@@ -67,8 +67,6 @@ _replace_conf_from_env() {
         done
       fi
 
-      echo "Replace in confg $newname = $value"
-
       if [[ -z $sed_query ]]; then
         sed_query="s/(#\s)*?$oldname\s?=\s?.*?$/$newname = $value/g"
       else
