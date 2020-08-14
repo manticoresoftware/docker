@@ -22,14 +22,15 @@ _searchd_want_help() {
 
 docker_setup_env() {
   if [ -n "$QUERY_LOG_TO_STDOUT" ]; then
-	ln -sf /dev/stdout /var/log/manticore/query.log
+    ln -sf /dev/stdout /var/log/manticore/query.log
   fi
 
 }
 _main() {
+  _replace_conf_from_env
   # first arg is `h` or some `--option`
   if [ "${1#-}" != "$1" ]; then
-    set -- searchd  "$@"
+    set -- searchd "$@"
   fi
   if [ "$1" = 'searchd' ] && ! _searchd_want_help "@"; then
     docker_setup_env "$@"
@@ -41,8 +42,48 @@ _main() {
   fi
   exec "$@"
 }
+
+_replace_conf_from_env() {
+
+  sed_query=""
+
+  while IFS='=' read -r oldname value; do
+    if [[ $oldname == 'searchd_'* || $oldname == 'common_'* ]]; then
+      value=$(echo ${!oldname} | sed 's/\//\\\//g')
+      oldname=$(echo $oldname | sed "s/searchd_//g;s/common_//g;")
+      newname=$oldname
+
+      if [[ $newname == 'listen_env' ]]; then
+        newname="listen"
+        IFS='|' read -ra ADDR <<<"$value"
+        count=0
+
+        for i in "${ADDR[@]}"; do
+          if [[ $count == 0 ]]; then
+            value=$i
+          else
+            value="$value\n    listen = $i"
+          fi
+          count=$((count + 1))
+        done
+      fi
+
+      echo "Replace in confg $newname = $value"
+
+      if [[ -z $sed_query ]]; then
+        sed_query="s/(#\s)*?$oldname\s?=\s?.*?$/$newname = $value/g"
+      else
+        sed_query="$sed_query;s/(#\s)*?$oldname\s?=\s?.*?$/$newname = $value/g"
+      fi
+
+    fi
+  done < <(env)
+
+  if [[ ! -z $sed_query ]]; then
+    sed -i -E "$sed_query" /etc/manticoresearch/manticore.conf
+  fi
+}
 # If we are sourced from elsewhere, don't perform any further actions
 if ! _is_sourced; then
   _main "$@"
 fi
-

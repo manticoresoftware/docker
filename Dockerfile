@@ -36,7 +36,7 @@ RUN set -x \
 COPY manticore.conf /etc/manticoresearch/
 COPY sandbox.sql /sandbox.sql
 COPY .mysql_history /root/.mysql_history
-COPY runner.sh /var/lib/manticore
+
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh
 WORKDIR /var/lib/manticore
@@ -47,4 +47,4 @@ EXPOSE 9312
 EXPOSE 9315-9325
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
-CMD ["/var/lib/manticore/runner.sh"]
+CMD ["searchd", "--nodetach"]
