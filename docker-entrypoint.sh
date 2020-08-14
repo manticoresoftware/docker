@@ -1,6 +1,5 @@
 #!/bin/bash
 set -eo pipefail
-
 # check to see if this file is being run or sourced from another script
 _is_sourced() {
   # https://unix.stackexchange.com/a/215279
@@ -27,7 +26,6 @@ docker_setup_env() {
 
 }
 _main() {
-  _replace_conf_from_env
   # first arg is `h` or some `--option`
   if [ "${1#-}" != "$1" ]; then
     set -- searchd "$@"
@@ -40,6 +38,7 @@ _main() {
       exec gosu manticore "$0" "$@"
     fi
   fi
+  _replace_conf_from_env
   exec "$@"
 }
 
