@@ -1,10 +1,10 @@
-FROM debian:buster-slim
+FROM ubuntu:focal
 
 RUN groupadd -r manticore && useradd -r -g manticore manticore
 
 ENV GOSU_VERSION 1.11
 ENV MANTICORE_VERSION 3.5.0
-ARG FULL_VERSION="${MANTICORE_VERSION}-200722-1d34c491"
+
 RUN set -x \
 	&& apt-get update && apt-get install -y --no-install-recommends ca-certificates wget gnupg dirmngr && rm -rf /var/lib/apt/lists/* \
 	&& wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
@@ -16,18 +16,13 @@ RUN set -x \
 	&& rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
 	&& chmod +x /usr/local/bin/gosu \
 	&& gosu nobody true \
-        && wget  https://repo.manticoresearch.com/repository/manticoresearch_buster/pool/m/manticore/manticore_${FULL_VERSION}_amd64.deb \
-        && dpkg -i manticore_${FULL_VERSION}_amd64.deb \
+        && wget https://repo.manticoresearch.com/manticore-repo.noarch.deb \
+        && dpkg -i manticore-repo.noarch.deb \
+        && apt update && apt install -y manticore \
         && mkdir -p /var/run/manticore && mkdir -p /var/lib/manticore/replication \
-        && apt-get update && apt install -y libmariadbclient-dev-compat libexpat1 libodbc1 libpq5 openssl libcrypto++6 mariadb-client \
-        && wget http://security.debian.org/debian-security/pool/updates/main/o/openssl/libssl1.0.0_1.0.1t-1+deb8u12_amd64.deb \
-        && wget https://downloads.mariadb.com/Connectors/c/connector-c-3.1.7/mariadb-connector-c-3.1.7-linux-x86_64.tar.gz \
-        && tar zxvf mariadb-connector-c-3.1.7-linux-x86_64.tar.gz \
-        && cp mariadb-connector-c-3.1.7-linux-x86_64/lib/mariadb/plugin/caching_sha2_password.so /usr/lib/x86_64-linux-gnu/mariadb19/plugin/ \
-        && rm -rf mariadb-connector-c-3.1.7-linux-x86_64.tar.gz mariadb-connector-c-3.1.7-linux-x86_64/  \
+        && apt-get update && apt install -y libmysqlclient21 libexpat1 libodbc1 libpq5 openssl libcrypto++6 mysql-client \
         && apt-get purge -y --auto-remove ca-certificates wget \
-        && dpkg --force-all -i libssl1.0.0_1.0.1t-1+deb8u12_amd64.deb  && rm -rf libssl1.0.0_1.0.1t-1+deb8u12_amd64.deb\
-        && rm -rf /var/lib/apt/lists/*  &&  rm -f manticore_${FULL_VERSION}_amd64.deb \
+        && rm -rf /var/lib/apt/lists/* \
         && rm -f /usr/bin/mariabackup /usr/bin/mysqldump /usr/bin/mysqlslap /usr/bin/mysqladmin /usr/bin/mysqlimport /usr/bin/mysqlshow /usr/bin/mbstream /usr/bin/mysql_waitpid /usr/bin/innotop /usr/bin/mysqlaccess /usr/bin/mytop /usr/bin/mysqlreport /usr/bin/mysqldumpslow /usr/bin/mysql_find_rows /usr/bin/mysql_fix_extensions /usr/bin/mysql_embedded /usr/bin/mysqlcheck \
         && rm -f /usr/bin/spelldump /usr/bin/wordbreaker \
         && mkdir -p /var/run/mysqld/ && chown manticore:manticore /var/run/mysqld/ \
