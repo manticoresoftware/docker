@@ -52,8 +52,8 @@ _replace_conf_from_env() {
       oldname=$(echo $oldname | sed "s/searchd_//g;s/common_//g;")
       newname=$oldname
 
-      if [[ $newname == 'listen_env' ]]; then
-        newname="listen"
+      if [[ $newname == 'listen' ]]; then
+        oldname="listen_env"
         IFS='|' read -ra ADDR <<<"$value"
         count=0
 
