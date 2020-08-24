@@ -238,13 +238,13 @@ The settings must be prefixed with their section name, example for in case of `m
 docker run --name manticore  -p 127.0.0.1:9306:9306  -e searchd_mysql_version_string='5.5.0' -d manticoresearch/manticore
 ```
 
-In case of `listen` directive, you can pass using Docker variable `searchd_listen_env`  new listening interfaces in addition to the default ones. Multiple interfaces can be declared separated by semi-colon ("|").
+In case of `listen` directive, you can pass using Docker variable `searchd_listen`  new listening interfaces in addition to the default ones. Multiple interfaces can be declared separated by semi-colon ("|").
 For listening only on  network address, the `$ip` (retrieved internally from `hostname -i`) can be used as address alias.
 
-For example `-e searchd_listen_env='9316:http|9307:mysql'` will add an additional SQL interface on port 9307, a SQL VIP on 5443 running only on the instance IP  and HTTP on port 93126, beside the defaults on 9306 and 9308,, respectively.
+For example `-e searchd_listen='9316:http|9307:mysql'` will add an additional SQL interface on port 9307, a SQL VIP on 5443 running only on the instance IP  and HTTP on port 93126, beside the defaults on 9306 and 9308, respectively.
 
 ```bash
-$ docker run --rm -p 1188:9307  -e searchd_mysql_version_string='5.5.0' -e searchd_listen_env='9316:http|9307:mysql||$ip:5443:mysql_vip'  manticore
+$ docker run --rm -p 1188:9307  -e searchd_mysql_version_string='5.5.0' -e searchd_listen='9316:http|9307:mysql|$ip:5443:mysql_vip'  manticore
 [Mon Aug 17 07:31:58.719 2020] [1] using config file '/etc/manticoresearch/manticore.conf' (9130 chars)...
 listening on all interfaces for http, port=9316
 listening on all interfaces for mysql, port=9307
