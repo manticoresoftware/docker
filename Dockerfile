@@ -3,7 +3,7 @@ FROM ubuntu:focal
 RUN groupadd -r manticore && useradd -r -g manticore manticore
 
 ENV GOSU_VERSION 1.11
-ENV MANTICORE_VERSION 3.5.0
+ENV MANTICORE_VERSION 3.5.2
 
 RUN set -x \
 	&& apt-get update && apt-get install -y --no-install-recommends ca-certificates wget gnupg dirmngr && rm -rf /var/lib/apt/lists/* \
