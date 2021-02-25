@@ -39,7 +39,6 @@ ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 9306
 EXPOSE 9308
 EXPOSE 9312
-EXPOSE 9315-9325
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 CMD ["searchd", "--nodetach"]
