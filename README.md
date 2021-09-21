@@ -18,7 +18,7 @@ The image comes with libraries for easy indexing data from MySQL, PostgreSQL XML
 The below is the simplest way to start Manticore in a container and log in to it via mysql client:
   
 ```bash
-docker run --name manticore --rm -d manticoresearch/manticore && docker exec -it manticore mysql && docker stop manticore
+docker run --name manticore --rm -d manticoresearch/manticore && sleep 3 && docker exec -it manticore mysql && docker stop manticore
 ```
 
 When you exit from the mysql client it stops and removes the container, so **use it only for testing / sandboxing purposes**. See below how to use it in production.
@@ -43,7 +43,8 @@ Configuration file inside the instance is located at  `/etc/manticoresearch/mant
 The ports are 9306/9308/9312 for SQL/HTTP/Binary, expose them depending on how you are going to use Manticore. For example:
 
 ```bash
-docker run --name manticore -v $(pwd)/data:/var/lib/manticore -p 127.0.0.1:9306:9306 -p 127.0.0.1:9308:9308 -d manticoresearch/manticore
+
+--name manticore -v $(pwd)/data:/var/lib/manticore -p 127.0.0.1:9306:9306 -p 127.0.0.1:9308:9308 -d manticoresearch/manticore
 ```
 
 ```bash
