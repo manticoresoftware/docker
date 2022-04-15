@@ -38,14 +38,13 @@ Also the mysql client has in history several sample queries that you can run on 
 
 For data persistence the  folder `/var/lib/manticore/` should be mounted to local storage or other desired storage engine. 
 
+```bash
+docker run --name manticore -v $(pwd)/data:/var/lib/manticore -p 127.0.0.1:9306:9306 -p 127.0.0.1:9308:9308 -d manticoresearch/manticore
+```
+
 Configuration file inside the instance is located at  `/etc/manticoresearch/manticore.conf`. For custom settings, this file should be mounted to own configuration file.
 
 The ports are 9306/9308/9312 for SQL/HTTP/Binary, expose them depending on how you are going to use Manticore. For example:
-
-```bash
-
---name manticore -v $(pwd)/data:/var/lib/manticore -p 127.0.0.1:9306:9306 -p 127.0.0.1:9308:9308 -d manticoresearch/manticore
-```
 
 ```bash
 docker run --name manticore -v $(pwd)/manticore.conf:/etc/manticoresearch/manticore.conf -v $(pwd)/data:/var/lib/manticore/ -p 127.0.0.1:9306:9306 -p 127.0.0.1:9308:9308 -d manticoresearch/manticore
@@ -92,25 +91,24 @@ docker run --name manticore -p 9308:9308 -d manticoresearch/manticore
 ```
 
 Create a table:
-```JSON
+```bash
 curl -X POST 'http://127.0.0.1:9308/sql' -d 'mode=raw&query=CREATE TABLE testrt ( title text, content text, gid integer)'
 ```
 Insert a document:
 
-```JSON
+```bash
 curl -X POST 'http://127.0.0.1:9308/json/insert' -d'{"index":"testrt","id":1,"doc":{"title":"Hello","content":"world","gid":1}}'
 ```
 
 Perform a simple search:
 
-```JSON
+```bash
 curl -X POST 'http://127.0.0.1:9308/json/search' -d '{"index":"testrt","query":{"match":{"*":"hello world"}}}'
 ```
 
 ### Logging
 
 By default, the daemon is set to send it's logging to `/dev/stdout`, which can be viewed from the host with:
-
 
 ```bash
 docker logs manticore
