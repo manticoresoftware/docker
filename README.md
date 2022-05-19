@@ -2,7 +2,7 @@
 
 This is the git repo of official [Docker image](https://hub.docker.com/r/manticoresearch/manticore/) for [Manticore Search](https://github.com/manticoresoftware/manticoresearch). 
 
-Manticore Search is a powerful free open source search engine with a focus on low latency and high throughput full-text search and high volume stream filtering. It helps thousands of companies from small to large, such as Craigslist, to search and filter petabytes of text data on a single or hundreds of nodes, do stream full-text filtering, add auto-complete, spell correction, more-like-this, faceting and other search-related technologies to their sites.
+Manticore Search is an easy to use open source fast database for search. It helps thousands of companies from small to large, such as Craigslist, to search and filter petabytes of text data on a single or hundreds of nodes, do stream full-text filtering, add auto-complete, spell correction, more-like-this, faceting and other search-related technologies to their websites and applications.
 
 The default configuration includes a sample Real-Time index and listens on the default ports:
   * `9306` for connections from a MySQL client
@@ -108,14 +108,13 @@ curl -X POST 'http://127.0.0.1:9308/json/search' -d '{"index":"testrt","query":{
 
 ### Logging
 
-By default, the daemon is set to send it's logging to `/dev/stdout`, which can be viewed from the host with:
+By default, the search daemon logs to `/dev/stdout` and the log can be read on the host with:
 
 ```bash
 docker logs manticore
 ```
 
-The query log can be diverted to Docker log by passing variable `QUERY_LOG_TO_STDOUT=true`.
-
+If you want to get log of your queries the same way you can do it by passing variable `QUERY_LOG_TO_STDOUT=true`.
 
 ### Multi-node cluster with replication
 
