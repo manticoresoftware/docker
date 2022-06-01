@@ -28,6 +28,18 @@ RUN set -x \
     && mkdir -p /var/run/mysqld/ && chown manticore:manticore /var/run/mysqld/ \
     && echo "\n[mysql]\nsilent\nwait\ntable\n" >> /etc/mysql/my.cnf
 
+# Add SQL Server ODBC Driver 17 for Ubuntu 18.04
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+RUN curl https://packages.microsoft.com/config/ubuntu/18.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
+RUN apt-get update
+RUN ACCEPT_EULA=Y apt-get install -y --allow-unauthenticated msodbcsql17
+RUN ACCEPT_EULA=Y apt-get install -y --allow-unauthenticated mssql-tools
+RUN echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
+RUN echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+
+COPY startup.sh /
+RUN chmod +x /startup.sh
+ENTRYPOINT ["sh","/startup.sh"]
 COPY manticore.conf /etc/manticoresearch/
 COPY sandbox.sql /sandbox.sql
 COPY .mysql_history /root/.mysql_history
