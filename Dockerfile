@@ -1,12 +1,27 @@
-FROM ubuntu:bionic
+FROM ubuntu:focal
+
+ARG BUILD_TARGET
 
 RUN groupadd -r manticore && useradd -r -g manticore manticore
 
 ENV GOSU_VERSION 1.11
-ENV MANTICORE_VERSION 5.0.2
 
-RUN set -x \
-    && apt-get update && apt-get install -y --no-install-recommends ca-certificates wget gnupg dirmngr && rm -rf /var/lib/apt/lists/* \
+# Specify do we build release image or dev build. Also this paramether affects Manticore Columnar lib installation.
+# In dev case we download the latest build. If prod - use $COLUMNAR_URL to download package
+
+# Variable can take values:
+
+# ENV BUILD_TARGET "dev"
+# ENV BUILD_TARGET "release"
+
+ENV BUILD_TARGET=${BUILD_TARGET:-"release"}
+
+# Columnar package URL. Need only for release bulds
+ENV COLUMNAR_URL https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-amd64/manticore-columnar-lib_1.15.4-220522-2fef34e_amd64.deb
+
+RUN export BUILD_SUFFIX="$([ "${BUILD_TARGET}" = "release" ] && echo "" || echo "dev-")" \
+    && set -x \
+    && apt-get update && apt-get install -y --no-install-recommends ca-certificates binutils wget gnupg dirmngr && rm -rf /var/lib/apt/lists/* \
     && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
     && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
     && export GNUPGHOME="$(mktemp -d)" \
@@ -16,12 +31,12 @@ RUN set -x \
     && rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
     && chmod +x /usr/local/bin/gosu \
     && gosu nobody true \
-    && wget https://repo.manticoresearch.com/manticore-repo.noarch.deb \
-    && dpkg -i manticore-repo.noarch.deb \
+    && wget https://repo.manticoresearch.com/manticore-${BUILD_SUFFIX}repo.noarch.deb \
+    && dpkg -i manticore-${BUILD_SUFFIX}repo.noarch.deb \
     && apt-key adv --fetch-keys 'https://repo.manticoresearch.com/GPG-KEY-manticore' && apt update && apt install -y manticore \
     && mkdir -p /var/run/manticore && mkdir -p /var/lib/manticore/replication \
-    && apt-get update && apt install -y  libexpat1 libodbc1 libpq5 openssl libcrypto++6 libmysqlclient20 mysql-client \
-    && apt-get purge -y --auto-remove ca-certificates wget \
+    && apt-get update && apt install -y  libexpat1 libodbc1 libpq5 openssl libcrypto++6 libmysqlclient21 mysql-client \
+    && apt-get purge -y --auto-remove \
     && rm -rf /var/lib/apt/lists/* \
     && rm -f /usr/bin/mariabackup /usr/bin/mysqldump /usr/bin/mysqlslap /usr/bin/mysqladmin /usr/bin/mysqlimport /usr/bin/mysqlshow /usr/bin/mbstream /usr/bin/mysql_waitpid /usr/bin/innotop /usr/bin/mysqlaccess /usr/bin/mytop /usr/bin/mysqlreport /usr/bin/mysqldumpslow /usr/bin/mysql_find_rows /usr/bin/mysql_fix_extensions /usr/bin/mysql_embedded /usr/bin/mysqlcheck \
     && rm -f /usr/bin/spelldump /usr/bin/wordbreaker \

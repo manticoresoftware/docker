@@ -1,5 +1,6 @@
 #!/bin/bash
 set -eo pipefail
+
 # check to see if this file is being run or sourced from another script
 _is_sourced() {
   # https://unix.stackexchange.com/a/215279
@@ -24,6 +25,39 @@ docker_setup_env() {
     ln -sf /dev/stdout /var/log/manticore/query.log
   fi
 
+if [ -n "$MCL" ]; then
+    export LIB_MANTICORE_COLUMNAR="/var/lib/manticore/columnar/lib_manticore_columnar.so"
+    export LIB_MANTICORE_SECONDARY="/var/lib/manticore/columnar/lib_manticore_secondary.so"
+
+   if [[ ! -f "$LIB_MANTICORE_COLUMNAR" && ! -f "$LIB_MANTICORE_COLUMNAR" ]]; then
+      mkdir /var/lib/manticore/columnar/
+
+      IS_RELEASE_DIGIT=$(searchd -v | head -n 1 | cut -d" " -f2| cut -d. -f3)
+      if [[ $(($IS_RELEASE_DIGIT % 2)) -ne 0 ]]; then
+
+          apt-get update && apt --fix-broken install -y && apt-get install -y manticore-columnar-lib
+
+          ls /var/lib/manticore/columnar/
+          ls /usr/share/manticore/modules/
+
+          cp /usr/share/manticore/modules/lib_manticore_columnar.so $LIB_MANTICORE_COLUMNAR && \
+          cp /usr/share/manticore/modules/lib_manticore_secondary.so $LIB_MANTICORE_SECONDARY
+
+        else
+
+          echo "Release"
+          wget -P /tmp $COLUMNAR_URL
+
+          LAST_PATH=$(pwd)
+          cd /tmp
+          PACKAGE_NAME=$(ls | grep manticore-columnar | head -n 1)
+          ar -x $PACKAGE_NAME
+          tar -xf data.tar.gz
+          find . -name '*.so' -exec cp {} /var/lib/manticore/columnar/ \;
+          cd $LAST_PATH
+      fi
+   fi
+fi
 }
 _main() {
   # first arg is `h` or some `--option`
