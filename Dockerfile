@@ -1,26 +1,17 @@
 FROM ubuntu:focal
 
 ARG BUILD_TARGET
+ARG DAEMON_URL
+ARG MCL_URL
 
 RUN groupadd -r manticore && useradd -r -g manticore manticore
 
 ENV GOSU_VERSION 1.11
+ENV MCL_URL=${MCL_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-amd64/manticore-columnar-lib_1.15.4-220522-2fef34e_amd64.deb"}
+ENV DAEMON_URL=${DAEMON_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/manticore_5.0.2-220530-348514c86_amd64.tgz"}
+ENV BUILD_TARGET=${BUILD_TARGET:-"dev"}
 
-# Specify do we build release image or dev build. Also this paramether affects Manticore Columnar lib installation.
-# In dev case we download the latest build. If prod - use $COLUMNAR_URL to download package
-
-# Variable can take values:
-
-# ENV BUILD_TARGET "dev"
-# ENV BUILD_TARGET "release"
-
-ENV BUILD_TARGET=${BUILD_TARGET:-"release"}
-
-# Columnar package URL. Need only for release bulds
-ENV COLUMNAR_URL https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-amd64/manticore-columnar-lib_1.15.4-220522-2fef34e_amd64.deb
-
-RUN export BUILD_SUFFIX="$([ "${BUILD_TARGET}" = "release" ] && echo "" || echo "dev-")" \
-    && set -x \
+RUN set -x \
     && apt-get update && apt-get install -y --no-install-recommends ca-certificates binutils wget gnupg dirmngr && rm -rf /var/lib/apt/lists/* \
     && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
     && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
@@ -30,18 +21,29 @@ RUN export BUILD_SUFFIX="$([ "${BUILD_TARGET}" = "release" ] && echo "" || echo 
     && { command -v gpgconf > /dev/null && gpgconf --kill all || :; } \
     && rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
     && chmod +x /usr/local/bin/gosu \
-    && gosu nobody true \
-    && wget https://repo.manticoresearch.com/manticore-${BUILD_SUFFIX}repo.noarch.deb \
-    && dpkg -i manticore-${BUILD_SUFFIX}repo.noarch.deb \
-    && apt-key adv --fetch-keys 'https://repo.manticoresearch.com/GPG-KEY-manticore' && apt update && apt install -y manticore \
+    && gosu nobody true && \
+    if [ "${BUILD_TARGET}" = "dev" ]; then \
+      wget https://repo.manticoresearch.com/manticore-dev-repo.noarch.deb \
+      && dpkg -i manticore-dev-repo.noarch.deb \
+      && apt-key adv --fetch-keys 'https://repo.manticoresearch.com/GPG-KEY-manticore' && apt update && apt install -y manticore \
+      && apt-get update  \
+      && echo $(apt-get -y download --print-uris manticore-columnar-lib | cut -d" " -f1 | cut -d "'" -f 2) > /var/lib/manticore/mcl.url ;\
+    else \
+      wget $DAEMON_URL && ARCHIVE_NAME=$(ls | grep '.tgz' | head -n1 ) && tar -xf $ARCHIVE_NAME && rm $ARCHIVE_NAME && \
+      dpkg -i manticore* && echo $MCL_URL > /var/lib/manticore/mcl.url && rm *.deb ; \
+    fi \
     && mkdir -p /var/run/manticore && mkdir -p /var/lib/manticore/replication \
     && apt-get update && apt install -y  libexpat1 libodbc1 libpq5 openssl libcrypto++6 libmysqlclient21 mysql-client \
     && apt-get purge -y --auto-remove \
     && rm -rf /var/lib/apt/lists/* \
-    && rm -f /usr/bin/mariabackup /usr/bin/mysqldump /usr/bin/mysqlslap /usr/bin/mysqladmin /usr/bin/mysqlimport /usr/bin/mysqlshow /usr/bin/mbstream /usr/bin/mysql_waitpid /usr/bin/innotop /usr/bin/mysqlaccess /usr/bin/mytop /usr/bin/mysqlreport /usr/bin/mysqldumpslow /usr/bin/mysql_find_rows /usr/bin/mysql_fix_extensions /usr/bin/mysql_embedded /usr/bin/mysqlcheck \
+    && rm -f /usr/bin/mariabackup /usr/bin/mysqldump /usr/bin/mysqlslap /usr/bin/mysqladmin /usr/bin/mysqlimport  \
+    /usr/bin/mysqlshow /usr/bin/mbstream /usr/bin/mysql_waitpid /usr/bin/innotop /usr/bin/mysqlaccess /usr/bin/mytop  \
+    /usr/bin/mysqlreport /usr/bin/mysqldumpslow /usr/bin/mysql_find_rows /usr/bin/mysql_fix_extensions  \
+    /usr/bin/mysql_embedded /usr/bin/mysqlcheck \
     && rm -f /usr/bin/spelldump /usr/bin/wordbreaker \
     && mkdir -p /var/run/mysqld/ && chown manticore:manticore /var/run/mysqld/ \
     && echo "\n[mysql]\nsilent\nwait\ntable\n" >> /etc/mysql/my.cnf
+
 
 COPY manticore.conf /etc/manticoresearch/
 COPY sandbox.sql /sandbox.sql

@@ -29,33 +29,19 @@ if [ -n "$MCL" ]; then
     export LIB_MANTICORE_COLUMNAR="/var/lib/manticore/columnar/lib_manticore_columnar.so"
     export LIB_MANTICORE_SECONDARY="/var/lib/manticore/columnar/lib_manticore_secondary.so"
 
-   if [[ ! -f "$LIB_MANTICORE_COLUMNAR" && ! -f "$LIB_MANTICORE_COLUMNAR" ]]; then
+   if [[ ! -f "$LIB_MANTICORE_COLUMNAR" && ! -f "$LIB_MANTICORE_SECONDARY" ]]; then
       mkdir /var/lib/manticore/columnar/
 
-      IS_RELEASE_DIGIT=$(searchd -v | head -n 1 | cut -d" " -f2| cut -d. -f3)
-      if [[ $(($IS_RELEASE_DIGIT % 2)) -ne 0 ]]; then
+      MCL_URL=$(cat /var/lib/manticore/mcl.url)
+      wget -P /tmp $MCL_URL
 
-          apt-get update && apt --fix-broken install -y && apt-get install -y manticore-columnar-lib
-
-          ls /var/lib/manticore/columnar/
-          ls /usr/share/manticore/modules/
-
-          cp /usr/share/manticore/modules/lib_manticore_columnar.so $LIB_MANTICORE_COLUMNAR && \
-          cp /usr/share/manticore/modules/lib_manticore_secondary.so $LIB_MANTICORE_SECONDARY
-
-        else
-
-          echo "Release"
-          wget -P /tmp $COLUMNAR_URL
-
-          LAST_PATH=$(pwd)
-          cd /tmp
-          PACKAGE_NAME=$(ls | grep manticore-columnar | head -n 1)
-          ar -x $PACKAGE_NAME
-          tar -xf data.tar.gz
-          find . -name '*.so' -exec cp {} /var/lib/manticore/columnar/ \;
-          cd $LAST_PATH
-      fi
+      LAST_PATH=$(pwd)
+      cd /tmp
+      PACKAGE_NAME=$(ls | grep manticore-columnar | head -n 1)
+      ar -x $PACKAGE_NAME
+      tar -xf data.tar.gz
+      find . -name '*.so' -exec cp {} /var/lib/manticore/columnar/ \;
+      cd $LAST_PATH
    fi
 fi
 }
