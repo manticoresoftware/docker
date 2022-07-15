@@ -9,7 +9,7 @@ RUN groupadd -r manticore && useradd -r -g manticore manticore
 ENV GOSU_VERSION 1.11
 ENV MCL_URL=${MCL_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-amd64/manticore-columnar-lib_1.15.4-220522-2fef34e_amd64.deb"}
 ENV DAEMON_URL=${DAEMON_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/manticore_5.0.2-220530-348514c86_amd64.tgz"}
-ENV BUILD_TARGET=${BUILD_TARGET:-"dev"}
+ENV BUILD_TARGET=${BUILD_TARGET:-"release"}
 
 RUN set -x \
     && apt-get update && apt-get install -y --no-install-recommends ca-certificates binutils wget gnupg dirmngr && rm -rf /var/lib/apt/lists/* \
@@ -27,10 +27,10 @@ RUN set -x \
       && dpkg -i manticore-dev-repo.noarch.deb \
       && apt-key adv --fetch-keys 'https://repo.manticoresearch.com/GPG-KEY-manticore' && apt update && apt install -y manticore \
       && apt-get update  \
-      && echo $(apt-get -y download --print-uris manticore-columnar-lib | cut -d" " -f1 | cut -d "'" -f 2) > /var/lib/manticore/mcl.url ;\
+      && echo $(apt-get -y download --print-uris manticore-columnar-lib | cut -d" " -f1 | cut -d "'" -f 2) > /mcl.url ;\
     else \
       wget $DAEMON_URL && ARCHIVE_NAME=$(ls | grep '.tgz' | head -n1 ) && tar -xf $ARCHIVE_NAME && rm $ARCHIVE_NAME && \
-      dpkg -i manticore* && echo $MCL_URL > /var/lib/manticore/mcl.url && rm *.deb ; \
+      dpkg -i manticore* && echo $MCL_URL > /mcl.url && rm *.deb ; \
     fi \
     && mkdir -p /var/run/manticore && mkdir -p /var/lib/manticore/replication \
     && apt-get update && apt install -y  libexpat1 libodbc1 libpq5 openssl libcrypto++6 libmysqlclient21 mysql-client \

@@ -32,7 +32,7 @@ if [ -n "$MCL" ]; then
    if [[ ! -f "$LIB_MANTICORE_COLUMNAR" && ! -f "$LIB_MANTICORE_SECONDARY" ]]; then
       mkdir /var/lib/manticore/columnar/
 
-      MCL_URL=$(cat /var/lib/manticore/mcl.url)
+      MCL_URL=$(cat /mcl.url)
       wget -P /tmp $MCL_URL
 
       LAST_PATH=$(pwd)
