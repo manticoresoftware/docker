@@ -30,7 +30,7 @@ if [ -n "$MCL" ]; then
     export LIB_MANTICORE_SECONDARY="/var/lib/manticore/columnar/lib_manticore_secondary.so"
 
    if [[ ! -f "$LIB_MANTICORE_COLUMNAR" && ! -f "$LIB_MANTICORE_SECONDARY" ]]; then
-      mkdir /var/lib/manticore/columnar/
+      mkdir /var/lib/manticore/columnar/ || echo "Failed to create columnar dir"
 
       MCL_URL=$(cat /mcl.url)
       wget -P /tmp $MCL_URL
