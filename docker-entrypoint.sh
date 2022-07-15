@@ -25,25 +25,28 @@ docker_setup_env() {
     ln -sf /dev/stdout /var/log/manticore/query.log
   fi
 
-if [ -n "$MCL" ]; then
-    export LIB_MANTICORE_COLUMNAR="/var/lib/manticore/columnar/lib_manticore_columnar.so"
-    export LIB_MANTICORE_SECONDARY="/var/lib/manticore/columnar/lib_manticore_secondary.so"
+  if [ -n "$MCL" ]; then
+      export LIB_MANTICORE_COLUMNAR="/var/lib/manticore/columnar/lib_manticore_columnar.so"
+      export LIB_MANTICORE_SECONDARY="/var/lib/manticore/columnar/lib_manticore_secondary.so"
 
-   if [[ ! -f "$LIB_MANTICORE_COLUMNAR" && ! -f "$LIB_MANTICORE_SECONDARY" ]]; then
-      mkdir /var/lib/manticore/columnar/ || echo "Failed to create columnar dir"
+      if [[ ! -f "$LIB_MANTICORE_COLUMNAR" || ! -f "$LIB_MANTICORE_SECONDARY" ]]; then
+        if ! mkdir -p /var/lib/manticore/columnar/ ; then
+          echo "ERROR: Manticore Columnar Library is inaccessible: couldn't create /var/lib/manticore/columnar/."
+          exit
+        fi
 
-      MCL_URL=$(cat /mcl.url)
-      wget -P /tmp $MCL_URL
+        MCL_URL=$(cat /mcl.url)
+        wget -P /tmp $MCL_URL
 
-      LAST_PATH=$(pwd)
-      cd /tmp
-      PACKAGE_NAME=$(ls | grep manticore-columnar | head -n 1)
-      ar -x $PACKAGE_NAME
-      tar -xf data.tar.gz
-      find . -name '*.so' -exec cp {} /var/lib/manticore/columnar/ \;
-      cd $LAST_PATH
-   fi
-fi
+        LAST_PATH=$(pwd)
+        cd /tmp
+        PACKAGE_NAME=$(ls | grep manticore-columnar | head -n 1)
+        ar -x $PACKAGE_NAME
+        tar -xf data.tar.gz
+        find . -name '*.so' -exec cp {} /var/lib/manticore/columnar/ \;
+        cd $LAST_PATH
+      fi
+  fi
 }
 _main() {
   # first arg is `h` or some `--option`
