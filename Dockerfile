@@ -1,6 +1,6 @@
 FROM ubuntu:focal
 
-ARG BUILD_TARGET
+ARG DEV
 ARG DAEMON_URL
 ARG MCL_URL
 
@@ -12,7 +12,7 @@ ENV DAEMON_URL=${DAEMON_URL:-"https://repo.manticoresearch.com/repository/mantic
 ENV BUILD_TARGET=${BUILD_TARGET:-"release"}
 
 RUN set -x \
-    && apt-get update && apt-get install -y --no-install-recommends ca-certificates binutils wget gnupg dirmngr && rm -rf /var/lib/apt/lists/* \
+    && apt-get update && apt-get -y install --no-install-recommends ca-certificates binutils wget gnupg dirmngr && rm -rf /var/lib/apt/lists/* \
     && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
     && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
     && export GNUPGHOME="$(mktemp -d)" \
@@ -22,10 +22,10 @@ RUN set -x \
     && rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
     && chmod +x /usr/local/bin/gosu \
     && gosu nobody true && \
-    if [ "${BUILD_TARGET}" = "dev" ]; then \
+    if [ "${DEV}" = "1" ]; then \
       wget https://repo.manticoresearch.com/manticore-dev-repo.noarch.deb \
       && dpkg -i manticore-dev-repo.noarch.deb \
-      && apt-key adv --fetch-keys 'https://repo.manticoresearch.com/GPG-KEY-manticore' && apt update && apt install -y manticore \
+      && apt-key adv --fetch-keys 'https://repo.manticoresearch.com/GPG-KEY-manticore' && apt-get -y update && apt-get -y install manticore \
       && apt-get update  \
       && echo $(apt-get -y download --print-uris manticore-columnar-lib | cut -d" " -f1 | cut -d "'" -f 2) > /mcl.url ;\
     else \
@@ -33,8 +33,8 @@ RUN set -x \
       dpkg -i manticore* && echo $MCL_URL > /mcl.url && rm *.deb ; \
     fi \
     && mkdir -p /var/run/manticore && mkdir -p /var/lib/manticore/replication \
-    && apt-get update && apt install -y  libexpat1 libodbc1 libpq5 openssl libcrypto++6 libmysqlclient21 mysql-client \
-    && apt-get purge -y --auto-remove \
+    && apt-get update && apt-get -y install  libexpat1 libodbc1 libpq5 openssl libcrypto++6 libmysqlclient21 mysql-client \
+    && apt-get -y purge --auto-remove \
     && rm -rf /var/lib/apt/lists/* \
     && rm -f /usr/bin/mariabackup /usr/bin/mysqldump /usr/bin/mysqlslap /usr/bin/mysqladmin /usr/bin/mysqlimport  \
     /usr/bin/mysqlshow /usr/bin/mbstream /usr/bin/mysql_waitpid /usr/bin/innotop /usr/bin/mysqlaccess /usr/bin/mytop  \
