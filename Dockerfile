@@ -9,7 +9,6 @@ RUN groupadd -r manticore && useradd -r -g manticore manticore
 ENV GOSU_VERSION 1.11
 ENV MCL_URL=${MCL_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-amd64/manticore-columnar-lib_1.15.4-220522-2fef34e_amd64.deb"}
 ENV DAEMON_URL=${DAEMON_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/manticore_5.0.2-220530-348514c86_amd64.tgz"}
-ENV BUILD_TARGET=${BUILD_TARGET:-"release"}
 
 RUN set -x \
     && apt-get update && apt-get -y install --no-install-recommends ca-certificates binutils wget gnupg dirmngr && rm -rf /var/lib/apt/lists/* \
