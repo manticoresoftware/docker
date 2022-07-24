@@ -41,7 +41,13 @@ RUN set -x \
     /usr/bin/mysql_embedded /usr/bin/mysqlcheck \
     && rm -f /usr/bin/spelldump /usr/bin/wordbreaker \
     && mkdir -p /var/run/mysqld/ && chown manticore:manticore /var/run/mysqld/ \
-    && echo "\n[mysql]\nsilent\nwait\ntable\n" >> /etc/mysql/my.cnf
+    && echo "\n[mysql]\nsilent\nwait\ntable\n" >> /etc/mysql/my.cnf && \
+    wget -P /tmp https://repo.manticoresearch.com/repository/morphology/en.pak.tgz && \
+    wget -P /tmp https://repo.manticoresearch.com/repository/morphology/de.pak.tgz && \
+    wget -P /tmp https://repo.manticoresearch.com/repository/morphology/ru.pak.tgz && \
+    tar -xf /tmp/en.pak.tgz -C /usr/share/manticore/ &&  \
+    tar -xf /tmp/de.pak.tgz -C /usr/share/manticore/ &&  \
+    tar -xf /tmp/ru.pak.tgz -C /usr/share/manticore/
 
 
 COPY manticore.conf /etc/manticoresearch/
