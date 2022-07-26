@@ -1,5 +1,6 @@
 #!/bin/bash
 set -eo pipefail
+
 # check to see if this file is being run or sourced from another script
 _is_sourced() {
   # https://unix.stackexchange.com/a/215279
@@ -21,9 +22,39 @@ _searchd_want_help() {
 
 docker_setup_env() {
   if [ -n "$QUERY_LOG_TO_STDOUT" ]; then
-    ln -sf /dev/stdout /var/log/manticore/query.log
+    export searchd_query_log=/var/log/manticore/query.log
+    [ ! -f /var/log/manticore/query.log ] && ln -sf /dev/stdout /var/log/manticore/query.log
   fi
 
+  if [[ "${MCL}" == "1" ]]; then
+      LIB_MANTICORE_COLUMNAR="/var/lib/manticore/.mcl/lib_manticore_columnar.so"
+      LIB_MANTICORE_SECONDARY="/var/lib/manticore/.mcl/lib_manticore_secondary.so"
+
+      [ -L /usr/share/manticore/modules/lib_manticore_columnar.so ] || ln -s $LIB_MANTICORE_COLUMNAR /usr/share/manticore/modules/lib_manticore_columnar.so
+      [ -L /usr/share/manticore/modules/lib_manticore_secondary.so ] || ln -s $LIB_MANTICORE_SECONDARY /usr/share/manticore/modules/lib_manticore_secondary.so
+
+      searchd -v|grep -i error|egrep "trying to load" \
+      && rm $LIB_MANTICORE_COLUMNAR $LIB_MANTICORE_SECONDARY \
+      && echo "WARNING: wrong MCL version was removed, installing the correct one"
+
+      if [[ ! -f "$LIB_MANTICORE_COLUMNAR" || ! -f "$LIB_MANTICORE_SECONDARY" ]]; then
+        if ! mkdir -p /var/lib/manticore/.mcl/ ; then
+          echo "ERROR: Manticore Columnar Library is inaccessible: couldn't create /var/lib/manticore/.mcl/."
+          exit
+        fi
+
+        MCL_URL=$(cat /mcl.url)
+        wget -P /tmp $MCL_URL
+
+        LAST_PATH=$(pwd)
+        cd /tmp
+        PACKAGE_NAME=$(ls | grep manticore-columnar | head -n 1)
+        ar -x $PACKAGE_NAME
+        tar -xf data.tar.gz
+        find . -name '*.so' -exec cp {} /var/lib/manticore/.mcl/ \;
+        cd $LAST_PATH
+      fi
+  fi
 }
 _main() {
   # first arg is `h` or some `--option`
