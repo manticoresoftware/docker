@@ -241,6 +241,8 @@ Take into account that Manticore search inside the container is run under user `
 docker exec -it manticore gosu manticore indexer --all --rotate
 ```
 
+### Environment variables
+
 You can also set individual `searchd` and `common` configuration settings using Docker environment variables.  
 
 The settings must be prefixed with their section name, for example to change value of setting `mysql_version_string` in section `searchd` the variable must be named `searchd_mysql_version_string`:
