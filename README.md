@@ -69,6 +69,7 @@ version: '2.2'
 
 services:
   manticore:
+    user: manticore
     container_name: manticore
     image: manticoresearch/manticore
     restart: always
@@ -270,6 +271,30 @@ listening on all interfaces for http, port=9308
 prereading 0 indexes
 prereaded 0 indexes in 0.000 sec
 accepting connections
+```
+# Troubleshooting
+### Non root volume mount
+
+In case you run Manticore Search docker image as non-root, you can be faced with the permission mismatch:
+```bash
+FATAL: directory /var/lib/manticore write error: failed to open /var/lib/manticore/tmp: Permission denied
+```
+or in case using `MCL=1`
+```bash
+mkdir: cannot create directory ‘/var/lib/manticore/.mcl/’: Permission denied
+```
+It's because docker mounts image under his running user. At most machines docker runs as root, so if you say 
+mount volume `- ./data:/var/lib/manticore` it will create `data` dir as `root` and mount to `/var/lib/manticore`
+also as `root`.
+
+Great! let's run `chown -R manticore:manticore data`?
+No, cause user `manticore` may not exist in your system.
+More, your user `manticore` can have user ID = 126 for example.
+But the user in the container has ID = 999. 
+So the right solution is:
+
+```bash 
+chown -R 999:999 data 
 ```
 
 
