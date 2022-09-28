@@ -69,7 +69,6 @@ version: '2.2'
 
 services:
   manticore:
-    user: manticore
     container_name: manticore
     image: manticoresearch/manticore
     restart: always
@@ -272,31 +271,30 @@ prereading 0 indexes
 prereaded 0 indexes in 0.000 sec
 accepting connections
 ```
-# Troubleshooting
-### Non root volume mount
 
-In case you run Manticore Search docker image as non-root, you can be faced with the permission mismatch:
+### Running under non-root
+By default the main Manticore process `searchd` is running under user `manticore` inside the container, but the script which runs on starting the container is run under your default docker user which in most cases is `root`. If that's not what you want you can use `docker ... --user manticore` or `user: manticore` in docker compose yaml to make everything run under `manticore`. Read below about possible volume permissions issue you can get and how to solve it.
+
+# Troubleshooting
+### Permissions issue with a mounted volume
+
+In case you are running Manticore Search docker under non-root (using `docker ... --user manticore` or `user: manticore` in docker compose yaml), you can face a permissions issue, for example:
 ```bash
 FATAL: directory /var/lib/manticore write error: failed to open /var/lib/manticore/tmp: Permission denied
 ```
-or in case using `MCL=1`
+
+or in case you are using `-e MCL=1`:
+
 ```bash
 mkdir: cannot create directory ‘/var/lib/manticore/.mcl/’: Permission denied
 ```
-It's because docker mounts image under his running user. At most machines docker runs as root, so if you say 
-mount volume `- ./data:/var/lib/manticore` it will create `data` dir as `root` and mount to `/var/lib/manticore`
-also as `root`.
 
-Great! let's run `chown -R manticore:manticore data`?
-No, cause user `manticore` may not exist in your system.
-More, your user `manticore` can have user ID = 126 for example.
-But the user in the container has ID = 999. 
-So the right solution is:
-
-```bash 
-chown -R 999:999 data 
+This can happen because the user which is used to run processes inside the container may have no permissions to modify the directory you have mounted to the container. To fix it you can `chown` or `chmod` the mounted directory. If you run the container under user `manticore` you need to do:
+```bash
+chown -R 999:999 data
 ```
 
+since user `manticore` has ID 999 inside the container.
 
 # Issues
 
