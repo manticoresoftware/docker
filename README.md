@@ -272,6 +272,29 @@ prereaded 0 indexes in 0.000 sec
 accepting connections
 ```
 
+### Running under non-root
+By default the main Manticore process `searchd` is running under user `manticore` inside the container, but the script which runs on starting the container is run under your default docker user which in most cases is `root`. If that's not what you want you can use `docker ... --user manticore` or `user: manticore` in docker compose yaml to make everything run under `manticore`. Read below about possible volume permissions issue you can get and how to solve it.
+
+# Troubleshooting
+### Permissions issue with a mounted volume
+
+In case you are running Manticore Search docker under non-root (using `docker ... --user manticore` or `user: manticore` in docker compose yaml), you can face a permissions issue, for example:
+```bash
+FATAL: directory /var/lib/manticore write error: failed to open /var/lib/manticore/tmp: Permission denied
+```
+
+or in case you are using `-e MCL=1`:
+
+```bash
+mkdir: cannot create directory ‘/var/lib/manticore/.mcl/’: Permission denied
+```
+
+This can happen because the user which is used to run processes inside the container may have no permissions to modify the directory you have mounted to the container. To fix it you can `chown` or `chmod` the mounted directory. If you run the container under user `manticore` you need to do:
+```bash
+chown -R 999:999 data
+```
+
+since user `manticore` has ID 999 inside the container.
 
 # Issues
 
