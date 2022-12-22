@@ -1,9 +1,6 @@
 FROM ubuntu:focal
 
-ARG ARCH
-
-RUN if [ -z "$ARCH" ] ; then echo Architecture is not provided && exit 1; fi
-RUN if [ ! "$ARCH" = "amd" -a ! "$ARCH" = "arm" ] ; then echo Supported architecture are ARM and AMD only && exit 1 ; fi
+ARG TARGETPLATFORM
 
 ARG DEV
 ARG DAEMON_URL
@@ -18,10 +15,9 @@ ENV DAEMON_URL=${DAEMON_URL:-"https://repo.manticoresearch.com/repository/mantic
 RUN if [ ! -z "${MCL_URL##*_ARCH_*}" ] ; then echo No _ARCH_ placeholder in daemon URL && exit 1 ; fi
 RUN if [ ! -z "${DAEMON_URL##*_ARCH_*}" ] ; then echo No _ARCH_ placeholder in daemon URL && exit 1 ; fi
 
-RUN DAEMON_URL=$(echo $DAEMON_URL | sed "s/_ARCH_/$ARCH/")
-RUN echo $DAEMON_URL && exit 1
-
 RUN set -x \
+    && if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else export ARCH="amd"; fi \
+    && echo "Start building image for linux/${ARCH}64 architecture" \
     && apt-get update && apt-get -y install --no-install-recommends ca-certificates binutils wget gnupg dirmngr && rm -rf /var/lib/apt/lists/* \
     && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
     && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
