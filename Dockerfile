@@ -63,7 +63,7 @@ RUN set -x \
     /usr/bin/mysqlreport /usr/bin/mysqldumpslow /usr/bin/mysql_find_rows /usr/bin/mysql_fix_extensions  \
     /usr/bin/mysql_embedded /usr/bin/mysqlcheck \
     && rm -f /usr/bin/spelldump /usr/bin/wordbreaker \
-    && mkdir -p /var/run/mysqld/ && chown manticore:manticore /var/run/mysqld/ \
+    && mkdir -p /var/run/mysqld/ && chown manticore:manticore /var/lib/manticore/ /var/run/mysqld/ /usr/share/manticore/modules/ /var/run/manticore \
     && echo "\n[mysql]\nsilent\nwait\ntable\n" >> /etc/mysql/my.cnf && \
     wget -P /tmp https://repo.manticoresearch.com/repository/morphology/en.pak.tgz && \
     wget -P /tmp https://repo.manticoresearch.com/repository/morphology/de.pak.tgz && \
