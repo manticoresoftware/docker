@@ -26,6 +26,36 @@ docker_setup_env() {
     [ ! -f /var/log/manticore/query.log ] && ln -sf /dev/stdout /var/log/manticore/query.log
   fi
 
+  if [[ "${EXTRA}" == "1" ]]; then
+
+    if [ ! -f /etc/ssl/cert.pem ]; then
+      for cert in "/etc/ssl/certs/ca-certificates.crt" \
+        "/etc/pki/tls/certs/ca-bundle.crt" \
+        "/etc/ssl/ca-bundle.pem" \
+        "/etc/pki/tls/cacert.pem" \
+        "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"; do
+        if [ -f "$cert" ]; then
+          ln -s "$cert" /etc/ssl/cert.pem
+          break
+        fi
+      done
+    fi
+
+    LAST_PATH=$(pwd)
+    EXTRA_URL=$(cat /extra.url)
+    mkdir /tmp/manticore-extra
+    wget -P /tmp/manticore-extra $EXTRA_URL
+    cd /tmp/manticore-extra
+
+    PACKAGE_NAME=$(ls | grep manticore-executor | head -n 1)
+    ar -x $PACKAGE_NAME
+    tar -xf data.tar.xz
+    find . -name 'manticore-executor' -exec cp {} /usr/bin/manticore-executor \;
+    cd $LAST_PATH
+
+    MCL="1"
+  fi
+
   if [[ "${MCL}" == "1" ]]; then
       LIB_MANTICORE_COLUMNAR="/var/lib/manticore/.mcl/lib_manticore_columnar.so"
       LIB_MANTICORE_SECONDARY="/var/lib/manticore/.mcl/lib_manticore_secondary.so"
