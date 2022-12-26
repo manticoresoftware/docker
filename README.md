@@ -58,7 +58,7 @@ The docker image doesn't include [Manticore Columnar Library](https://github.com
 * columnar storage
 * secondary indexes
 
-but you can easily enable it in runtime by using environment variable `MCL=1`, i.e. `docker run -e MCL=1 ... manticoresearch/manticore`. It will then download and install the library and put it to the data dir (which is normally mapped as a volume in production). Next time you run the container the library will be already there, hence it won't be downloaded again unless you change the Manticore Search version.
+but you can easily enable it in runtime by using environment variable `EXTRA=1`, i.e. `docker run -e EXTRA=1 ... manticoresearch/manticore`. It will then download and install the library and put it to the data dir (which is normally mapped as a volume in production). Next time you run the container the library will be already there, hence it won't be downloaded again unless you change the Manticore Search version.
 
 ### Docker-compose
 
@@ -84,7 +84,7 @@ services:
         soft: -1
         hard: -1
     environment:
-      - MCL=1
+      - EXTRA=1
     volumes:
       - ./data:/var/lib/manticore
 #      - ./manticore.conf:/etc/manticoresearch/manticore.conf # uncommment if you use a custom config
@@ -147,7 +147,7 @@ services:
         soft: -1
         hard: -1
     environment:
-      - MCL=1
+      - EXTRA=1
     networks:
       - manticore
   manticore-2:
@@ -162,7 +162,7 @@ services:
         soft: -1
         hard: -1
     environment:
-      - MCL=1
+      - EXTRA=1
     networks:
       - manticore
 networks:
@@ -283,7 +283,7 @@ In case you are running Manticore Search docker under non-root (using `docker ..
 FATAL: directory /var/lib/manticore write error: failed to open /var/lib/manticore/tmp: Permission denied
 ```
 
-or in case you are using `-e MCL=1`:
+or in case you are using `-e EXTRA=1`:
 
 ```bash
 mkdir: cannot create directory ‘/var/lib/manticore/.mcl/’: Permission denied

@@ -85,6 +85,12 @@ docker_setup_env() {
         cd $LAST_PATH
       fi
   fi
+
+
+  if [[ -z "${MCL}" && "${MCL}" != "1" ]]; then
+    export searchd_secondary_indexes=0
+  fi
+
 }
 _main() {
   # first arg is `h` or some `--option`

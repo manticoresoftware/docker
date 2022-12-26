@@ -19,8 +19,10 @@ https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/ma
 https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-server_5.0.2-220530-348514c86__ARCH_64.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-server-core_5.0.2-220530-348514c86__ARCH_64.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-tools_5.0.2-220530-348514c86__ARCH_64.deb"}
-ENV EXTRA_URL=${EXTRA_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_focal_dev/dists/focal/main/binary-_ARCH_64/manticore-executor_0.5.9-22122110-e940d44__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_focal_dev/dists/focal/main/binary-_ARCH_64/manticore-extra_0.5.9-22122109-e940d44_all.deb"}
+
+# if you set EXTRA=1, MCL=1 will called automatically
+# Here is only executor URL, cause columnar-lib which included into package will be installed via MCL=1 flag.
+ENV EXTRA_URL=${EXTRA_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_focal_dev/dists/focal/main/binary-_ARCH_64/manticore-executor_0.5.9-22122110-e940d44__ARCH_64.deb"}
 
 
 RUN if [ ! -z "${MCL_URL##*_ARCH_*}" ] ; then echo No _ARCH_ placeholder in daemon URL && exit 1 ; fi
@@ -29,8 +31,8 @@ RUN if [ ! -z "${DAEMON_URL##*_ARCH_*}" ] ; then echo No _ARCH_ placeholder in d
 RUN set -x \
     && if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else export ARCH="amd"; fi \
     && echo "Start building image for linux/${ARCH}64 architecture" \
-    && echo "#!/bin/sh\necho 'This manticore executor stub'" > /usr/bin/manticore-executor  \
-    && chown manticore:manticore /usr/bin/manticore-executor  \
+    && mkdir /etc/ssl/ && touch /usr/bin/manticore-executor /etc/ssl/cert.pem \
+    && chown manticore:manticore /usr/bin/manticore-executor /etc/ssl/cert.pem \
     && chmod +x /usr/bin/manticore-executor \
     && apt-get update && apt-get -y install --no-install-recommends ca-certificates binutils wget gnupg xz-utils dirmngr && rm -rf /var/lib/apt/lists/* \
     && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
@@ -48,11 +50,11 @@ RUN set -x \
       && apt-key adv --fetch-keys 'https://repo.manticoresearch.com/GPG-KEY-manticore' && apt-get -y update && apt-get -y install manticore \
       && apt-get update  \
       && echo $(apt-get -y download --print-uris manticore-columnar-lib | cut -d" " -f1 | cut -d "'" -f 2) > /mcl.url \
-      && echo $(apt-get -y download --print-uris executor | cut -d" " -f1 | cut -d "'" -f 2) > /extra.url ;\
+      && echo $(apt-get -y download --print-uris manticore-executor | cut -d" " -f1 | cut -d "'" -f 2) > /extra.url ;\
     else \
       wget $(echo $DAEMON_URL | sed "s/_ARCH_/$ARCH/g") && \
-      dpkg -i manticore* && echo echo $MCL_URL | sed "s/_ARCH_/$ARCH/g" > /mcl.url && \
-      echo echo $EXTRA_URL | sed "s/_ARCH_/$ARCH/g" > /extra.url && rm *.deb ; \
+      dpkg -i manticore* && echo $MCL_URL | sed "s/_ARCH_/$ARCH/g" > /mcl.url && \
+      echo $EXTRA_URL | sed "s/_ARCH_/$ARCH/g" > /extra.url && rm *.deb ; \
     fi \
     && mkdir -p /var/run/manticore && mkdir -p /var/lib/manticore/replication \
     && apt-get update && apt-get -y install  libexpat1 libodbc1 libpq5 openssl libcrypto++6 libmysqlclient21 mysql-client \
