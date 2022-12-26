@@ -31,8 +31,8 @@ RUN if [ ! -z "${DAEMON_URL##*_ARCH_*}" ] ; then echo No _ARCH_ placeholder in d
 RUN set -x \
     && if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else export ARCH="amd"; fi \
     && echo "Start building image for linux/${ARCH}64 architecture" \
-    && mkdir /etc/ssl/ && touch /usr/bin/manticore-executor /etc/ssl/cert.pem \
-    && chown manticore:manticore /usr/bin/manticore-executor /etc/ssl/cert.pem \
+    && mkdir /etc/ssl/ && touch /usr/bin/manticore-executor \
+    && chown -R manticore:manticore /usr/bin/manticore-executor /etc/ssl/ \
     && chmod +x /usr/bin/manticore-executor \
     && apt-get update && apt-get -y install --no-install-recommends ca-certificates binutils wget gnupg xz-utils dirmngr && rm -rf /var/lib/apt/lists/* \
     && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
