@@ -27,31 +27,37 @@ docker_setup_env() {
   fi
 
   if [[ "${EXTRA}" == "1" ]]; then
+    if [ ! which manticore-executor ]; then
+        if [ ! -f /etc/ssl/cert.pem ]; then
+              for cert in "/etc/ssl/certs/ca-certificates.crt" \
+                "/etc/pki/tls/certs/ca-bundle.crt" \
+                "/etc/ssl/ca-bundle.pem" \
+                "/etc/pki/tls/cacert.pem" \
+                "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"; do
+                if [ -f "$cert" ]; then
+                  ln -s "$cert" /etc/ssl/cert.pem
+                  break
+                fi
+              done
+            fi
 
-    if [ ! -f /etc/ssl/cert.pem ]; then
-      for cert in "/etc/ssl/certs/ca-certificates.crt" \
-        "/etc/pki/tls/certs/ca-bundle.crt" \
-        "/etc/ssl/ca-bundle.pem" \
-        "/etc/pki/tls/cacert.pem" \
-        "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"; do
-        if [ -f "$cert" ]; then
-          ln -s "$cert" /etc/ssl/cert.pem
-          break
-        fi
-      done
+            LAST_PATH=$(pwd)
+            EXTRA_URL=$(cat /extra.url)
+            EXTRA_DIR="/tmp/manticore-extra"
+
+            if [ ! -d $EXTRA_DIR ]; then
+              mkdir $EXTRA_DIR
+            fi
+
+            wget -P $EXTRA_DIR $EXTRA_URL
+            cd $EXTRA_DIR
+
+            PACKAGE_NAME=$(ls | grep manticore-executor | head -n 1)
+            ar -x $PACKAGE_NAME
+            tar -xf data.tar.xz
+            find . -name 'manticore-executor' -exec cp {} /usr/bin/manticore-executor \;
+            cd $LAST_PATH
     fi
-
-    LAST_PATH=$(pwd)
-    EXTRA_URL=$(cat /extra.url)
-    mkdir /tmp/manticore-extra
-    wget -P /tmp/manticore-extra $EXTRA_URL
-    cd /tmp/manticore-extra
-
-    PACKAGE_NAME=$(ls | grep manticore-executor | head -n 1)
-    ar -x $PACKAGE_NAME
-    tar -xf data.tar.xz
-    find . -name 'manticore-executor' -exec cp {} /usr/bin/manticore-executor \;
-    cd $LAST_PATH
 
     MCL="1"
   fi
