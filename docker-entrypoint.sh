@@ -27,7 +27,7 @@ docker_setup_env() {
   fi
 
   if [[ "${EXTRA}" == "1" ]]; then
-    if [ ! which manticore-executor ]; then
+    if ! which manticore-executor > /dev/null; then
         if [ ! -f /etc/ssl/cert.pem ]; then
               for cert in "/etc/ssl/certs/ca-certificates.crt" \
                 "/etc/pki/tls/certs/ca-bundle.crt" \
