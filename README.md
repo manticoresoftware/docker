@@ -273,9 +273,24 @@ accepting connections
 ```
 
 ### Running under non-root
-By default the main Manticore process `searchd` is running under user `manticore` inside the container, but the script which runs on starting the container is run under your default docker user which in most cases is `root`. If that's not what you want you can use `docker ... --user manticore` or `user: manticore` in docker compose yaml to make everything run under `manticore`. Read below about possible volume permissions issue you can get and how to solve it.
+By default, the main Manticore process `searchd` is running under user `manticore` inside the container, but the script which runs on starting the container is run under your default docker user which in most cases is `root`. If that's not what you want you can use `docker ... --user manticore` or `user: manticore` in docker compose yaml to make everything run under `manticore`. Read below about possible volume permissions issue you can get and how to solve it.
+
+# How to build
+For building multi arch builds we use buildx plugin. Before building you need to run
+
+```bash
+    docker buildx create  --name manticore_build --platform linux/amd64,linux/arm64
+    docker buildx use manticore_build
+    docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+```
+Next you run `build` and `push` commands
+```bash
+docker buildx build --push --build-arg DEV=1 --platform linux/arm64,linux/amd64 --tag  manticoresearch/manticore:$BUILD_TAG . 
+```
+
 
 # Troubleshooting
+
 ### Permissions issue with a mounted volume
 
 In case you are running Manticore Search docker under non-root (using `docker ... --user manticore` or `user: manticore` in docker compose yaml), you can face a permissions issue, for example:
