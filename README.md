@@ -58,7 +58,7 @@ The docker image doesn't include [Manticore Columnar Library](https://github.com
 * columnar storage
 * secondary indexes
 
-but you can easily enable it in runtime by using environment variable `MCL=1`, i.e. `docker run -e MCL=1 ... manticoresearch/manticore`. It will then download and install the library and put it to the data dir (which is normally mapped as a volume in production). Next time you run the container the library will be already there, hence it won't be downloaded again unless you change the Manticore Search version.
+but you can easily enable it in runtime by using environment variable `EXTRA=1`, i.e. `docker run -e EXTRA=1 ... manticoresearch/manticore`. It will then download and install the library and put it to the data dir (which is normally mapped as a volume in production). Next time you run the container the library will be already there, hence it won't be downloaded again unless you change the Manticore Search version.
 
 ### Docker-compose
 
@@ -84,7 +84,7 @@ services:
         soft: -1
         hard: -1
     environment:
-      - MCL=1
+      - EXTRA=1
     volumes:
       - ./data:/var/lib/manticore
 #      - ./manticore.conf:/etc/manticoresearch/manticore.conf # uncommment if you use a custom config
@@ -147,7 +147,7 @@ services:
         soft: -1
         hard: -1
     environment:
-      - MCL=1
+      - EXTRA=1
     networks:
       - manticore
   manticore-2:
@@ -162,7 +162,7 @@ services:
         soft: -1
         hard: -1
     environment:
-      - MCL=1
+      - EXTRA=1
     networks:
       - manticore
 networks:
@@ -273,9 +273,26 @@ accepting connections
 ```
 
 ### Running under non-root
-By default the main Manticore process `searchd` is running under user `manticore` inside the container, but the script which runs on starting the container is run under your default docker user which in most cases is `root`. If that's not what you want you can use `docker ... --user manticore` or `user: manticore` in docker compose yaml to make everything run under `manticore`. Read below about possible volume permissions issue you can get and how to solve it.
+By default, the main Manticore process `searchd` is running under user `manticore` inside the container, but the script which runs on starting the container is run under your default docker user which in most cases is `root`. If that's not what you want you can use `docker ... --user manticore` or `user: manticore` in docker compose yaml to make everything run under `manticore`. Read below about possible volume permissions issue you can get and how to solve it.
+
+# Building with buildx
+
+To build multi-arch images, we use the buildx plugin. Before building, follow these steps:
+
+```bash
+    docker buildx create  --name manticore_build --platform linux/amd64,linux/arm64
+    docker buildx use manticore_build
+    docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+```
+
+Once the above steps are completed, run the following `build` and `push` commands:
+
+```bash
+docker buildx build --push --build-arg DEV=1 --platform linux/arm64,linux/amd64 --tag  manticoresearch/manticore:$BUILD_TAG . 
+```
 
 # Troubleshooting
+
 ### Permissions issue with a mounted volume
 
 In case you are running Manticore Search docker under non-root (using `docker ... --user manticore` or `user: manticore` in docker compose yaml), you can face a permissions issue, for example:
@@ -283,7 +300,7 @@ In case you are running Manticore Search docker under non-root (using `docker ..
 FATAL: directory /var/lib/manticore write error: failed to open /var/lib/manticore/tmp: Permission denied
 ```
 
-or in case you are using `-e MCL=1`:
+or in case you are using `-e EXTRA=1`:
 
 ```bash
 mkdir: cannot create directory ‘/var/lib/manticore/.mcl/’: Permission denied
