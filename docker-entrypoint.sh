@@ -43,19 +43,21 @@ docker_setup_env() {
 
             LAST_PATH=$(pwd)
             EXTRA_URL=$(cat /extra.url)
-            EXTRA_DIR="/tmp/manticore-extra"
+            EXTRA_DIR="/var/lib/manticore/.extra/"
 
             if [ ! -d $EXTRA_DIR ]; then
               mkdir $EXTRA_DIR
             fi
 
-            wget -P $EXTRA_DIR $EXTRA_URL
-            cd $EXTRA_DIR
+            if [[ -z $(find $EXTRA_DIR -name 'manticore-executor') ]]; then
+                wget -P $EXTRA_DIR $EXTRA_URL
+                cd $EXTRA_DIR
+                PACKAGE_NAME=$(ls | grep manticore-executor | head -n 1)
+                ar -x $PACKAGE_NAME
+                tar -xf data.tar.xz
+            fi
 
-            PACKAGE_NAME=$(ls | grep manticore-executor | head -n 1)
-            ar -x $PACKAGE_NAME
-            tar -xf data.tar.xz
-            find . -name 'manticore-executor' -exec cp {} /usr/bin/manticore-executor \;
+            find $EXTRA_DIR -name 'manticore-executor' -exec cp {} /usr/bin/manticore-executor \;
             cd $LAST_PATH
     fi
 
