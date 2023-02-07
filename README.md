@@ -282,9 +282,9 @@ By default, the main Manticore process `searchd` is running under user `manticor
 To build multi-arch images, we use the buildx plugin. Before building, follow these steps:
 
 ```bash
-    docker buildx create  --name manticore_build --platform linux/amd64,linux/arm64
-    docker buildx use manticore_build
-    docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+docker buildx create  --name manticore_build --platform linux/amd64,linux/arm64
+docker buildx use manticore_build
+docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 ```
 
 Once the above steps are completed, run the following `build` and `push` commands:
