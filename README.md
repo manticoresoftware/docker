@@ -20,10 +20,10 @@ The image comes with libraries for easy indexing data from MySQL, PostgreSQL XML
 The below is the simplest way to start Manticore in a container and log in to it via mysql client:
 
 ```bash
-docker run --name manticore --rm -d manticoresearch/manticore && sleep 3 && docker exec -it manticore mysql && docker stop manticore
+docker run -e EXTRA=1 --name manticore --rm -d manticoresearch/manticore && until docker logs manticore 2>&1 | grep -q "accepting connections"; do sleep 1; done && docker exec -it manticore mysql && docker stop manticore
 ```
 
-When you exit from the mysql client it stops and removes the container, so **use it only for testing / sandboxing purposes**. See below how to use it in production.
+Note that upon exiting the MySQL client, the Manticore container will be stopped and removed, resulting in no saved data. For information on using Manticore in a production environment, please see below.
 
 The image comes with a sample index which can be loaded like this:
 
@@ -73,6 +73,8 @@ services:
   manticore:
     container_name: manticore
     image: manticoresearch/manticore
+    environment:
+      - EXTRA=1
     restart: always
     ports:
       - 127.0.0.1:9306:9306
@@ -139,6 +141,8 @@ services:
 
   manticore-1:
     image: manticoresearch/manticore
+    environment:
+      - EXTRA=1
     restart: always
     ulimits:
       nproc: 65535
@@ -154,6 +158,8 @@ services:
       - manticore
   manticore-2:
     image: manticoresearch/manticore
+    environment:
+      - EXTRA=1
     restart: always
     ulimits:
       nproc: 65535
@@ -234,7 +240,7 @@ For the best performance, Manticore tables' components can be locked into memory
 If you want to run Manticore with your custom config containing indexes definition you will need to mount the configuration to the instance:
 
 ```bash
-docker run --name manticore -v $(pwd)/manticore.conf:/etc/manticoresearch/manticore.conf -v $(pwd)/data/:/var/lib/manticore -p 127.0.0.1:9306:9306 -d manticoresearch/manticore
+docker run -e EXTRA=1 --name manticore -v $(pwd)/manticore.conf:/etc/manticoresearch/manticore.conf -v $(pwd)/data/:/var/lib/manticore -p 127.0.0.1:9306:9306 -d manticoresearch/manticore
 ```
 
 Take into account that Manticore search inside the container is run under user `manticore`. Performing operations with tables (like creating or rotating plain indexes) should be also done under `manticore`. Otherwise the files will be created under `root` and the search daemon won't have rights to open them. For example here is how you can rotate all plain indexes:
@@ -251,7 +257,7 @@ The settings must be prefixed with their section name, for example to change val
 
 
 ```bash
-docker run --name manticore  -p 127.0.0.1:9306:9306  -e searchd_mysql_version_string='5.5.0' -d manticoresearch/manticore
+docker run -e EXTRA=1 --name manticore  -p 127.0.0.1:9306:9306  -e searchd_mysql_version_string='5.5.0' -d manticoresearch/manticore
 ```
 
 In case of `listen` directive, you can pass using Docker variable `searchd_listen` new listening interfaces in addition to the default ones. Multiple interfaces can be declared separated by semi-colon ("|").
@@ -260,7 +266,7 @@ For listening only on network address, the `$ip` (retrieved internally from `hos
 For example `-e searchd_listen='9316:http|9307:mysql|$ip:5443:mysql_vip'` will add an additional SQL interface on port 9307, a SQL VIP on 5443 running only on the instance IP  and HTTP on port 9316, beside the defaults on 9306 and 9308, respectively.
 
 ```bash
-$ docker run --rm -p 1188:9307  -e searchd_mysql_version_string='5.5.0' -e searchd_listen='9316:http|9307:mysql|$ip:5443:mysql_vip'  manticore
+$ docker run -e EXTRA=1 --rm -p 1188:9307  -e searchd_mysql_version_string='5.5.0' -e searchd_listen='9316:http|9307:mysql|$ip:5443:mysql_vip'  manticore
 [Mon Aug 17 07:31:58.719 2020] [1] using config file '/etc/manticoresearch/manticore.conf' (9130 chars)...
 listening on all interfaces for http, port=9316
 listening on all interfaces for mysql, port=9307
