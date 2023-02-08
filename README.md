@@ -41,7 +41,7 @@ Also the mysql client has in history several sample queries that you can run on 
 For data persistence `/var/lib/manticore/` should be mounted to local storage or other desired storage engine.
 
 ```bash
-docker run --name manticore -v $(pwd)/data:/var/lib/manticore -p 127.0.0.1:9306:9306 -p 127.0.0.1:9308:9308 -d manticoresearch/manticore
+docker run -e EXTRA=1 --name manticore -v $(pwd)/data:/var/lib/manticore -p 127.0.0.1:9306:9306 -p 127.0.0.1:9308:9308 -d manticoresearch/manticore
 ```
 
 Configuration file inside the instance is located at `/etc/manticoresearch/manticore.conf`. For custom settings, this file should be mounted to your own configuration file.
@@ -49,18 +49,27 @@ Configuration file inside the instance is located at `/etc/manticoresearch/manti
 The ports are 9306/9308/9312 for SQL/HTTP/Binary, expose them depending on how you are going to use Manticore. For example:
 
 ```bash
-docker run --name manticore -v $(pwd)/manticore.conf:/etc/manticoresearch/manticore.conf -v $(pwd)/data:/var/lib/manticore/ -p 127.0.0.1:9306:9306 -p 127.0.0.1:9308:9308 -d manticoresearch/manticore
+docker run -e EXTRA=1 --name manticore -v $(pwd)/manticore.conf:/etc/manticoresearch/manticore.conf -v $(pwd)/data:/var/lib/manticore/ -p 127.0.0.1:9306:9306 -p 127.0.0.1:9308:9308 -d manticoresearch/manticore
 ```
 
 Make sure to remove `127.0.0.1:` if you want the ports to be available for external hosts.
 
-### Manticore Columnar Library
+### Manticore Columnar Library and Manticore Buddy
 
 The docker image doesn't include [Manticore Columnar Library](https://github.com/manticoresoftware/columnar) which has to be used if you need:
 * columnar storage
 * secondary indexes
 
-but you can easily enable it in runtime by using environment variable `EXTRA=1`, i.e. `docker run -e EXTRA=1 ... manticoresearch/manticore`. It will then download and install the library and put it to the data dir (which is normally mapped as a volume in production). Next time you run the container the library will be already there, hence it won't be downloaded again unless you change the Manticore Search version.
+but you can easily enable it in runtime by using environment variable `EXTRA=1`, i.e. `docker run -e EXTRA=1 ... manticoresearch/manticore`. It will then download and install the library and put it to the data dir (which is normally mapped as a volume in production). Next time you run the container the library will be already there, hence it won't be downloaded again unless you change the Manticore Search version. This also enables [Manticore Buddy](https://github.com/manticoresoftware/manticoresearch-buddy) which is used to process some commands. Read [the changelog](https://manual.manticoresearch.com/Changelog#Version-6.0.0) for more details.
+
+### Manticore Columnar Library and Manticore Buddy
+
+The Manticore Search Docker image doesn't come with the [Manticore Columnar Library](https://github.com/manticoresoftware/columnar) pre-installed, which is necessary if you require columnar storage and secondary indexes. However, it can easily be enabled during runtime by setting the environment variable `EXTRA=1`. For example, `docker run -e EXTRA=1 ... manticoresearch/manticore`. This will download and install the library in the data directory (which is typically mapped as a volume in production environments) and it won't be re-downloaded unless the Manticore Search version is changed. 
+
+Using `EXTRA=1` also activates [Manticore Buddy](https://github.com/manticoresoftware/manticoresearch-buddy), which is used for processing certain commands. For more information, refer to the [changelog](https://manual.manticoresearch.com/Changelog#Version-6.0.0).
+
+If you need just the MCL alone you can use the environment variable `MCL=1`.
+
 
 ### Docker-compose
 
@@ -101,7 +110,7 @@ Besides using the exposed ports 9306 and 9308 you can log into the instance by r
 Manticore is accessible via HTTP on ports 9308 and 9312. You can map either of them locally and connect with curl:
 
 ```bash
-docker run --name manticore -p 9308:9308 -d manticoresearch/manticore
+docker run -e EXTRA=1 --name manticore -p 9308:9308 -d manticoresearch/manticore
 ```
 
 Create a table:
