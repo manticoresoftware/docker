@@ -56,14 +56,6 @@ Make sure to remove `127.0.0.1:` if you want the ports to be available for exter
 
 ### Manticore Columnar Library and Manticore Buddy
 
-The docker image doesn't include [Manticore Columnar Library](https://github.com/manticoresoftware/columnar) which has to be used if you need:
-* columnar storage
-* secondary indexes
-
-but you can easily enable it in runtime by using environment variable `EXTRA=1`, i.e. `docker run -e EXTRA=1 ... manticoresearch/manticore`. It will then download and install the library and put it to the data dir (which is normally mapped as a volume in production). Next time you run the container the library will be already there, hence it won't be downloaded again unless you change the Manticore Search version. This also enables [Manticore Buddy](https://github.com/manticoresoftware/manticoresearch-buddy) which is used to process some commands. Read [the changelog](https://manual.manticoresearch.com/Changelog#Version-6.0.0) for more details.
-
-### Manticore Columnar Library and Manticore Buddy
-
 The Manticore Search Docker image doesn't come with the [Manticore Columnar Library](https://github.com/manticoresoftware/columnar) pre-installed, which is necessary if you require columnar storage and secondary indexes. However, it can easily be enabled during runtime by setting the environment variable `EXTRA=1`. For example, `docker run -e EXTRA=1 ... manticoresearch/manticore`. This will download and install the library in the data directory (which is typically mapped as a volume in production environments) and it won't be re-downloaded unless the Manticore Search version is changed. 
 
 Using `EXTRA=1` also activates [Manticore Buddy](https://github.com/manticoresoftware/manticoresearch-buddy), which is used for processing certain commands. For more information, refer to the [changelog](https://manual.manticoresearch.com/Changelog#Version-6.0.0).
