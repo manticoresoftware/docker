@@ -118,6 +118,8 @@ _main() {
 }
 
 _replace_conf_from_env() {
+  # we exit in case a custom config is provided
+  if [ "$(md5sum /etc/manticoresearch/manticore.conf | awk '{print $1}')" != "$(cat /manticore.conf.md5)" ]; then return; fi
 
   sed_query=""
 

@@ -88,6 +88,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
     && tar -xf /tmp/ru.pak.tgz -C /usr/share/manticore/
 
 COPY manticore.conf /etc/manticoresearch/
+RUN md5sum /etc/manticoresearch/manticore.conf|awk '{print $1}' > /manticore.conf.md5
 COPY sandbox.sql /sandbox.sql
 COPY .mysql_history /root/.mysql_history
 
