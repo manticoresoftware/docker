@@ -68,7 +68,7 @@ The Manticore Search Docker image doesn't come with the [Manticore Columnar Libr
 
 Using `EXTRA=1` also activates [Manticore Buddy](https://github.com/manticoresoftware/manticoresearch-buddy), which is used for processing certain commands. For more information, refer to the [changelog](https://manual.manticoresearch.com/Changelog#Version-6.0.0).
 
-If you need just the MCL alone you can use the environment variable `MCL=1`.
+If you only need the MCL, you can use the environment variable `MCL=1`.
 
 
 ### Docker-compose
