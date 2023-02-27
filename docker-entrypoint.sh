@@ -105,7 +105,7 @@ _main() {
   if [ "${1#-}" != "$1" ]; then
     set -- searchd "$@"
   fi
-  if [ "$1" = 'searchd' ] && ! _searchd_want_help "@"; then
+  if ([ "$1" = 'searchd' ] || [ "$1" = 'indexer' ]) && ! _searchd_want_help "@"; then
     docker_setup_env "$@"
     # allow the container to be started with `--user`
     if [ "$(id -u)" = '0' ]; then
