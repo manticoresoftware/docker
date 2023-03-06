@@ -11,7 +11,7 @@ RUN groupadd -r manticore && useradd -r -g manticore manticore
 
 ENV GOSU_VERSION 1.11
 
-ENV MCL_URL=${MCL_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-columnar-lib_2.0.0-230130-a7c703d__ARCH_64.deb"}
+ENV MCL_URL=${MCL_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-columnar-lib_2.0.4-230306-5a49bd7__ARCH_64.deb"}
 ENV DAEMON_URL=${DAEMON_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-server_6.0.2-230210-89c7a5139__ARCH_64.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-server-core_6.0.2-230210-89c7a5139__ARCH_64.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-backup_0.5.2-23020607-4a37932_all.deb \
