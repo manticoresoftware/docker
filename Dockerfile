@@ -12,14 +12,14 @@ RUN groupadd -r manticore && useradd -r -g manticore manticore
 ENV GOSU_VERSION 1.11
 
 ENV MCL_URL=${MCL_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-columnar-lib_2.0.4-230306-5a49bd7__ARCH_64.deb"}
-ENV DAEMON_URL=${DAEMON_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-server_6.0.2-230210-89c7a5139__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-server-core_6.0.2-230210-89c7a5139__ARCH_64.deb \
+ENV DAEMON_URL=${DAEMON_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-server_6.0.4-230314-1a3a4ea82__ARCH_64.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-server-core_6.0.4-230314-1a3a4ea82__ARCH_64.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-backup_0.5.2-23020607-4a37932_all.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-buddy_0.3.4-23020607-4798582_all.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-tools_6.0.2-230210-89c7a5139__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-common_6.0.2-230210-89c7a5139_all.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore_6.0.2-230210-89c7a5139__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-dev_6.0.2-230210-89c7a5139_all.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-buddy_0.4.2-23031500-36757ee_all.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-tools_6.0.4-230314-1a3a4ea82__ARCH_64.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-common_6.0.4-230314-1a3a4ea82_all.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore_6.0.4-230314-1a3a4ea82__ARCH_64.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-dev_6.0.4-230314-1a3a4ea82_all.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-icudata-65l.deb"}
 
 # if you set EXTRA=1, MCL=1 will called automatically
