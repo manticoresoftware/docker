@@ -27,79 +27,126 @@ docker_setup_env() {
   fi
 
   if [[ "${EXTRA}" == "1" ]]; then
-    if [[ $(du /usr/bin/manticore-executor | cut -f1) == "0" ]]; then
-        if [ ! -f /etc/ssl/cert.pem ]; then
-              for cert in "/etc/ssl/certs/ca-certificates.crt" \
-                "/etc/pki/tls/certs/ca-bundle.crt" \
-                "/etc/ssl/ca-bundle.pem" \
-                "/etc/pki/tls/cacert.pem" \
-                "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"; do
-                if [ -f "$cert" ]; then
-                  ln -s "$cert" /etc/ssl/cert.pem
-                  break
-                fi
-              done
-            fi
+    MCL_DIR="/var/lib/manticore/.mcl/"
+    EXTRA_DIR="/var/lib/manticore/.extra/"
 
-            LAST_PATH=$(pwd)
-            EXTRA_URL=$(cat /extra.url)
-            EXTRA_DIR="/var/lib/manticore/.extra/"
+    if [ -f "${EXTRA_DIR}manticore-executor" ]; then
+      cp ${EXTRA_DIR}manticore-executor /usr/bin/manticore-executor
+    fi
 
-            if [ ! -d $EXTRA_DIR ]; then
-              mkdir $EXTRA_DIR
-            fi
+    if [ ! -f /etc/ssl/cert.pem ]; then
+      for cert in "/etc/ssl/certs/ca-certificates.crt" \
+        "/etc/pki/tls/certs/ca-bundle.crt" \
+        "/etc/ssl/ca-bundle.pem" \
+        "/etc/pki/tls/cacert.pem" \
+        "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"; do
+        if [ -f "$cert" ]; then
+          ln -s "$cert" /etc/ssl/cert.pem
+          break
+        fi
+      done
+    fi
 
-            if [[ -z $(find $EXTRA_DIR -name 'manticore-executor') ]]; then
-                wget -P $EXTRA_DIR $EXTRA_URL
-                cd $EXTRA_DIR
-                PACKAGE_NAME=$(ls | grep manticore-executor | head -n 1)
-                ar -x $PACKAGE_NAME
-                tar -xf data.tar.xz
-            fi
+    LAST_PATH=$(pwd)
+    EXTRA_URL=$(cat /extra.url)
+    EXTRA_INSTALLED_VERSION_PATH="/var/lib/manticore/.extra.installed"
+    NEW_EXTRA_VERSION=$(echo $EXTRA_URL | cut -d"_" -f4 | cut -d"-" -f3)
 
-            find $EXTRA_DIR -name 'manticore-executor' -exec cp {} /usr/bin/manticore-executor \;
-            cd $LAST_PATH
+    if [ ! -f $EXTRA_INSTALLED_VERSION_PATH ]; then
+      # Extra was never be installed
+      echo "Install extra packages"
+      install_extra $EXTRA_URL $EXTRA_INSTALLED_VERSION_PATH $NEW_EXTRA_VERSION $EXTRA_DIR
+    else
+      INSTALLED_EXTRA_VERSION=$(cat $EXTRA_INSTALLED_VERSION_PATH)
+
+      if [[ $INSTALLED_EXTRA_VERSION != $NEW_EXTRA_VERSION ]]; then
+        echo "Extra packages version mismatch. Updating..."
+        install_extra $EXTRA_URL $EXTRA_INSTALLED_VERSION_PATH $NEW_EXTRA_VERSION $EXTRA_DIR 1
+      fi
     fi
 
     MCL="1"
   fi
 
   if [[ "${MCL}" == "1" ]]; then
-      LIB_MANTICORE_COLUMNAR="/var/lib/manticore/.mcl/lib_manticore_columnar.so"
-      LIB_MANTICORE_SECONDARY="/var/lib/manticore/.mcl/lib_manticore_secondary.so"
+    LIB_MANTICORE_COLUMNAR="${MCL_DIR}lib_manticore_columnar.so"
+    LIB_MANTICORE_SECONDARY="${MCL_DIR}lib_manticore_secondary.so"
+    COLUMNAR_VERSION=$(cat /mcl.url | cut -d"-" -f6 | cut -d"_" -f1)
 
-      [ -L /usr/share/manticore/modules/lib_manticore_columnar.so ] || ln -s $LIB_MANTICORE_COLUMNAR /usr/share/manticore/modules/lib_manticore_columnar.so
-      [ -L /usr/share/manticore/modules/lib_manticore_secondary.so ] || ln -s $LIB_MANTICORE_SECONDARY /usr/share/manticore/modules/lib_manticore_secondary.so
+    [ -L /usr/share/manticore/modules/lib_manticore_columnar.so ] || ln -s $LIB_MANTICORE_COLUMNAR /usr/share/manticore/modules/lib_manticore_columnar.so
+    [ -L /usr/share/manticore/modules/lib_manticore_secondary.so ] || ln -s $LIB_MANTICORE_SECONDARY /usr/share/manticore/modules/lib_manticore_secondary.so
 
-      searchd -v|grep -i error|egrep "trying to load" \
-      && rm $LIB_MANTICORE_COLUMNAR $LIB_MANTICORE_SECONDARY \
-      && echo "WARNING: wrong MCL version was removed, installing the correct one"
+    searchd -v | grep -i error | egrep "trying to load" &&
+      rm $LIB_MANTICORE_COLUMNAR $LIB_MANTICORE_SECONDARY &&
+      echo "WARNING: wrong MCL version was removed, installing the correct one"
 
-      if [[ ! -f "$LIB_MANTICORE_COLUMNAR" || ! -f "$LIB_MANTICORE_SECONDARY" ]]; then
-        if ! mkdir -p /var/lib/manticore/.mcl/ ; then
-          echo "ERROR: Manticore Columnar Library is inaccessible: couldn't create /var/lib/manticore/.mcl/."
-          exit
-        fi
+    if ! searchd --version | head -n 1 | grep $COLUMNAR_VERSION; then
+      echo "Columnar version mismatch"
+      rm $LIB_MANTICORE_COLUMNAR > /dev/null 2>&1  || echo "Lib columnar not installed"
+      rm $LIB_MANTICORE_SECONDARY > /dev/null 2>&1  || echo "Secondary columnar not installed"
+    fi
 
-        MCL_URL=$(cat /mcl.url)
-        wget -P /tmp $MCL_URL
-
-        LAST_PATH=$(pwd)
-        cd /tmp
-        PACKAGE_NAME=$(ls | grep manticore-columnar | head -n 1)
-        ar -x $PACKAGE_NAME
-        tar -xf data.tar.gz
-        find . -name '*.so' -exec cp {} /var/lib/manticore/.mcl/ \;
-        cd $LAST_PATH
+    if [[ ! -f "$LIB_MANTICORE_COLUMNAR" || ! -f "$LIB_MANTICORE_SECONDARY" ]]; then
+      if ! mkdir -p ${MCL_DIR}; then
+        echo "ERROR: Manticore Columnar Library is inaccessible: couldn't create ${MCL_DIR}."
+        exit
       fi
-  fi
 
+      MCL_URL=$(cat /mcl.url)
+      wget -P /tmp $MCL_URL
+
+      LAST_PATH=$(pwd)
+      cd /tmp
+      PACKAGE_NAME=$(ls | grep manticore-columnar | head -n 1)
+      ar -x $PACKAGE_NAME
+      tar -xf data.tar.gz
+      find . -name '*.so' -exec cp {} ${MCL_DIR} \;
+      cd $LAST_PATH
+    fi
+  fi
 
   if [[ -z "${MCL}" && "${MCL}" != "1" ]]; then
     export searchd_secondary_indexes=0
   fi
 
 }
+
+install_extra() {
+
+  # $EXTRA_URL $1
+  # $EXTRA_INSTALLED_VERSION_PATH $2
+  # $NEW_EXTRA_VERSION $3
+  # $EXTRA_DIR $4
+  # $FORCE $5
+
+  # In case force update
+  if [ $5=1 ]; then
+    rm -rf "${4}"
+  fi
+
+
+  if [ ! -d $4 ]; then
+    mkdir $4
+  fi
+
+  if [[ -z $(find $4 -name 'manticore-executor') ]]; then
+    wget -P $4 $1
+    cd $4
+    PACKAGE_NAME=$(ls | grep manticore-executor | head -n 1)
+    ar -x $PACKAGE_NAME
+    tar -xf data.tar.xz
+  fi
+
+  find $4 -name 'manticore-executor' -exec cp {} /usr/bin/manticore-executor \;
+
+  echo $3 >$2
+
+  cd $LAST_PATH
+
+  rm -rf "${4}*"
+  cp /usr/bin/manticore-executor ${4}
+}
+
 _main() {
   # first arg is `h` or some `--option`
   if [ "${1#-}" != "$1" ]; then
