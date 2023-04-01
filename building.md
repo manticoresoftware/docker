@@ -2,7 +2,7 @@
 
 ### Getting started
 
-We uses `docker buildx` for building our docker packages. To build new image:
+We use `docker buildx` for building our docker packages. To build new image:
 1) Check is `buildex` driver was already started, and re-run it in case check was failed:
   ```shell
     if [[ ! $(docker ps | grep manticore_build) ]]; then
