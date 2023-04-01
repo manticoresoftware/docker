@@ -26,8 +26,9 @@ docker_setup_env() {
     [ ! -f /var/log/manticore/query.log ] && ln -sf /dev/stdout /var/log/manticore/query.log
   fi
 
+  MCL_DIR="/var/lib/manticore/.mcl/"
+
   if [[ "${EXTRA}" == "1" ]]; then
-    MCL_DIR="/var/lib/manticore/.mcl/"
     EXTRA_DIR="/var/lib/manticore/.extra/"
 
     if [ -f "${EXTRA_DIR}manticore-executor" ]; then
