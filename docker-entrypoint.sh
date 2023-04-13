@@ -27,7 +27,6 @@ docker_setup_env() {
   fi
 
   if [[ "${EXTRA}" == "1" ]]; then
-    MCL_DIR="/var/lib/manticore/.mcl/"
     EXTRA_DIR="/var/lib/manticore/.extra/"
 
     if [ -f "${EXTRA_DIR}manticore-executor" ]; then
@@ -69,6 +68,7 @@ docker_setup_env() {
   fi
 
   if [[ "${MCL}" == "1" ]]; then
+    MCL_DIR="/var/lib/manticore/.mcl/"
     LIB_MANTICORE_COLUMNAR="${MCL_DIR}lib_manticore_columnar.so"
     LIB_MANTICORE_SECONDARY="${MCL_DIR}lib_manticore_secondary.so"
     COLUMNAR_VERSION=$(cat /mcl.url | cut -d"-" -f6 | cut -d"_" -f1)
