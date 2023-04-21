@@ -35,7 +35,8 @@ RUN set -x \
     && mkdir /etc/ssl/ && touch /usr/bin/manticore-executor \
     && chown -R manticore:manticore /usr/bin/manticore-executor /etc/ssl/ \
     && chmod +x /usr/bin/manticore-executor \
-    && apt-get -y update && apt-get -y install --no-install-recommends ca-certificates binutils wget gnupg xz-utils dirmngr && rm -rf /var/lib/apt/lists/* \
+    && apt-get -y update && apt-get -y install --no-install-recommends ca-certificates binutils wget gnupg xz-utils dirmngr locales && rm -rf /var/lib/apt/lists/* \
+    && locale-gen --lang en_US \
     && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
     && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
     && export GNUPGHOME="$(mktemp -d)" \
