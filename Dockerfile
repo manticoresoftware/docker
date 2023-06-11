@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu:focal as initial
 
 ARG TARGETPLATFORM
 
@@ -79,15 +79,17 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
       && apt-get -y update  \
       && echo $(apt-get -y download --print-uris manticore-columnar-lib | cut -d" " -f1 | cut -d "'" -f 2) > /mcl.url \
       && echo $(apt-get -y download --print-uris manticore-executor | cut -d" " -f1 | cut -d "'" -f 2) > /extra.url ;\
-    elif [ ! -z $DAEMON_URL ]; then \
+    elif [ ! -z "$DAEMON_URL" ]; then \
       echo "2nd step of building release image for linux/${ARCH}64 architecture" \
+      && echo "ARCH: ${ARCH}" \
+      && echo $DAEMON_URL | sed "s/_ARCH_/$ARCH/g" \
       && wget -q $(echo $DAEMON_URL | sed "s/_ARCH_/$ARCH/g") \
       && apt-get -y install ./manticore*deb \
       && echo $MCL_URL | sed "s/_ARCH_/$ARCH/g" > /mcl.url \
       && echo $EXTRA_URL | sed "s/_ARCH_/$ARCH/g" > /extra.url \
       && rm *.deb ; \
-    fi \
-    && if [ -d "/packages/" ]; then apt -y install /packages/*deb; fi \
+    fi
+RUN if [ -d "/packages/" ]; then apt -y install /packages/*deb; fi \
     && mkdir -p /var/run/manticore \
     && mkdir -p /var/lib/manticore/replication \
     && apt-get -y purge --auto-remove \
@@ -111,6 +113,9 @@ COPY .mysql_history /root/.mysql_history
 
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh
+
+FROM scratch
+COPY --from=initial / /
 WORKDIR /var/lib/manticore
 ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 9306
@@ -121,11 +126,16 @@ ENV LC_ALL C.UTF-8
 CMD ["searchd", "--nodetach"]
 
 # How to build manually:
+#   Prepare builder:
+#     docker buildx create --use
+#
 #   Dev version:
 #     Build and load to local registry:
 #       docker buildx build --progress=plain --build-arg DEV=1 --load --platform linux/amd64 --tag manticore:dev .
 #     Build multi-arch and push to remote registry:
-#       docker buildx build --progress=plain --build-arg DEV=1 --push --platform linux/amd64,linux/arm64 --tag manticore:dev .
+#       docker buildx build --progress=plain --build-arg DEV=1 --push --platform linux/amd64,linux/arm64 --tag username/manticore:dev .
+#   Release version:
+#     docker buildx build --progress=plain --build-arg --push --platform linux/amd64,linux/arm64 --tag username/manticore:dev .
 #
 #   With empty urls assuming *deb in the local dir:
-#     docker buildx build --progress=plain --build-arg DEV=0 --build-arg DAEMON_URL="" --build-arg  MCL_URL="" --load --platform linux/amd64 --tag manticoresearch/manticore:local .
+#     docker buildx build --progress=plain --build-arg DEV=0 --build-arg DAEMON_URL="" --build-arg  MCL_URL="" --load --platform linux/amd64 --tag username/manticore:local .
