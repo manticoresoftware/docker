@@ -48,8 +48,8 @@ RUN set -x \
     && chmod +x /usr/bin/manticore-executor \
     && apt-get -y update && apt-get -y install --no-install-recommends ca-certificates binutils wget gnupg xz-utils dirmngr locales && rm -rf /var/lib/apt/lists/* \
     && locale-gen --lang en_US \
-    && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
-    && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
+    && wget -q -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
+    && wget -q -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
     && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
@@ -73,7 +73,7 @@ ADD *deb /packages/
 RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else export ARCH="amd"; fi \
     && if [ "${DEV}" = "1" ]; then \
       echo "2nd step of building dev image for linux/${ARCH}64 architecture" \
-      && wget https://repo.manticoresearch.com/manticore-dev-repo.noarch.deb \
+      && wget -q https://repo.manticoresearch.com/manticore-dev-repo.noarch.deb \
       && dpkg -i manticore-dev-repo.noarch.deb \
       && apt-key adv --fetch-keys 'https://repo.manticoresearch.com/GPG-KEY-manticore' && apt-get -y update && apt-get -y install manticore \
       && apt-get -y update  \
@@ -81,7 +81,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
       && echo $(apt-get -y download --print-uris manticore-executor | cut -d" " -f1 | cut -d "'" -f 2) > /extra.url ;\
     elif [ ! -z $DAEMON_URL ]; then \
       echo "2nd step of building release image for linux/${ARCH}64 architecture" \
-      && wget $(echo $DAEMON_URL | sed "s/_ARCH_/$ARCH/g") \
+      && wget -q $(echo $DAEMON_URL | sed "s/_ARCH_/$ARCH/g") \
       && apt-get -y install ./manticore*deb \
       && echo $MCL_URL | sed "s/_ARCH_/$ARCH/g" > /mcl.url \
       && echo $EXTRA_URL | sed "s/_ARCH_/$ARCH/g" > /extra.url \
@@ -97,9 +97,9 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
     && mkdir -p /var/run/mysqld/ \
     && chown manticore:manticore /var/lib/manticore/ /var/run/mysqld/ /usr/share/manticore/modules/ /var/run/manticore \
     && echo "\n[mysql]\nsilent\nwait\ntable\n" >> /etc/mysql/my.cnf \
-    && wget https://repo.manticoresearch.com/repository/morphology/en.pak.tgz?docker_build=1 -O /tmp/en.pak.tgz \
-    && wget https://repo.manticoresearch.com/repository/morphology/de.pak.tgz?docker_build=1 -O /tmp/de.pak.tgz \
-    && wget https://repo.manticoresearch.com/repository/morphology/ru.pak.tgz?docker_build=1 -O /tmp/ru.pak.tgz \
+    && wget -q https://repo.manticoresearch.com/repository/morphology/en.pak.tgz?docker_build=1 -O /tmp/en.pak.tgz \
+    && wget -q https://repo.manticoresearch.com/repository/morphology/de.pak.tgz?docker_build=1 -O /tmp/de.pak.tgz \
+    && wget -q https://repo.manticoresearch.com/repository/morphology/ru.pak.tgz?docker_build=1 -O /tmp/ru.pak.tgz \
     && tar -xf /tmp/en.pak.tgz -C /usr/share/manticore/ \
     && tar -xf /tmp/de.pak.tgz -C /usr/share/manticore/ \
     && tar -xf /tmp/ru.pak.tgz -C /usr/share/manticore/
