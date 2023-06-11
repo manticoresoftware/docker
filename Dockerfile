@@ -92,6 +92,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
     && mkdir -p /var/lib/manticore/replication \
     && apt-get -y purge --auto-remove \
     && rm -rf /var/lib/apt/lists/* \
+    && rm -fr /packages
     && rm -f /usr/bin/spelldump /usr/bin/wordbreaker \
     && mkdir -p /var/run/mysqld/ \
     && chown manticore:manticore /var/lib/manticore/ /var/run/mysqld/ /usr/share/manticore/modules/ /var/run/manticore \
