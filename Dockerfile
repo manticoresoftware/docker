@@ -22,12 +22,23 @@ https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/ma
 https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-dev_6.0.4-230314-1a3a4ea82_all.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-icudata-65l.deb"}
 
-# if you set EXTRA=1, MCL=1 will called automatically
-# Here is only executor URL, cause columnar-lib which included into package will be installed via MCL=1 flag.
+# If you set EXTRA=1, MCL=1 will automatically be invoked.
+# We're only providing the executor URL here because the columnar-lib included in the package will be installed via the MCL=1 flag.
 ENV EXTRA_URL=${EXTRA_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-executor_0.6.2-23012605-d95e43e__ARCH_64.deb"}
 
-RUN if [ ! -z "${MCL_URL##*_ARCH_*}" ] ; then echo No _ARCH_ placeholder in daemon URL && exit 1 ; fi
-RUN if [ ! -z "${DAEMON_URL##*_ARCH_*}" ] ; then echo No _ARCH_ placeholder in daemon URL && exit 1 ; fi
+RUN if [ -z "$MCL_URL" ] ; then \
+    echo "WARNING: MCL_URL is empty"; \
+elif [ ! -z "${MCL_URL##*_ARCH_*}" ] ; then \
+    echo "ERROR: MCL_URL is not empty, but no _ARCH_ placeholder found in daemon URL"; \
+    exit 1; \
+fi
+
+RUN if [ -z "$DAEMON_URL" ] ; then \
+    echo "WARNING: DAEMON_URL is empty"; \
+elif [ ! -z "${DAEMON_URL##*_ARCH_*}" ] ; then \
+    echo "ERROR: DAEMON_URL is not empty, but no _ARCH_ placeholder found in daemon URL"; \
+    exit 1; \
+fi
 
 RUN set -x \
     && if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else export ARCH="amd"; fi \
@@ -56,6 +67,9 @@ RUN set -x \
 # The below is to make sure the following is never taken from cache
 ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 
+# Add any .deb or .ddeb packages in the current dir to install them all later
+ADD *deb /packages/
+
 RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else export ARCH="amd"; fi \
     && if [ "${DEV}" = "1" ]; then \
       echo "2nd step of building dev image for linux/${ARCH}64 architecture" \
@@ -65,7 +79,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
       && apt-get -y update  \
       && echo $(apt-get -y download --print-uris manticore-columnar-lib | cut -d" " -f1 | cut -d "'" -f 2) > /mcl.url \
       && echo $(apt-get -y download --print-uris manticore-executor | cut -d" " -f1 | cut -d "'" -f 2) > /extra.url ;\
-    else \
+    elif [ ! -z $DAEMON_URL ]; then \
       echo "2nd step of building release image for linux/${ARCH}64 architecture" \
       && wget $(echo $DAEMON_URL | sed "s/_ARCH_/$ARCH/g") \
       && apt-get -y install ./manticore*deb \
@@ -73,6 +87,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
       && echo $EXTRA_URL | sed "s/_ARCH_/$ARCH/g" > /extra.url \
       && rm *.deb ; \
     fi \
+    && if [ -d "/packages/" ]; then apt -y install /packages/*deb; fi \
     && mkdir -p /var/run/manticore \
     && mkdir -p /var/lib/manticore/replication \
     && apt-get -y purge --auto-remove \
@@ -81,9 +96,9 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
     && mkdir -p /var/run/mysqld/ \
     && chown manticore:manticore /var/lib/manticore/ /var/run/mysqld/ /usr/share/manticore/modules/ /var/run/manticore \
     && echo "\n[mysql]\nsilent\nwait\ntable\n" >> /etc/mysql/my.cnf \
-    && wget -P /tmp https://repo.manticoresearch.com/repository/morphology/en.pak.tgz \
-    && wget -P /tmp https://repo.manticoresearch.com/repository/morphology/de.pak.tgz \
-    && wget -P /tmp https://repo.manticoresearch.com/repository/morphology/ru.pak.tgz \
+    && wget https://repo.manticoresearch.com/repository/morphology/en.pak.tgz?docker_build=1 -O /tmp/en.pak.tgz \
+    && wget https://repo.manticoresearch.com/repository/morphology/de.pak.tgz?docker_build=1 -O /tmp/de.pak.tgz \
+    && wget https://repo.manticoresearch.com/repository/morphology/ru.pak.tgz?docker_build=1 -O /tmp/ru.pak.tgz \
     && tar -xf /tmp/en.pak.tgz -C /usr/share/manticore/ \
     && tar -xf /tmp/de.pak.tgz -C /usr/share/manticore/ \
     && tar -xf /tmp/ru.pak.tgz -C /usr/share/manticore/
@@ -103,3 +118,13 @@ EXPOSE 9312
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 CMD ["searchd", "--nodetach"]
+
+# How to build manually:
+#   Dev version:
+#     Build and load to local registry:
+#       docker buildx build --progress=plain --build-arg DEV=1 --load --platform linux/amd64 --tag manticore:dev .
+#     Build multi-arch and push to remote registry:
+#       docker buildx build --progress=plain --build-arg DEV=1 --push --platform linux/amd64,linux/arm64 --tag manticore:dev .
+#
+#   With empty urls assuming *deb in the local dir:
+#     docker buildx build --progress=plain --build-arg DEV=0 --build-arg DAEMON_URL="" --build-arg  MCL_URL="" --load --platform linux/amd64 --tag manticoresearch/manticore:local .
