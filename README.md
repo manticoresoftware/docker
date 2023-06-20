@@ -88,8 +88,6 @@ services:
       memlock:
         soft: -1
         hard: -1
-    environment:
-      - EXTRA=1
     volumes:
       - ./data:/var/lib/manticore
 #      - ./manticore.conf:/etc/manticoresearch/manticore.conf # uncommment if you use a custom config
@@ -153,8 +151,6 @@ services:
       memlock:
         soft: -1
         hard: -1
-    environment:
-      - EXTRA=1
     networks:
       - manticore
   manticore-2:
@@ -170,8 +166,6 @@ services:
       memlock:
         soft: -1
         hard: -1
-    environment:
-      - EXTRA=1
     networks:
       - manticore
 networks:
