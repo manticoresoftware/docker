@@ -109,6 +109,10 @@ docker_setup_env() {
     export searchd_secondary_indexes=0
   fi
 
+  if [[ "${CREATE_PLAIN_INDEXES}" == "1" ]]; then
+    indexer --all
+  fi
+
 }
 
 install_extra() {
@@ -160,7 +164,7 @@ _main() {
   if ([ "$1" = 'searchd' ] || [ "$1" = 'indexer' ]) && ! _searchd_want_help "@"; then
     # allow the container to be started with `--user`
     if [ "$(id -u)" = '0' ]; then
-      find /var/lib/manticore /var/log/manticore /var/run/manticore /etc/manticoresearch \! -user manticore -exec chown manticore '{}' +
+      find /var/lib/manticore /var/log/manticore /var/run/manticore /etc/manticoresearch \! -user manticore -exec chown manticore:manticore '{}' +
       exec gosu manticore "$0" "$@"
     fi
   fi
