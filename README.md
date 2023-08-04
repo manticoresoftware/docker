@@ -2,7 +2,7 @@
 
 This is the git repo of official [Docker image](https://hub.docker.com/r/manticoresearch/manticore/) for [Manticore Search](https://github.com/manticoresoftware/manticoresearch).
 
-❗ Please note: This is a development version repo. For the latest release's information, refer to the readme at https://github.com/manticoresoftware/docker/tree/docker-6.0.4
+❗ Please note: This is a development version repo. For the latest release's information, refer to the readme at https://github.com/manticoresoftware/docker/tree/docker-6.2.0
 
 Manticore Search is an easy to use open source fast database for search. It helps thousands of companies from small to large, such as Craigslist, to search and filter petabytes of text data on a single or hundreds of nodes, do stream full-text filtering, add auto-complete, spell correction, more-like-this, faceting and other search-related technologies to their websites and applications.
 
@@ -56,7 +56,7 @@ Make sure to remove `127.0.0.1:` if you want the ports to be available for exter
 
 ### Manticore Columnar Library and Manticore Buddy
 
-The Manticore Search Docker image doesn't come with the [Manticore Columnar Library](https://github.com/manticoresoftware/columnar) pre-installed, which is necessary if you require columnar storage and secondary indexes. However, it can easily be enabled during runtime by setting the environment variable `EXTRA=1`. For example, `docker run -e EXTRA=1 ... manticoresearch/manticore`. This will download and install the library in the data directory (which is typically mapped as a volume in production environments) and it won't be re-downloaded unless the Manticore Search version is changed. 
+The Manticore Search Docker image doesn't come with the [Manticore Columnar Library](https://github.com/manticoresoftware/columnar) pre-installed, which is necessary if you require columnar storage and secondary indexes. However, it can easily be enabled during runtime by setting the environment variable `EXTRA=1`. For example, `docker run -e EXTRA=1 ... manticoresearch/manticore`. This will download and install the library in the data directory (which is typically mapped as a volume in production environments) and it won't be re-downloaded unless the Manticore Search version is changed.
 
 Using `EXTRA=1` also activates [Manticore Buddy](https://github.com/manticoresoftware/manticoresearch-buddy), which is used for processing certain commands. For more information, refer to the [changelog](https://manual.manticoresearch.com/Changelog#Version-6.0.0).
 
@@ -297,7 +297,7 @@ docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 Once the above steps are completed, run the following `build` and `push` commands:
 
 ```bash
-docker buildx build --push --build-arg DEV=1 --platform linux/arm64,linux/amd64 --tag  manticoresearch/manticore:$BUILD_TAG . 
+docker buildx build --push --build-arg DEV=1 --platform linux/arm64,linux/amd64 --tag  manticoresearch/manticore:$BUILD_TAG .
 ```
 
 # Troubleshooting
