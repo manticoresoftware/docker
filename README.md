@@ -281,6 +281,13 @@ prereaded 0 indexes in 0.000 sec
 accepting connections
 ```
 
+### Startup flags
+
+To start Manticore with custom startup flags, specify them as arguments when using docker run. Ensure you do not include the `searchd` command and include the `--nodetach` flag. Here's an example:
+```bash
+docker run -e EXTRA=1 --name manticore --rm manticoresearch/manticore:latest --replay-flags=ignore-trx-errors --nodetach
+```
+
 ### Running under non-root
 By default, the main Manticore process `searchd` is running under user `manticore` inside the container, but the script which runs on starting the container is run under your default docker user which in most cases is `root`. If that's not what you want you can use `docker ... --user manticore` or `user: manticore` in docker compose yaml to make everything run under `manticore`. Read below about possible volume permissions issue you can get and how to solve it.
 
