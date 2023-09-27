@@ -113,6 +113,27 @@ docker_setup_env() {
     indexer --all
   fi
 
+
+# echo "tbl:* * * * *;tbl2:*/5 2 * * *" | ./cron.sh
+
+##!/bin/bash
+#
+#read -p "Enter command: " input
+#
+#IFS=';' read -ra ITM <<< "$input"
+#for item in "${ITM[@]}"; do
+#
+#  IFS=':' read -ra ADDR <<< "$item"
+#
+#echo "${ADDR[1]}"
+#[[ "${ADDR[1]}" =~ ([0-9,\-\/\*]+\s?){5} ]] && echo matched5
+#
+#  md5=$(echo -n ${ADDR[0]} | md5sum |  awk '{print $1}')
+#  echo "${ADDR[1]} flock -w 0 /tmp/${md5}.lock indexer --rotate ${ADDR[0]}"
+#
+#
+#done
+
 }
 
 install_extra() {
