@@ -293,11 +293,27 @@ docker run -e EXTRA=1 --name manticore --rm manticoresearch/manticore:latest --r
 ### Running under non-root
 By default, the main Manticore process `searchd` is running under user `manticore` inside the container, but the script which runs on starting the container is run under your default docker user which in most cases is `root`. If that's not what you want you can use `docker ... --user manticore` or `user: manticore` in docker compose yaml to make everything run under `manticore`. Read below about possible volume permissions issue you can get and how to solve it.
 
-### Creating plain tables on startup
-To build plain tables specified in your custom configuration file, you can use the `CREATE_PLAIN_TABLES=1` environment variable. It will execute `indexer --all` before Manticore starts. This is useful if you don't use volumes, and your tables are easy to recreate.
-```bash
-docker run -e CREATE_PLAIN_TABLES=1 --name manticore -v $(pwd)/manticore.conf:/etc/manticoresearch/manticore.conf -p 9306:9306 -p 9308:9308 -d manticoresearch/manticore
-```
+
+### Establishing Plain Tables at Startup
+
+We offer several approaches for establishing plain tables as specified in your custom configuration file 
+during startup. These actions occur before Manticore begins its operation and are particularly 
+beneficial when you do not utilize volumes, or when your tables can be easily recreated.
+
+1) **Index All Plain Indexes on Startup:**
+
+   To achieve this, simply set the environment variable `CREATE_PLAIN_TABLES=1`.
+2) **Initialize Indexing for Specific Tables on Startup:**
+
+   You can initiate indexing for specific tables by using the following syntax: `CREATE_PLAIN_TABLES=tbl1;tbl2`.
+3) **Scheduled Cron-Based Indexing for Specific Tables:**
+
+   Schedule indexing tasks for desired tables using the format `CREATE_PLAIN_TABLES={table name}:{crontab schedule command}`.
+    * For a single table, use: `CREATE_PLAIN_TABLES=tbl:* * * * *`.
+    * To combine multiple tables, format it like this: `CREATE_PLAIN_TABLES=tbl:* * * * *;tbl2:*/5 2 * * *`.
+4) **Combining Cron-Based and Startup Table Indexing:**
+
+   If you want to combine cron-based indexing with indexing desired tables at startup, utilize the following format: `CREATE_PLAIN_TABLES=tbl:* * * * *;tbl2:*/5 2 * * *;deltaTable;tbl2`.
 
 # Building with buildx
 

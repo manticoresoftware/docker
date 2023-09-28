@@ -46,7 +46,7 @@ RUN set -x \
     && mkdir /etc/ssl/ && touch /usr/bin/manticore-executor \
     && chown -R manticore:manticore /usr/bin/manticore-executor /etc/ssl/ \
     && chmod +x /usr/bin/manticore-executor \
-    && apt-get -y update && apt-get -y install --no-install-recommends ca-certificates binutils wget gnupg xz-utils dirmngr locales cron && rm -rf /var/lib/apt/lists/* \
+    && apt-get -y update && apt-get -y install --no-install-recommends ca-certificates binutils wget gnupg xz-utils dirmngr locales cron nano && rm -rf /var/lib/apt/lists/* \
     && locale-gen --lang en_US \
     && wget -q -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
     && wget -q -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
@@ -68,7 +68,7 @@ RUN set -x \
 ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 
 # Add any .deb or .ddeb packages in the current dir to install them all later
-ADD *deb /packages/
+#ADD *deb /packages/
 
 RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else export ARCH="amd"; fi \
     && if [ "${DEV}" = "1" ]; then \
@@ -113,6 +113,10 @@ COPY .mysql_history /root/.mysql_history
 
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh
+
+RUN touch /etc/cron.d/manticore /var/run/crond.pid && \
+    chown manticore:manticore /etc/cron.d/manticore /var/run/crond.pid && \
+    chmod gu+s /usr/sbin/cron
 
 FROM scratch
 COPY --from=initial / /

@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eo pipefail
+set -exo pipefail
 
 # check to see if this file is being run or sourced from another script
 _is_sourced() {
@@ -109,30 +109,43 @@ docker_setup_env() {
     export searchd_secondary_indexes=0
   fi
 
+  if [[ -n ${CREATE_PLAIN_TABLES} && ${CREATE_PLAIN_TABLES} != "1" ]]; then
+
+    INDEXER_TABLES_LIST=""
+
+    IFS=';' read -ra ITM <<<"${CREATE_PLAIN_TABLES}"
+    for item in "${ITM[@]}"; do
+
+      IFS=':' read -ra ADDR <<<"$item"
+
+      if [ -z "${ADDR[1]}" ]; then
+        INDEXER_TABLES_LIST+=" ${ADDR[0]}"
+        continue
+      fi
+
+      if [[ ! "${ADDR[1]}" =~ ^([0-9,\-\/\*]+ )([0-9,\-\/\*]+ )([0-9,\-\/\*]+ )([0-9,\-\/\*]+ )([0-9,\-\/\*]+)$ ]]; then
+        echo -e "\033[0;31mError:\033[0m Wrong crontab syntax \033[0;31m${ADDR[1]}\033[0m for index: ${ADDR[0]}"
+        continue
+      fi
+
+      md5=$(echo -n ${ADDR[0]} | md5sum | awk '{print $1}')
+      echo "${ADDR[1]} flock -w 0 /tmp/${md5}.lock indexer --rotate ${ADDR[0]} >> /var/log/manticore/cron-${md5}.log" >> /etc/cron.d/manticore
+      CRONTAB_AFFECTED=1
+    done
+
+    if [ -n "$CRONTAB_AFFECTED" ]; then
+        crontab /etc/cron.d/manticore
+        cron -f &
+    fi
+
+    if [ -n "$INDEXER_TABLES_LIST" ]; then
+        indexer --rotate $INDEXER_TABLES_LIST
+    fi
+  fi
+
   if [[ "${CREATE_PLAIN_TABLES}" == "1" ]]; then
     indexer --all
   fi
-
-
-# echo "tbl:* * * * *;tbl2:*/5 2 * * *" | ./cron.sh
-
-##!/bin/bash
-#
-#read -p "Enter command: " input
-#
-#IFS=';' read -ra ITM <<< "$input"
-#for item in "${ITM[@]}"; do
-#
-#  IFS=':' read -ra ADDR <<< "$item"
-#
-#echo "${ADDR[1]}"
-#[[ "${ADDR[1]}" =~ ([0-9,\-\/\*]+\s?){5} ]] && echo matched5
-#
-#  md5=$(echo -n ${ADDR[0]} | md5sum |  awk '{print $1}')
-#  echo "${ADDR[1]} flock -w 0 /tmp/${md5}.lock indexer --rotate ${ADDR[0]}"
-#
-#
-#done
 
 }
 
@@ -174,12 +187,9 @@ install_extra() {
 
 _main() {
   # first arg is `h` or some `--option`
+
   if [ "${1#-}" != "$1" ]; then
     set -- searchd "$@"
-  fi
-
-  if ! _searchd_want_help "@"; then
-    docker_setup_env "$@"
   fi
 
   if ([ "$1" = 'searchd' ] || [ "$1" = 'indexer' ]) && ! _searchd_want_help "@"; then
@@ -189,6 +199,11 @@ _main() {
       exec gosu manticore "$0" "$@"
     fi
   fi
+
+  if ! _searchd_want_help "@"; then
+    docker_setup_env "$@"
+  fi
+
   _replace_conf_from_env
   exec "$@"
 }
