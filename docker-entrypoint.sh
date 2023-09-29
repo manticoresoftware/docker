@@ -116,20 +116,20 @@ docker_setup_env() {
     IFS=';' read -ra ITM <<<"${CREATE_PLAIN_TABLES}"
     for item in "${ITM[@]}"; do
 
-      IFS=':' read -ra ADDR <<<"$item"
+      IFS=':' read -ra LINE <<<"$item"
 
-      if [ -z "${ADDR[1]}" ]; then
-        INDEXER_TABLES_LIST+=" ${ADDR[0]}"
+      if [ -z "${LINE[1]}" ]; then
+        INDEXER_TABLES_LIST+=" ${LINE[0]}"
         continue
       fi
 
-      if [[ ! "${ADDR[1]}" =~ ^([0-9,\-\/\*]+ )([0-9,\-\/\*]+ )([0-9,\-\/\*]+ )([0-9,\-\/\*]+ )([0-9,\-\/\*]+)$ ]]; then
-        echo -e "\033[0;31mError:\033[0m Wrong crontab syntax \033[0;31m${ADDR[1]}\033[0m for index: ${ADDR[0]}"
+      if [[ ! "${LINE[1]}" =~ ^([0-9,\-\/\*]+ )([0-9,\-\/\*]+ )([0-9,\-\/\*]+ )([0-9,\-\/\*]+ )([0-9,\-\/\*]+)$ ]]; then
+        echo -e "\033[0;31mError:\033[0m Wrong crontab syntax \033[0;31m${LINE[1]}\033[0m for index: ${LINE[0]}"
         continue
       fi
 
-      md5=$(echo -n ${ADDR[0]} | md5sum | awk '{print $1}')
-      echo "${ADDR[1]} flock -w 0 /tmp/${md5}.lock indexer --rotate ${ADDR[0]} >> /var/log/manticore/cron-${md5}.log" >> /etc/cron.d/manticore
+      md5=$(echo -n ${LINE[0]} | md5sum | awk '{print $1}')
+      echo "${LINE[1]} flock -w 0 /tmp/${md5}.lock indexer --rotate ${LINE[0]} >> /var/log/manticore/cron-${LINE[0]}.log" >> /etc/cron.d/manticore
       CRONTAB_AFFECTED=1
     done
 
@@ -222,10 +222,10 @@ _replace_conf_from_env() {
 
       if [[ $newname == 'listen' ]]; then
         oldname="listen_env"
-        IFS='|' read -ra ADDR <<<"$value"
+        IFS='|' read -ra LISTEN_VALUES <<<"$value"
         count=0
 
-        for i in "${ADDR[@]}"; do
+        for i in "${LISTEN_VALUES[@]}"; do
           if [[ $count == 0 ]]; then
             value=$i
           else
