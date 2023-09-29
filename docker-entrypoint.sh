@@ -109,6 +109,40 @@ docker_setup_env() {
     export searchd_secondary_indexes=0
   fi
 
+  if [[ -n ${CREATE_PLAIN_TABLES} && ${CREATE_PLAIN_TABLES} != "1" ]]; then
+
+    INDEXER_TABLES_LIST=""
+
+    IFS=';' read -ra ITM <<<"${CREATE_PLAIN_TABLES}"
+    for item in "${ITM[@]}"; do
+
+      IFS=':' read -ra LINE <<<"$item"
+
+      if [ -z "${LINE[1]}" ]; then
+        INDEXER_TABLES_LIST+=" ${LINE[0]}"
+        continue
+      fi
+
+      if [[ ! "${LINE[1]}" =~ ^([0-9,\-\/\*]+ )([0-9,\-\/\*]+ )([0-9,\-\/\*]+ )([0-9,\-\/\*]+ )([0-9,\-\/\*]+)$ ]]; then
+        echo -e "\033[0;31mError:\033[0m Wrong crontab syntax \033[0;31m${LINE[1]}\033[0m for table: ${LINE[0]}"
+        continue
+      fi
+
+      md5=$(echo -n ${LINE[0]} | md5sum | awk '{print $1}')
+      echo "${LINE[1]} flock -w 0 /tmp/${md5}.lock indexer --rotate ${LINE[0]} >> /var/log/manticore/cron-${LINE[0]}.log" >> /etc/cron.d/manticore
+      CRONTAB_AFFECTED=1
+    done
+
+    if [ -n "$CRONTAB_AFFECTED" ]; then
+        crontab /etc/cron.d/manticore
+        cron -f &
+    fi
+
+    if [ -n "$INDEXER_TABLES_LIST" ]; then
+        indexer --rotate $INDEXER_TABLES_LIST
+    fi
+  fi
+
   if [[ "${CREATE_PLAIN_TABLES}" == "1" ]]; then
     indexer --all
   fi
@@ -153,12 +187,9 @@ install_extra() {
 
 _main() {
   # first arg is `h` or some `--option`
+
   if [ "${1#-}" != "$1" ]; then
     set -- searchd "$@"
-  fi
-
-  if ! _searchd_want_help "@"; then
-    docker_setup_env "$@"
   fi
 
   if ([ "$1" = 'searchd' ] || [ "$1" = 'indexer' ]) && ! _searchd_want_help "@"; then
@@ -168,6 +199,11 @@ _main() {
       exec gosu manticore "$0" "$@"
     fi
   fi
+
+  if ! _searchd_want_help "@"; then
+    docker_setup_env "$@"
+  fi
+
   _replace_conf_from_env
   exec "$@"
 }
@@ -186,10 +222,10 @@ _replace_conf_from_env() {
 
       if [[ $newname == 'listen' ]]; then
         oldname="listen_env"
-        IFS='|' read -ra ADDR <<<"$value"
+        IFS='|' read -ra LISTEN_VALUES <<<"$value"
         count=0
 
-        for i in "${ADDR[@]}"; do
+        for i in "${LISTEN_VALUES[@]}"; do
           if [[ $count == 0 ]]; then
             value=$i
           else
