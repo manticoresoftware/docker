@@ -294,30 +294,27 @@ docker run -e EXTRA=1 --name manticore --rm manticoresearch/manticore:latest --r
 By default, the main Manticore process `searchd` is running under user `manticore` inside the container, but the script which runs on starting the container is run under your default docker user which in most cases is `root`. If that's not what you want you can use `docker ... --user manticore` or `user: manticore` in docker compose yaml to make everything run under `manticore`. Read below about possible volume permissions issue you can get and how to solve it.
 
 
-### Establishing Plain Tables at Startup
+### Building plain tables on startup
 
-We offer several approaches for establishing plain tables as specified in your custom configuration file 
-during startup. These actions occur before Manticore begins its operation and are particularly 
-beneficial when you do not utilize volumes, or when your tables can be easily recreated.
+There are several methods to build plain tables from your custom configuration file. Each method utilizes the environment variable `CREATE_PLAIN_TABLES` (`docker run -e CREATE_PLAIN_TABLES=...`)
 
-1) **Index All Plain Indexes on Startup:**
+1) **Build all plain tables on startup:**  
+   Simply set the environment variable to `CREATE_PLAIN_TABLES=1`.
 
-   To achieve this, simply set the environment variable `CREATE_PLAIN_TABLES=1`.
-2) **Initialize Indexing for Specific Tables on Startup:**
+2) **Build specific tables on startup:**  
+   To initiate indexing for specific tables, use the following syntax: `CREATE_PLAIN_TABLES=tbl1;tbl2`.
 
-   You can initiate indexing for specific tables by using the following syntax: `CREATE_PLAIN_TABLES=tbl1;tbl2`.
-3) **Scheduled Cron-Based Indexing for Specific Tables:**
-
-   Schedule indexing tasks for desired tables using the format `CREATE_PLAIN_TABLES={table name}:{crontab schedule command}`.
+3) **Scheduled cron-based building of specific tables:**  
+   Schedule indexing tasks for specific tables using the format `CREATE_PLAIN_TABLES={table name}:{crontab schedule command}`.
     * For a single table, use: `CREATE_PLAIN_TABLES=tbl:* * * * *`.
-    * To combine multiple tables, format it like this: `CREATE_PLAIN_TABLES=tbl:* * * * *;tbl2:*/5 2 * * *`.
-4) **Combining Cron-Based and Startup Table Indexing:**
+    * To index multiple tables, format it like this: `CREATE_PLAIN_TABLES=tbl:* * * * *;tbl2:*/5 2 * * *`.
 
-   If you want to combine cron-based indexing with indexing desired tables at startup, utilize the following format: `CREATE_PLAIN_TABLES=tbl:* * * * *;tbl2:*/5 2 * * *;deltaTable;tbl2`.
+4) **Combining cron-based and startup table rebuilding:**  
+   To combine cron-based indexing with the indexing of desired tables on startup, use this format: `CREATE_PLAIN_TABLES=tbl:* * * * *;tbl2:*/5 2 * * *;deltaTable;tbl3`.
 
-# Building with buildx
+# Building docker image with buildx
 
-To build multi-arch images, we use the buildx plugin. Before building, follow these steps:
+To build multi-arch images, we use the buildx docker plugin. Before building, follow these steps:
 
 ```bash
 docker buildx create  --name manticore_build --platform linux/amd64,linux/arm64
