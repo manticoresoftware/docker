@@ -124,7 +124,7 @@ docker_setup_env() {
       fi
 
       if [[ ! "${ADDR[1]}" =~ ^([0-9,\-\/\*]+ )([0-9,\-\/\*]+ )([0-9,\-\/\*]+ )([0-9,\-\/\*]+ )([0-9,\-\/\*]+)$ ]]; then
-        echo -e "\033[0;31mError:\033[0m Wrong crontab syntax \033[0;31m${ADDR[1]}\033[0m for index: ${ADDR[0]}"
+        echo -e "\033[0;31mError:\033[0m Wrong crontab syntax \033[0;31m${ADDR[1]}\033[0m for table: ${ADDR[0]}"
         continue
       fi
 
