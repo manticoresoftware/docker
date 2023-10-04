@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eo pipefail
+set -exo pipefail
 
 # check to see if this file is being run or sourced from another script
 _is_sourced() {
@@ -195,7 +195,7 @@ _main() {
   if ([ "$1" = 'searchd' ] || [ "$1" = 'indexer' ]) && ! _searchd_want_help "@"; then
     # allow the container to be started with `--user`
     if [ "$(id -u)" = '0' ]; then
-      find /var/lib/manticore /var/log/manticore /var/run/manticore /etc/manticoresearch \! -user manticore -exec chown manticore:manticore '{}' +
+      find /var/lib/manticore /var/log/manticore /var/run/manticore /etc/manticoresearch /dev/stdout \! -user manticore -exec chown manticore:manticore '{}' +
       exec gosu manticore "$0" "$@"
     fi
   fi
