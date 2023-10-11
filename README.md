@@ -312,6 +312,52 @@ There are several methods to build plain tables from your custom configuration f
 4) **Combining cron-based and startup table rebuilding:**  
    To combine cron-based indexing with the indexing of desired tables on startup, use this format: `CREATE_PLAIN_TABLES=tbl:* * * * *;tbl2:*/5 2 * * *;deltaTable;tbl3`.
 
+# Backup And Restore
+
+### Full backup
+
+To create a **full backup**, you need to include the `-e EXTRA=1` flag. 
+The `manticore-backup` package utilizes the `manticore-executor`, which is installed with the EXTRA packages.
+
+Creating a **full backup** is a straightforward process. Simply run the following command:
+
+```bash
+docker exec -it CONTAINER-ID manticore-backup --backup-dir=/tmp
+```
+This command will generate a backup in your `/tmp/` directory.
+
+```bash
+$ ls /tmp/ | grep backup-*
+backup-20230509133521
+```
+Inside this folder, you will find your backup.
+
+### Restore full dump
+
+We have automated the backup restoration process on startup, following the typical approach for Docker images of MySQL or other common databases.
+
+To restore your full backup, you need to mount your backup to the `/docker-entrypoint-initdb.d` folder. 
+Please note that you should mount the content of your backup, not the backup folder itself (e.g., `backup-202307..`).
+
+The restore process temporarily prevents the regular `searchd` start. 
+If you wish to avoid this behavior, you can set the flag `-e START_AFTER_RESTORE=true`.
+
+### Creating SQL dumps
+
+The simplest way to ensure this is to use `docker exec` and run the tool from the same container. Here's an example:
+
+```bash
+docker exec some-mysql sh -c 'exec mysqldump' > /some/path/on/your/host/dump.sql
+```
+
+### Restore SQL dumps
+
+For restoring data, you can use the `docker exec` command with the `-i` flag, similar to the following:
+
+```bash
+docker exec -i MANTICORE_CONTAINER sh -c 'exec mysql' < /some/path/on/your/host/dump.sql
+```
+
 # Building docker image with buildx
 
 To build multi-arch images, we use the buildx docker plugin. Before building, follow these steps:

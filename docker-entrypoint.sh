@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eo pipefail
+set -exo pipefail
 
 # check to see if this file is being run or sourced from another script
 _is_sourced() {
@@ -21,6 +21,11 @@ _searchd_want_help() {
 }
 
 docker_setup_env() {
+
+  GREEN='\033[0;32m'
+  RED='\033[0;31m'
+  NC='\033[0m' # No Color
+
   if [ -n "$QUERY_LOG_TO_STDOUT" ]; then
     export searchd_query_log=/var/log/manticore/query.log
     [ ! -f /var/log/manticore/query.log ] && ln -sf /dev/stdout /var/log/manticore/query.log
@@ -124,7 +129,7 @@ docker_setup_env() {
       fi
 
       if [[ ! "${LINE[1]}" =~ ^([0-9,\-\/\*]+ )([0-9,\-\/\*]+ )([0-9,\-\/\*]+ )([0-9,\-\/\*]+ )([0-9,\-\/\*]+)$ ]]; then
-        echo -e "\033[0;31mError:\033[0m Wrong crontab syntax \033[0;31m${LINE[1]}\033[0m for table: ${LINE[0]}"
+        echo -e "${RED}Error:${NC} Wrong crontab syntax ${RED}${LINE[1]}${NC} for table: ${LINE[0]}"
         continue
       fi
 
@@ -205,6 +210,38 @@ _main() {
   fi
 
   _replace_conf_from_env
+
+  BACKUP_INIT_FOLDER="/docker-entrypoint-initdb.d"
+
+  if [[ $(ls -1 $BACKUP_INIT_FOLDER | wc -l) -eq 4 ]]; then
+
+    if [ $(ls -la /usr/bin/manticore-executor | awk '{print $5}') -eq 0 ]; then
+        echo -e "${RED}Can't run manticore-backup. EXTRA packages wasn't installed${NC}"
+        exit 1
+    fi
+
+    [[ $(which manticore-backup) ]] || \
+      { echo -e "${RED}Manticore backup doesn't installed${NC}"; exit 1; }
+
+    if [ ! -f "${BACKUP_INIT_FOLDER}/versions.json" ]; then
+        echo -e "${RED}Dump is corrupted${NC}"
+        exit 1
+    fi
+
+    #ln -sf /tmp/backup $BACKUP_INIT_FOLDER
+    mkdir /tmp/backup && cp -r $BACKUP_INIT_FOLDER/* /tmp/backup
+
+    find /tmp/backup/config -type f -exec sh -c 'rm -f "${1#/tmp/backup/config}"' sh {} \;
+    find /tmp/backup/state -type f -exec sh -c 'rm -f "${1#/tmp/backup/state}"' sh {} \;
+
+    manticore-backup --backup-dir=/tmp --restore=backup
+
+    if [ -z "$START_AFTER_RESTORE" ]; then
+        echo -e "${GREEN}Dump successfully restored.${NC} Run container again without mount anything to docker-entrypoint-initdb.d"
+        exit 0
+    fi
+  fi
+
   exec "$@"
 }
 
