@@ -139,7 +139,7 @@ docker_setup_env() {
     fi
 
     if [ -n "$INDEXER_TABLES_LIST" ]; then
-        indexer --rotate $INDEXER_TABLES_LIST
+        indexer $INDEXER_TABLES_LIST
     fi
   fi
 
