@@ -1,0 +1,19 @@
+name: k3s Testing
+on: push
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          push: false
+      - name: Checkout
+        uses: actions/checkout@v4
+      - run: |
+          pwd
+          ls
+      - uses: manticoresoftware/clt@main
+        with:
+          image: manticoresearch/helm-test-kit:0.0.1
+          test_prefix: clt_tests/

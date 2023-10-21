@@ -1,0 +1,14 @@
+––– input –––
+searchd
+––– output –––
+Manticore %{SEMVER} %{COMMITDATE} dev
+Copyright (c) 2001-2016, Andrew Aksyonoff
+Copyright (c) 2008-2016, Sphinx Technologies Inc (http://sphinxsearch.com)
+Copyright (c) 2017-%{YEAR}, Manticore Software LTD (https://manticoresearch.com)
+[#!/[0-9]+/!#:#!/[0-9]+/!#.#!/[0-9]+/!#] [20] using config file '/etc/manticoresearch/manticore.conf' (#!/[0-9]+/!# chars)...
+[#!/[0-9]+/!#:#!/[0-9]+/!#.#!/[0-9]+/!#] [20] WARNING: secondary_indexes set but failed to initialize secondary library: (null)
+starting daemon version '%{SEMVER} %{COMMITDATE} dev' ...
+listening on all interfaces for mysql, port=9306
+listening on UNIX socket /var/run/mysqld/mysqld.sock
+listening on 172.17.0.3:9312 for sphinx and http(s)
+listening on all interfaces for sphinx and http(s), port=9308
