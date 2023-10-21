@@ -8,12 +8,10 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: false
-      - name: Checkout
-        uses: actions/checkout@v4
-      - run: |
-          pwd
-          ls
+          tags: manticoresoftware/manticore-docker-test-kit:latest
+          build-args: |
+            DEV=1
       - uses: manticoresoftware/clt@main
         with:
-          image: manticoresearch/helm-test-kit:0.0.1
+          image: manticoresoftware/manticore-docker-test-kit:latest
           test_prefix: clt_tests/
