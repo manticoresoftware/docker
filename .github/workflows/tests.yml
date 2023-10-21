@@ -10,7 +10,6 @@ jobs:
           push: false
           tags: manticoresoftware/manticore-docker-test-kit:latest
           build-args: |
-            DEV=1
             ARCH=amd
       - uses: manticoresoftware/clt@main
         with:
