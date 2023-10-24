@@ -9,6 +9,8 @@ jobs:
         with:
           push: false
           tags: manticoresoftware/manticore:current
+          build-args: |
+            DEV=1
       - name: Build test kit
         uses: docker/build-push-action@v5
         with:
