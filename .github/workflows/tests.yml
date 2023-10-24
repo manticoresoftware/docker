@@ -22,5 +22,5 @@ jobs:
       - uses: manticoresoftware/clt@main
         with:
           image: manticoresoftware/manticore-docker-test-kit:latest
-          test_prefix: ./clt_tests/tests/
+          test_prefix: clt_tests/tests/
           run_args: --privileged
