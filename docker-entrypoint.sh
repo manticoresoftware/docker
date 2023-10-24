@@ -129,7 +129,7 @@ docker_setup_env() {
       fi
 
       md5=$(echo -n ${LINE[0]} | md5sum | awk '{print $1}')
-      echo "${LINE[1]} flock -w 0 /tmp/${md5}.lock indexer --rotate ${LINE[0]} >> /var/log/manticore/cron-${LINE[0]}.log" >> /etc/cron.d/manticore
+      echo "${LINE[1]} cd /var/lib/manticore && flock -w 0 /tmp/${md5}.lock indexer --rotate ${LINE[0]} | sed \"s/.*/$(date): Indexer_${LINE[0]}: &/\" >> /proc/1/fd/1" >> /etc/cron.d/manticore
       CRONTAB_AFFECTED=1
     done
 
