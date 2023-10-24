@@ -11,6 +11,11 @@ jobs:
           tags: manticoresoftware/manticore:current
           build-args: |
             DEV=1
+      - name: Checkout
+        uses: actions/checkout@v4
+      - run: |
+          ls
+          pwd
       - name: Build test kit
         uses: docker/build-push-action@v5
         with:
