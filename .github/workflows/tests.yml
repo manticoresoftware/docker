@@ -16,7 +16,7 @@ jobs:
         with:
           push: false
           tags: manticoresoftware/manticore-docker-test-kit:latest
-          context: clt_tests/testkit
+          context: ./clt_tests/testkit/
       - uses: manticoresoftware/clt@main
         with:
           image: manticoresoftware/manticore-docker-test-kit:latest
