@@ -4,13 +4,6 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
-      - name: Build current docker image
-        uses: docker/build-push-action@v5
-        with:
-          push: false
-          tags: manticoresoftware/manticore:current
-          build-args: |
-            DEV=1
       - name: Checkout
         uses: actions/checkout@v4
       - name: Build test kit
@@ -19,8 +12,11 @@ jobs:
           push: false
           tags: manticoresoftware/manticore-docker-test-kit:latest
           context: ./clt_tests/testkit/
+      - run: |
+          ls
+          pwd
       - uses: manticoresoftware/clt@main
         with:
           image: manticoresoftware/manticore-docker-test-kit:latest
           test_prefix: clt_tests/tests/
-          run_args: --privileged
+          run_args: --privileged -v ".:/docker/"

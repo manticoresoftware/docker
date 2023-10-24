@@ -9,3 +9,6 @@ Done
 docker ps
 ––– output –––
 CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+––– input –––
+docker build -t ms:current /docker/
+––– output –––
