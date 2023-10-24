@@ -10,5 +10,5 @@ docker ps
 ––– output –––
 CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 ––– input –––
-docker build -t ms:current /docker/
+docker build -t manticoresoftware/manticore:current /docker/ > /dev/null
 ––– output –––
