@@ -1,4 +1,4 @@
-––– block: ../base/init –––
+––– block: ./base/init –––
 ––– input –––
 docker run --name=manticore --quiet -d manticoresoftware/manticore:current
 ––– output –––
