@@ -4,14 +4,19 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
-      - name: Build and push
+      - name: Build current docker image
+        uses: docker/build-push-action@v5
+        with:
+          push: false
+          tags: manticoresoftware/manticore:current
+      - name: Build test kit
         uses: docker/build-push-action@v5
         with:
           push: false
           tags: manticoresoftware/manticore-docker-test-kit:latest
-          build-args: |
-            ARCH=amd
+          build-contexts: |
+            clt_tests/testkit
       - uses: manticoresoftware/clt@main
         with:
           image: manticoresoftware/manticore-docker-test-kit:latest
-          test_prefix: clt_tests/
+          test_prefix: clt_tests/tests
