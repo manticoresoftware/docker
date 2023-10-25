@@ -4,5 +4,5 @@ docker run --name=manticore --quiet -d manticoresoftware/manticore:current
 ––– output –––
 #!/[0-9a-z]+/!#
 ––– input –––
-docker logs manticore
+sleep 5;docker logs manticore
 ––– output –––
