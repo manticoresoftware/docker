@@ -1,0 +1,13 @@
+––– block: ./base/init –––
+––– input –––
+docker run --rm --name=manticore --quiet -d manticoresoftware/manticore:current
+––– output –––
+#!/[0-9a-z]+/!#
+––– input –––
+sleep 5;docker logs manticore | grep "accepting connections"
+––– output –––
+accepting connections
+––– input –––
+docker stop manticore
+––– output –––
+#!/[0-9a-z]+/!#

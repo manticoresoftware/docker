@@ -1,0 +1,22 @@
+name: k3s Testing
+on: push
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build test kit
+        uses: docker/build-push-action@v5
+        with:
+          push: false
+          tags: manticoresoftware/manticore-docker-test-kit:latest
+          context: ./clt_tests/testkit/
+      - run: |
+          ls
+          pwd
+      - uses: manticoresoftware/clt@main
+        with:
+          image: manticoresoftware/manticore-docker-test-kit:latest
+          test_prefix: clt_tests/tests/
+          run_args: --privileged -v ".:/docker/"
