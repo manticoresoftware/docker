@@ -10,6 +10,6 @@ docker ps
 ––– output –––
 CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 ––– input –––
-docker build -t --build-arg="DEV=1" manticoresoftware/manticore:current /docker/ > /dev/null 2>&1; echo $?
+docker build --build-arg="DEV=1" -t manticoresoftware/manticore:current /docker/ > /dev/null 2>&1; echo $?
 ––– output –––
 0
