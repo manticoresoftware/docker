@@ -228,13 +228,11 @@ _main() {
         exit 1
     fi
 
-    #ln -sf /tmp/backup $BACKUP_INIT_FOLDER
-    mkdir /tmp/backup && cp -r $BACKUP_INIT_FOLDER/* /tmp/backup
+    find ${BACKUP_INIT_FOLDER}/config -type f -exec sh -c 'rm -f "${1#/docker-entrypoint-initdb.d/config}"' sh {} \;
+    find ${BACKUP_INIT_FOLDER}/state -type f -exec sh -c 'rm -f "${1#/docker-entrypoint-initdb.d/state}"' sh {} \;
 
-    find /tmp/backup/config -type f -exec sh -c 'rm -f "${1#/tmp/backup/config}"' sh {} \;
-    find /tmp/backup/state -type f -exec sh -c 'rm -f "${1#/tmp/backup/state}"' sh {} \;
-
-    manticore-backup --backup-dir=/tmp --restore=backup
+    manticore-backup --version
+    manticore-backup --force --backup-dir='/' --restore='docker-entrypoint-initdb.d'
 
     if [ -z "$START_AFTER_RESTORE" ]; then
         echo -e "${GREEN}Dump successfully restored.${NC} Run container again without mount anything to docker-entrypoint-initdb.d"
