@@ -1,4 +1,4 @@
-name: k3s Testing
+name: Testing
 on: push
 jobs:
   tests:
@@ -12,10 +12,7 @@ jobs:
           push: false
           tags: manticoresoftware/manticore-docker-test-kit:latest
           context: ./clt_tests/testkit/
-      - run: |
-          ls
-          pwd
-      - uses: manticoresoftware/clt@main
+      - uses: manticoresoftware/clt@0.1.9
         with:
           image: manticoresoftware/manticore-docker-test-kit:latest
           test_prefix: clt_tests/tests/
