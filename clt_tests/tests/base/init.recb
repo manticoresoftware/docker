@@ -1,0 +1,15 @@
+––– input –––
+(dockerd > /var/log/dockerd.log 2>&1 &) > /dev/null
+––– output –––
+––– input –––
+timeout 60 tail -n 100 -f /var/log/dockerd.log | grep -qm1 'API listen on /var/run/docker.sock' && echo 'Done' || echo 'Timeout failed'
+––– output –––
+Done
+––– input –––
+docker ps
+––– output –––
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+––– input –––
+docker build --build-arg="DEV=1" -t manticoresoftware/manticore:current /docker/ > /dev/null 2>&1; echo $?
+––– output –––
+0
