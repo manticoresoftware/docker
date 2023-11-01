@@ -65,6 +65,12 @@ docker_setup_env() {
     fi
 
     MCL="1"
+
+  else
+    if [[ $(du /usr/bin/manticore-executor | awk '{print $1}') -eq 0 ]]; then
+      export searchd_buddy_path=
+    fi
+
   fi
 
   if [[ "${MCL}" == "1" ]]; then
