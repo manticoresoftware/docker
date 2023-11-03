@@ -312,7 +312,7 @@ There are several methods to build plain tables from your custom configuration f
 4) **Combining cron-based and startup table rebuilding:**  
    To combine cron-based indexing with the indexing of desired tables on startup, use this format: `CREATE_PLAIN_TABLES=tbl:* * * * *;tbl2:*/5 2 * * *;deltaTable;tbl3`.
 
-# Backup And Restore
+# Backup and restore
 
 ### Full backup
 
