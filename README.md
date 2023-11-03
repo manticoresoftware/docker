@@ -334,7 +334,6 @@ Inside this folder, you will find your backup.
 
 ### Restore full dump
 
-We have automated the backup restoration process on startup, following the typical approach for Docker images of MySQL or other common databases.
 
 To restore your full backup, you need to mount your backup to the `/docker-entrypoint-initdb.d` folder. 
 Please note that you should mount the content of your backup, not the backup folder itself (e.g., `backup-202307..`).
