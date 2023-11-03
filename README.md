@@ -351,7 +351,7 @@ docker exec some-mysql sh -c 'exec mysqldump' > /some/path/on/your/host/dump.sql
 
 ### Restore SQL dumps
 
-For restoring data, you can use the `docker exec` command with the `-i` flag, similar to the following:
+For restoring data from an sql file created by `mysqldump`, you can use the `docker exec` command with the `-i` flag like this:
 
 ```bash
 docker exec -i MANTICORE_CONTAINER sh -c 'exec mysql' < /some/path/on/your/host/dump.sql
