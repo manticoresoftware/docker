@@ -215,7 +215,7 @@ _main() {
 
   if [[ $(ls -1 $BACKUP_INIT_FOLDER | wc -l) -eq 4 ]]; then
 
-    if [ $(ls -la /usr/bin/manticore-executor | awk '{print $5}') -eq 0 ]; then
+    if [ ! -s /usr/bin/manticore-executor ]; then
         echo -e "${RED}Can't run manticore-backup. EXTRA packages wasn't installed${NC}"
         exit 1
     fi
