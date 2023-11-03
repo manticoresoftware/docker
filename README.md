@@ -343,7 +343,7 @@ If you wish to avoid this behavior, you can set the flag `-e START_AFTER_RESTORE
 
 ### Creating SQL dumps
 
-The simplest way to ensure this is to use `docker exec` and run the tool from the same container. Here's an example:
+`manticore-backup` creates a physical backup. If you prefer a logical backup, you can use `mysqldump` in the container. For that use `docker exec` to log in to the container and run the tool. Here's an example:
 
 ```bash
 docker exec some-mysql sh -c 'exec mysqldump' > /some/path/on/your/host/dump.sql
