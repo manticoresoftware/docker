@@ -335,7 +335,7 @@ Inside this folder, you will find your backup.
 ### Restore full dump
 
 
-To restore your full backup, you need to mount your backup to the `/docker-entrypoint-initdb.d` folder. 
+To restore your full backup on startup, you need to mount your backup to the `/docker-entrypoint-initdb.d` folder. 
 Please note that you should mount the content of your backup, not the backup folder itself (e.g., `backup-202307..`).
 
 The restore process temporarily prevents the regular `searchd` start. 
