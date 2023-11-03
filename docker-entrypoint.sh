@@ -1,5 +1,5 @@
 #!/bin/bash
-set -exo pipefail
+set -eo pipefail
 
 # check to see if this file is being run or sourced from another script
 _is_sourced() {
