@@ -235,7 +235,7 @@ _main() {
     manticore-backup --force --backup-dir='/' --restore='docker-entrypoint-initdb.d'
 
     if [ -z "$START_AFTER_RESTORE" ]; then
-        echo -e "${GREEN}Dump successfully restored.${NC} Run container again without mount anything to docker-entrypoint-initdb.d"
+        echo -e "${GREEN}Dump successfully restored.${NC} Run the container again without mounting anything to docker-entrypoint-initdb.d"        
         exit 0
     fi
   fi
