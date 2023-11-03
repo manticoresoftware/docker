@@ -224,7 +224,7 @@ _main() {
       { echo -e "${RED}manticore-backup isn't installed.${NC}"; exit 1; }
 
     if [ ! -f "${BACKUP_INIT_FOLDER}/versions.json" ]; then
-        echo -e "${RED}Dump is corrupted${NC}"
+        echo -e "${RED}Dump is corrupted.${NC}"
         exit 1
     fi
 
