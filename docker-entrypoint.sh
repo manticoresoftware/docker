@@ -216,7 +216,7 @@ _main() {
   if [[ $(ls -1 $BACKUP_INIT_FOLDER | wc -l) -eq 4 ]]; then
 
     if [ ! -s /usr/bin/manticore-executor ]; then
-        echo -e "${RED}Can't run manticore-backup. EXTRA packages wasn't installed${NC}"
+        echo -e "${RED}Can't run manticore-backup. Use env. var. EXTRA=1 to install the missing packages.${NC}"
         exit 1
     fi
 

@@ -312,7 +312,7 @@ There are several methods to build plain tables from your custom configuration f
 4) **Combining cron-based and startup table rebuilding:**  
    To combine cron-based indexing with the indexing of desired tables on startup, use this format: `CREATE_PLAIN_TABLES=tbl:* * * * *;tbl2:*/5 2 * * *;deltaTable;tbl3`.
 
-# Backup And Restore
+# Backup and restore
 
 ### Full backup
 
@@ -334,9 +334,8 @@ Inside this folder, you will find your backup.
 
 ### Restore full dump
 
-We have automated the backup restoration process on startup, following the typical approach for Docker images of MySQL or other common databases.
 
-To restore your full backup, you need to mount your backup to the `/docker-entrypoint-initdb.d` folder. 
+To restore your full backup on startup, you need to mount your backup to the `/docker-entrypoint-initdb.d` folder. 
 Please note that you should mount the content of your backup, not the backup folder itself (e.g., `backup-202307..`).
 
 The restore process temporarily prevents the regular `searchd` start. 
@@ -344,7 +343,7 @@ If you wish to avoid this behavior, you can set the flag `-e START_AFTER_RESTORE
 
 ### Creating SQL dumps
 
-The simplest way to ensure this is to use `docker exec` and run the tool from the same container. Here's an example:
+`manticore-backup` creates a physical backup. If you prefer a logical backup, you can use `mysqldump` in the container. For that use `docker exec` to log in to the container and run the tool. Here's an example:
 
 ```bash
 docker exec some-mysql sh -c 'exec mysqldump' > /some/path/on/your/host/dump.sql
@@ -352,7 +351,7 @@ docker exec some-mysql sh -c 'exec mysqldump' > /some/path/on/your/host/dump.sql
 
 ### Restore SQL dumps
 
-For restoring data, you can use the `docker exec` command with the `-i` flag, similar to the following:
+For restoring data from an sql file created by `mysqldump`, you can use the `docker exec` command with the `-i` flag like this:
 
 ```bash
 docker exec -i MANTICORE_CONTAINER sh -c 'exec mysql' < /some/path/on/your/host/dump.sql
