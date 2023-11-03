@@ -221,7 +221,7 @@ _main() {
     fi
 
     [[ $(which manticore-backup) ]] || \
-      { echo -e "${RED}Manticore backup doesn't installed${NC}"; exit 1; }
+      { echo -e "${RED}manticore-backup isn't installed.${NC}"; exit 1; }
 
     if [ ! -f "${BACKUP_INIT_FOLDER}/versions.json" ]; then
         echo -e "${RED}Dump is corrupted${NC}"
