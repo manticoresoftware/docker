@@ -1,0 +1,27 @@
+––– block: ./base/init –––
+––– input –––
+docker run -d -e CREATE_PLAIN_TABLES=1 --name manticore -v $(pwd)/clt_tests/tests/base/manticore-indexer-all.conf:/etc/manticoresearch/manticore.conf manticoresoftware/manticore:current
+––– output –––
+#!/[0-9a-z]+/!#
+––– input –––
+sleep 5;docker logs manticore | grep "accepting connections"
+––– output –––
+accepting connections
+––– input –––
+docker exec manticore mysql -e "SHOW TABLES\G;"
+––– output –––
+*************************** 1. row ***************************
+Index: idx1
+ Type: local
+––– input –––
+docker exec manticore mysql -e "SELECT * FROM idx1\G;"
+––– output –––
+*************************** 1. row ***************************
+id: 1
+ f: abc
+*************************** 2. row ***************************
+id: 2
+ f: abc
+*************************** 3. row ***************************
+id: 3
+ f: abc abc

@@ -1,0 +1,62 @@
+––– block: ./base/init –––
+––– input –––
+docker run -d -e "CREATE_PLAIN_TABLES=idx1;idx2:* * * * *" --name manticore -v $(pwd)/clt_tests/tests/base/manticore-indexer-desired.conf:/etc/manticoresearch/manticore.conf manticoresoftware/manticore:current
+––– output –––
+#!/[0-9a-z]+/!#
+––– input –––
+timeout 5 docker logs -f manticore | grep -qm1 "accepting connections" && echo 'accepting connections' || echo 'Timeout failed'
+––– output –––
+accepting connections
+––– input –––
+docker exec manticore mysql -e "SELECT * FROM idx1\G;"
+––– output –––
+*************************** 1. row ***************************
+id: 1
+ f: abc
+*************************** 2. row ***************************
+id: 2
+ f: abc
+*************************** 3. row ***************************
+id: 3
+ f: abc abc
+––– input –––
+docker exec manticore ls | grep idx
+––– output –––
+idx1.spa
+idx1.spd
+idx1.spds
+idx1.spe
+idx1.sph
+idx1.sphi
+idx1.spi
+idx1.spl
+idx1.spm
+idx1.spp
+idx1.spt
+––– input –––
+sleep 65
+––– output –––
+––– input –––
+docker exec manticore ls | grep idx
+––– output –––
+idx1.spa
+idx1.spd
+idx1.spds
+idx1.spe
+idx1.sph
+idx1.sphi
+idx1.spi
+idx1.spl
+idx1.spm
+idx1.spp
+idx1.spt
+idx2.new.spa
+idx2.new.spd
+idx2.new.spds
+idx2.new.spe
+idx2.new.sph
+idx2.new.sphi
+idx2.new.spi
+idx2.new.spm
+idx2.new.spp
+idx2.new.spt

@@ -1,0 +1,28 @@
+––– block: ./base/init –––
+––– input –––
+docker run -d -e "CREATE_PLAIN_TABLES=idx1:* * * * *" --name manticore -v $(pwd)/clt_tests/tests/base/manticore-indexer-desired.conf:/etc/manticoresearch/manticore.conf manticoresoftware/manticore:current
+––– output –––
+#!/[0-9a-z]+/!#
+––– input –––
+timeout 5 docker logs -f manticore | grep -qm1 "accepting connections" && echo 'accepting connections' || echo 'Timeout failed'
+––– output –––
+accepting connections
+––– input –––
+docker exec manticore ls | grep idx | sort
+––– output –––
+––– input –––
+sleep 65
+––– output –––
+––– input –––
+docker exec manticore ls | grep idx | sort
+––– output –––
+idx1.new.spa
+idx1.new.spd
+idx1.new.spds
+idx1.new.spe
+idx1.new.sph
+idx1.new.sphi
+idx1.new.spi
+idx1.new.spm
+idx1.new.spp
+idx1.new.spt
