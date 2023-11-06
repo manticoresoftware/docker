@@ -213,7 +213,7 @@ _main() {
 
   BACKUP_INIT_FOLDER="/docker-entrypoint-initdb.d"
 
-  if [[ $(ls -1 $BACKUP_INIT_FOLDER | wc -l) -eq 4 ]]; then
+  if [ -f "${BACKUP_INIT_FOLDER}/versions.json" ]; then
 
     if [ ! -s /usr/bin/manticore-executor ]; then
         echo -e "${RED}Can't run manticore-backup. Use env. var. EXTRA=1 to install the missing packages.${NC}"
@@ -222,11 +222,6 @@ _main() {
 
     [[ $(which manticore-backup) ]] || \
       { echo -e "${RED}Manticore backup doesn't installed${NC}"; exit 1; }
-
-    if [ ! -f "${BACKUP_INIT_FOLDER}/versions.json" ]; then
-        echo -e "${RED}Dump is corrupted${NC}"
-        exit 1
-    fi
 
     find ${BACKUP_INIT_FOLDER}/config -type f -exec sh -c 'rm -f "${1#/docker-entrypoint-initdb.d/config}"' sh {} \;
     find ${BACKUP_INIT_FOLDER}/state -type f -exec sh -c 'rm -f "${1#/docker-entrypoint-initdb.d/state}"' sh {} \;
