@@ -312,6 +312,51 @@ There are several methods to build plain tables from your custom configuration f
 4) **Combining scheduled and startup table rebuilding:**  
    To combine scheduled building with the indexing of desired tables on startup, use this format: `CREATE_PLAIN_TABLES=tbl:* * * * *;tbl2:*/5 2 * * *;deltaTable;tbl3`.
 
+# Backup and restore
+
+### Full backup
+
+To create a **full backup**, you need to include the `-e EXTRA=1` flag. 
+The `manticore-backup` package utilizes the `manticore-executor`, which is installed with the EXTRA packages.
+
+Creating a **full backup** is a straightforward process. Simply run the following command:
+
+```bash
+docker exec -it CONTAINER-ID manticore-backup --backup-dir=/tmp
+```
+This command will generate a backup in your `/tmp/` directory.
+
+```bash
+$ ls /tmp/ | grep backup-*
+backup-20230509133521
+```
+Inside this folder, you will find your backup.
+
+### Restore full dump
+
+
+To restore your full backup on startup, you need to mount your backup to the `/docker-entrypoint-initdb.d` folder. 
+Please note that you should mount the content of your backup, not the backup folder itself (e.g., `backup-202307..`).
+
+The restore process temporarily prevents the regular `searchd` start. 
+If you wish to avoid this behavior, you can set the flag `-e START_AFTER_RESTORE=true`.
+
+### Creating SQL dumps
+
+`manticore-backup` creates a physical backup. If you prefer a logical backup, you can use `mysqldump` in the container. For that use `docker exec` to log in to the container and run the tool. Here's an example:
+
+```bash
+docker exec some-mysql sh -c 'exec mysqldump' > /some/path/on/your/host/dump.sql
+```
+
+### Restore SQL dumps
+
+For restoring data from an sql file created by `mysqldump`, you can use the `docker exec` command with the `-i` flag like this:
+
+```bash
+docker exec -i MANTICORE_CONTAINER sh -c 'exec mysql' < /some/path/on/your/host/dump.sql
+```
+
 # Building docker image with buildx
 
 To build multi-arch images, we use the buildx docker plugin. Before building, follow these steps:

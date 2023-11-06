@@ -92,12 +92,14 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
 RUN if [ -d "/packages/" ]; then apt -y install /packages/*deb; fi \
     && mkdir -p /var/run/manticore \
     && mkdir -p /var/lib/manticore/replication \
+    && mkdir /docker-entrypoint-initdb.d \
     && apt-get -y purge --auto-remove \
     && rm -rf /var/lib/apt/lists/* \
     && rm -fr /packages \
     && rm -f /usr/bin/spelldump /usr/bin/wordbreaker \
     && mkdir -p /var/run/mysqld/ \
-    && chown manticore:manticore /var/lib/manticore/ /var/run/mysqld/ /usr/share/manticore/modules/ /var/run/manticore \
+    && chown -R manticore:manticore /docker-entrypoint-initdb.d /var/lib/manticore/ /var/run/mysqld/ /usr/share/manticore/ \
+    /usr/share/manticore/modules/ /var/run/manticore \
     && echo "\n[mysql]\nsilent\nwait\ntable\n" >> /etc/mysql/my.cnf \
     && wget -q https://repo.manticoresearch.com/repository/morphology/en.pak.tgz?docker_build=1 -O /tmp/en.pak.tgz \
     && wget -q https://repo.manticoresearch.com/repository/morphology/de.pak.tgz?docker_build=1 -O /tmp/de.pak.tgz \

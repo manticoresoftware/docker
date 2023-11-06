@@ -21,6 +21,11 @@ _searchd_want_help() {
 }
 
 docker_setup_env() {
+
+  GREEN='\033[0;32m'
+  RED='\033[0;31m'
+  NC='\033[0m' # No Color
+
   if [ -n "$QUERY_LOG_TO_STDOUT" ]; then
     export searchd_query_log=/var/log/manticore/query.log
     [ ! -f /var/log/manticore/query.log ] && ln -sf /dev/stdout /var/log/manticore/query.log
@@ -130,7 +135,7 @@ docker_setup_env() {
       fi
 
       if [[ ! "${LINE[1]}" =~ ^([0-9,\-\/\*]+ )([0-9,\-\/\*]+ )([0-9,\-\/\*]+ )([0-9,\-\/\*]+ )([0-9,\-\/\*]+)$ ]]; then
-        echo -e "\033[0;31mError:\033[0m Wrong crontab syntax \033[0;31m${LINE[1]}\033[0m for table: ${LINE[0]}"
+        echo -e "${RED}Error:${NC} Wrong crontab syntax ${RED}${LINE[1]}${NC} for table: ${LINE[0]}"
         continue
       fi
 
@@ -211,6 +216,31 @@ _main() {
   fi
 
   _replace_conf_from_env
+
+  BACKUP_INIT_FOLDER="/docker-entrypoint-initdb.d"
+
+  if [ -f "${BACKUP_INIT_FOLDER}/versions.json" ]; then
+
+    if [ ! -s /usr/bin/manticore-executor ]; then
+        echo -e "${RED}Can't run manticore-backup. Use env. var. EXTRA=1 to install the missing packages.${NC}"
+        exit 1
+    fi
+
+    [[ $(which manticore-backup) ]] || \
+      { echo -e "${RED}Manticore backup doesn't installed${NC}"; exit 1; }
+
+    find ${BACKUP_INIT_FOLDER}/config -type f -exec sh -c 'rm -f "${1#/docker-entrypoint-initdb.d/config}"' sh {} \;
+    find ${BACKUP_INIT_FOLDER}/state -type f -exec sh -c 'rm -f "${1#/docker-entrypoint-initdb.d/state}"' sh {} \;
+
+    manticore-backup --version
+    manticore-backup --force --backup-dir='/' --restore='docker-entrypoint-initdb.d'
+
+    if [ -z "$START_AFTER_RESTORE" ]; then
+        echo -e "${GREEN}Dump successfully restored.${NC} Run container again without mount anything to docker-entrypoint-initdb.d"
+        exit 0
+    fi
+  fi
+
   exec "$@"
 }
 
