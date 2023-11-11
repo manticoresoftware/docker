@@ -129,7 +129,7 @@ EXPOSE 9308
 EXPOSE 9312
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
-CMD ["searchd", "--nodetach"]
+CMD ["searchd", "-c", "/etc/manticoresearch/envreader.sh", "--nodetach"]
 
 # How to build manually:
 #   Prepare builder:

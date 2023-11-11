@@ -1,10 +1,5 @@
 #!/bin/bash
 
-#set -x
-
-# We run this script as a config
-# We read original config and enrich it by environment variables
-
 conf=$(cat /etc/manticoresearch/manticore.conf)
 
 if [[ ! $(echo $conf | grep -E "common\s*{") ]]; then
