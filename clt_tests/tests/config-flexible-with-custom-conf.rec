@@ -1,0 +1,30 @@
+––– block: ./base/init –––
+––– input –––
+echo "" > /tmp/manticore.conf;echo $?
+––– output –––
+0
+––– input –––
+docker run --name manticore -v "/tmp/manticore.conf:/etc/manticoresearch/manticore.conf" -d -e searchd_data_dir=/var/lib/manticore -e searchd_log=/var/log/manticore/searchd.log -e searchd_max_packet_size=128M -e searchd_pid_file=/var/run/manticore/searchd.pid -e searchd_query_log_format=sphinxql -e "searchd_listen=9306:mysql41|/var/run/mysqld/mysqld.sock:mysql41|9312|9308:http|127.0.0.1:9315-9325:replication" manticoresoftware/manticore:current
+––– output –––
+#!/[0-9a-z]+/!#
+––– input –––
+sleep 5;docker logs manticore | grep "accepting connections"
+––– output –––
+accepting connections
+––– input –––
+docker exec manticore cat /etc/manticoresearch/manticore.conf.debug
+––– output –––
+searchd {
+query_log_format = sphinxql
+log = /var/log/manticore/searchd.log
+secondary_indexes = 0
+buddy_path =
+pid_file = /var/run/manticore/searchd.pid
+listen = 9306:mysql41
+listen = /var/run/mysqld/mysqld.sock:mysql41
+listen = 9312
+listen = 9308:http
+listen = 127.0.0.1:9315-9325:replication
+data_dir = /var/lib/manticore
+max_packet_size = 128M
+}

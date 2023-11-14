@@ -1,0 +1,29 @@
+––– block: ./base/init –––
+––– input –––
+docker run -d -e searchd_max_packet_size=64m -e "common_lemmatizer_base=/usr/share/manticore/" --name manticore manticoresoftware/manticore:current
+––– output –––
+#!/[0-9a-z]+/!#
+––– input –––
+sleep 5;docker logs manticore | grep "accepting connections"
+––– output –––
+accepting connections
+––– input –––
+docker exec manticore cat /etc/manticoresearch/manticore.conf.debug
+––– output –––
+searchd {
+secondary_indexes = 0
+buddy_path =
+data_dir = /var/lib/manticore
+listen = 9306:mysql41
+listen = /var/run/mysqld/mysqld.sock:mysql41
+listen = 172.18.0.2:9312
+listen = 9308:http
+listen = 172.18.0.2:9315-9325:replication
+log = /var/log/manticore/searchd.log
+max_packet_size = 64m
+pid_file = /var/run/manticore/searchd.pid
+query_log_format = sphinxql
+}
+common {
+lemmatizer_base = /usr/share/manticore/
+}
