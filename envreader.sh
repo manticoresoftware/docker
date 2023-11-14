@@ -1,14 +1,34 @@
 #!/bin/bash
 
-conf=$(cat /etc/manticoresearch/manticore.conf)
+if [[ $(grep -e "#!\/bin\/sh" -e "#!\/bin\/bash" /etc/manticoresearch/manticore.conf) ]]; then
+  executableConfig=1
+fi
 
-if [[ ! $(echo $conf | grep -E "common\s*{") ]]; then
+if [ -z $executableConfig ]; then
+  conf=$(cat /etc/manticoresearch/manticore.conf)
+else
+  conf=$(bash /etc/manticoresearch/manticore.conf)
+fi
+
+
+while IFS='=' read -r envVariable value; do
+  if [[ "${envVariable}" == searchd_* ]]; then
+    hasSearchdEnv=1
+  elif [[ "${envVariable}" == common_* ]]; then
+    hasCommonEnv=1
+  fi
+done < <(env)
+
+
+
+if [[ -n $hasCommonEnv && ! $(echo $conf | grep -E "common\s*{") ]]; then
     conf="$(echo "${conf}")
 common {
 }"
 fi
 
-if [[ ! $(echo $conf | grep -E "searchd\s*{") ]]; then
+
+if [[ -n $hasSearchdEnv && ! $(echo $conf | grep -E "searchd\s*{") ]]; then
     conf="$(echo "${conf}")
 searchd {
 }"
@@ -28,20 +48,20 @@ while IFS='=' read -r envVariable value; do
     value=$(echo ${!envVariable} | sed 's/\//\\\//g')
     cleaned_key=$(echo $envVariable | sed "s/${section}_//")
 
-          if [[ $cleaned_key == 'listen' ]]; then
+    if [[ $cleaned_key == 'listen' ]]; then
 
-            IFS='|' read -ra LISTEN_VALUES <<<"$value"
-            count=0
+      IFS='|' read -ra LISTEN_VALUES <<<"$value"
+      count=0
 
-            for i in "${LISTEN_VALUES[@]}"; do
-              if [[ $count == 0 ]]; then
-                value=$i
-              else
-                value="$value\n    listen = $i"
-              fi
-              count=$((count + 1))
-            done
-          fi
+      for i in "${LISTEN_VALUES[@]}"; do
+        if [[ $count == 0 ]]; then
+          value=$i
+        else
+          value="$value\n    listen = $i"
+        fi
+        count=$((count + 1))
+      done
+    fi
 
     pattern="\s*${cleaned_key}\s*="
     if [[ ${conf} =~ $pattern ]]; then
@@ -55,4 +75,5 @@ while IFS='=' read -r envVariable value; do
 done < <(env)
 
 
+echo "${conf}" > /etc/manticoresearch/manticore.conf.debug
 echo "${conf}"

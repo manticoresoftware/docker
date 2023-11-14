@@ -108,7 +108,7 @@ RUN if [ -d "/packages/" ]; then apt -y install /packages/*deb; fi \
     && tar -xf /tmp/de.pak.tgz -C /usr/share/manticore/ \
     && tar -xf /tmp/ru.pak.tgz -C /usr/share/manticore/
 
-COPY manticore.conf /etc/manticoresearch/
+COPY manticore.conf envreader.sh /etc/manticoresearch/
 RUN md5sum /etc/manticoresearch/manticore.conf|awk '{print $1}' > /manticore.conf.md5
 COPY sandbox.sql /sandbox.sql
 COPY .mysql_history /root/.mysql_history
