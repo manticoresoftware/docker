@@ -49,7 +49,7 @@ while IFS='=' read -r envVariable value; do
     cleaned_key=$(echo $envVariable | sed "s/${section}_//")
 
     if [[ $cleaned_key == 'listen' ]]; then
-
+      conf=$(echo "${conf}" | sed -e "s/^\s*listen\s*=.*$//g" | sed -r '/^\s*$/d')
       IFS='|' read -ra LISTEN_VALUES <<<"$value"
       count=0
 
