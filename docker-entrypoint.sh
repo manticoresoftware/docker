@@ -82,22 +82,25 @@ docker_setup_env() {
     MCL_DIR="/var/lib/manticore/.mcl/"
     LIB_MANTICORE_COLUMNAR="${MCL_DIR}lib_manticore_columnar.so"
     LIB_MANTICORE_SECONDARY="${MCL_DIR}lib_manticore_secondary.so"
+    LIB_MANTICORE_KNN="${MCL_DIR}lib_manticore_knn.so"
     COLUMNAR_VERSION=$(cat /mcl.url | cut -d"-" -f6 | cut -d"_" -f1)
 
     [ -L /usr/share/manticore/modules/lib_manticore_columnar.so ] || ln -s $LIB_MANTICORE_COLUMNAR /usr/share/manticore/modules/lib_manticore_columnar.so
     [ -L /usr/share/manticore/modules/lib_manticore_secondary.so ] || ln -s $LIB_MANTICORE_SECONDARY /usr/share/manticore/modules/lib_manticore_secondary.so
+    [ -L /usr/share/manticore/modules/lib_manticore_knn.so ] || ln -s $LIB_MANTICORE_KNN /usr/share/manticore/modules/lib_manticore_knn.so
 
     searchd -v | grep -i error | egrep "trying to load" &&
-      rm $LIB_MANTICORE_COLUMNAR $LIB_MANTICORE_SECONDARY &&
+      rm $LIB_MANTICORE_COLUMNAR $LIB_MANTICORE_SECONDARY $LIB_MANTICORE_KNN &&
       echo "WARNING: wrong MCL version was removed, installing the correct one"
 
     if ! searchd --version | head -n 1 | grep $COLUMNAR_VERSION; then
       echo "Columnar version mismatch"
-      rm $LIB_MANTICORE_COLUMNAR > /dev/null 2>&1  || echo "Lib columnar not installed"
-      rm $LIB_MANTICORE_SECONDARY > /dev/null 2>&1  || echo "Secondary columnar not installed"
+      rm $LIB_MANTICORE_COLUMNAR > /dev/null 2>&1  || echo "Columnar lib is not installed"
+      rm $LIB_MANTICORE_SECONDARY > /dev/null 2>&1  || echo "Secondary lib is not installed"
+      rm $LIB_MANTICORE_KNN > /dev/null 2>&1  || echo "KNN lib is not installed"
     fi
 
-    if [[ ! -f "$LIB_MANTICORE_COLUMNAR" || ! -f "$LIB_MANTICORE_SECONDARY" ]]; then
+    if [[ ! -f "$LIB_MANTICORE_COLUMNAR" || ! -f "$LIB_MANTICORE_SECONDARY" || ! -f "$LIB_MANTICORE_KNN" ]]; then
       if ! mkdir -p ${MCL_DIR}; then
         echo "ERROR: Manticore Columnar Library is inaccessible: couldn't create ${MCL_DIR}."
         exit
