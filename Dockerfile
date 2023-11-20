@@ -68,7 +68,7 @@ RUN set -x \
 ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 
 # Add any .deb or .ddeb packages in the current dir to install them all later
-ADD *deb /packages/
+#ADD *deb /packages/
 
 RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else export ARCH="amd"; fi \
     && if [ "${DEV}" = "1" ]; then \
@@ -108,7 +108,7 @@ RUN if [ -d "/packages/" ]; then apt -y install /packages/*deb; fi \
     && tar -xf /tmp/de.pak.tgz -C /usr/share/manticore/ \
     && tar -xf /tmp/ru.pak.tgz -C /usr/share/manticore/
 
-COPY envreader.sh /etc/manticoresearch/
+COPY manticore.conf.sh /etc/manticoresearch/
 RUN md5sum /etc/manticoresearch/manticore.conf | awk '{print $1}' > /manticore.conf.md5
 COPY sandbox.sql /sandbox.sql
 COPY .mysql_history /root/.mysql_history
@@ -129,7 +129,7 @@ EXPOSE 9308
 EXPOSE 9312
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
-CMD ["searchd", "-c", "/etc/manticoresearch/envreader.sh", "--nodetach"]
+CMD ["searchd", "-c", "/etc/manticoresearch/manticore.conf.sh", "--nodetach"]
 
 # How to build manually:
 #   Prepare builder:
