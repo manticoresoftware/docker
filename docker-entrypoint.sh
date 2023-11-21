@@ -215,8 +215,7 @@ _main() {
   expectedConfHash=$(cat /manticore.conf.md5)
 
   if [[ "$confHash" == "$expectedConfHash" ]]; then
-    ip=$(hostname -i|rev|cut -d\  -f 1|rev)
-    export searchd_listen="9306:mysql41|/var/run/mysqld/mysqld.sock:mysql41|9308:http|$ip:9312|$ip:9315-9325:replication"
+    export searchd_listen='9306:mysql41|/var/run/mysqld/mysqld.sock:mysql41|9308:http|$ip:9312|$ip:9315-9325:replication'
   fi
 
   if ! _searchd_want_help "@"; then

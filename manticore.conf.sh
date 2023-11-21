@@ -34,6 +34,7 @@ searchd {
 }"
 fi
 
+hostip=$(hostname -i|rev|cut -d\  -f 1|rev)
 
 while IFS='=' read -r envVariable value; do
 
@@ -54,6 +55,7 @@ while IFS='=' read -r envVariable value; do
       count=0
 
       for i in "${LISTEN_VALUES[@]}"; do
+        i=${i/\$ip/$hostip}
         if [[ $count == 0 ]]; then
           value=$i
         else
