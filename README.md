@@ -264,9 +264,14 @@ The settings must be prefixed with their section name, example for in case of `m
 docker run -e EXTRA=1 --name manticore  -p 127.0.0.1:9306:9306  -e searchd_mysql_version_string='5.5.0' -d manticoresearch/manticore
 ```
 
-In case of the `listen` directive, new listening interfaces using the Docker variable `searchd_listen`  in addition to the default ones. Multiple interfaces can be declared, separated by a semi-colon ("|"). To listen only on a network address, the `$ip` (retrieved internally from `hostname -i`) can be used as address alias.
+If you intend to enable the own `listen` directive, utilize the `searchd_listen` environment variable.
 
-For example `-e searchd_listen='9316:http|9307:mysql|$ip:5443:mysql_vip'` will add an additional SQL interface on port 9307, an SQL VIP listener on port 5443 running only on the instance's IP, and an HTTP listener on port 9316, in addition to the defaults on 9306 and 9308, respectively.
+You can specify multiple interfaces separated by a semicolon `("|")`. To exclusively listen on a network address, employ the `$ip` variable (internally retrieved from `hostname -i`) as an address alias.
+
+For instance, using `-e searchd_listen='9316:http|9307:mysql|$ip:5443:mysql_vip'` will incorporate an additional SQL interface on port `9307`, 
+an SQL VIP listener on port `5443` operating solely on the instance's IP (such as 172.17.0.2), and an HTTP listener on port `9316`.
+
+**Attention**: Setting this variable overrides default listeners!
 
 ```bash
 $ docker run -e EXTRA=1 --rm -p 1188:9307  -e searchd_mysql_version_string='5.5.0' -e searchd_listen='9316:http|9307:mysql|$ip:5443:mysql_vip'  manticore
@@ -274,10 +279,6 @@ $ docker run -e EXTRA=1 --rm -p 1188:9307  -e searchd_mysql_version_string='5.5.
 listening on all interfaces for http, port=9316
 listening on all interfaces for mysql, port=9307
 listening on 172.17.0.17:5443 for VIP mysql
-listening on all interfaces for mysql, port=9306
-listening on UNIX socket /var/run/mysqld/mysqld.sock
-listening on 172.17.0.17:9312 for sphinx
-listening on all interfaces for http, port=9308
 prereading 0 indexes
 prereaded 0 indexes in 0.000 sec
 accepting connections
