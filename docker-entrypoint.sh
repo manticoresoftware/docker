@@ -214,13 +214,6 @@ _main() {
     fi
   fi
 
-  confHash=$(md5sum /etc/manticoresearch/manticore.conf | awk '{print $1}')
-  expectedConfHash=$(cat /manticore.conf.md5)
-
-  if [[ "$confHash" == "$expectedConfHash" ]]; then
-    export searchd_listen='9306:mysql41|/var/run/mysqld/mysqld.sock:mysql41|9308:http|$ip:9312|$ip:9315-9325:replication'
-  fi
-
   if ! _searchd_want_help "@"; then
     docker_setup_env "$@"
   fi
