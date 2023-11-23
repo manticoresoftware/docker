@@ -6,7 +6,7 @@ docker run -e EXTRA=1 --name manticore --rm -d manticoresoftware/manticore:curre
 Waiting for Manticore docker to start. Consider mapping the data_dir to make it start faster next time
 #!/.*\.0$/!#
 ––– input –––
-docker exec -it manticore mysql -e "source /sandbox.sql"
+docker exec manticore mysql -e "source /sandbox.sql"
 ––– output –––
 ––– input –––
 docker exec manticore mysql -e "SHOW TABLES\G"
