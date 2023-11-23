@@ -1,0 +1,16 @@
+––– block: ./base/init –––
+––– input –––
+docker run -d -e QUERY_LOG_TO_STDOUT=true --name manticore manticoresoftware/manticore:current
+––– output –––
+#!/[0-9a-z]+/!#
+––– input –––
+sleep 5;docker logs manticore | grep "accepting connections"
+––– output –––
+accepting connections
+––– input –––
+docker exec manticore mysql -e "CREATE TABLE a; SELECT * FROM a;"
+––– output –––
+––– input –––
+docker logs manticore | grep "SELECT \* FROM a;"
+––– output –––
+/* #!/[A-Za-z]+/!# #!/[A-Za-z]+/!# %{NUMBER} #!/[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}/!# %{YEAR} conn %{NUMBER} real #!/[0-9]{1}\.[0-9]{3}/!# wall #!/[0-9]{1}\.[0-9]{3}/!# found %{NUMBER} */ SELECT * FROM a;
