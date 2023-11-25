@@ -1,0 +1,40 @@
+––– block: ./base/init –––
+––– input –––
+docker run --rm -e EXTRA=0 --name manticore -d manticoresoftware/manticore:current
+––– output –––
+#!/[0-9a-z]{40}$/!#
+––– input –––
+timeout 10 docker logs -f manticore 2>1 | grep -qm1 "accepting connections" && echo 'accepting connections' || echo 'Timeout failed'
+––– output –––
+accepting connections
+––– input –––
+docker exec manticore searchd --version
+––– output –––
+Manticore %{SEMVER} #!/[a-z0-9]{7,9}@[0-9]{6}/!# dev
+Copyright (c) 2001-2016, Andrew Aksyonoff
+Copyright (c) 2008-2016, Sphinx Technologies Inc (http://sphinxsearch.com)
+Copyright (c) 2017-%{YEAR}, Manticore Software LTD (https://manticoresearch.com)
+––– input –––
+docker stop manticore
+––– output –––
+manticore
+––– input –––
+sleep 1;docker run --rm -e EXTRA=1 --name manticore -v /tmp/idx:/var/lib/manticore -d manticoresoftware/manticore:current
+––– output –––
+#!/[0-9a-z]{40}$/!#
+––– input –––
+timeout 60 docker logs -f manticore 2>1 | grep -qm1 "secondary\|columnar" && echo 'Done' || echo 'Timeout failed'
+––– output –––
+Done
+––– input –––
+docker stop manticore
+––– output –––
+manticore
+––– input –––
+sleep 1;docker run --rm -e EXTRA=1 --name manticore -v /tmp/idx:/var/lib/manticore -d manticoresoftware/manticore:current
+––– output –––
+#!/[0-9a-z]{40}$/!#
+––– input –––
+timeout 10 docker logs -f manticore 2>1 | grep -qm1 "Install extra packages" || echo 'packages was not installed'
+––– output –––
+packages was not installed
