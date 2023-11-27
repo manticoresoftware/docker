@@ -38,3 +38,15 @@ sleep 1;docker run --rm -e EXTRA=1 --name manticore -v /tmp/idx:/var/lib/mantico
 timeout 10 docker logs -f manticore 2>1 | grep -qm1 "Install extra packages" || echo 'packages was not installed'
 ––– output –––
 packages was not installed
+––– input –––
+docker exec manticore manticore-executor -v
+––– output –––
+PHP %{SEMVER} (cli) (built: #!/[a-zA-Z]{3}/!# #!/[0-9]+/!# %{YEAR} #!/[0-9]{2}:[0-9]{2}:[0-9]{2}/!#) (NTS)
+Copyright (c) The PHP Group
+Zend Engine #!/v[0-9]+\.[0-9]+\.[0-9]+/!#, Copyright (c) Zend Technologies
+––– input –––
+docker exec manticore ls /usr/share/manticore/modules/lib_manticore_columnar.so /usr/share/manticore/modules/lib_manticore_secondary.so /usr/share/manticore/modules/lib_manticore_knn.so
+––– output –––
+/usr/share/manticore/modules/lib_manticore_columnar.so
+/usr/share/manticore/modules/lib_manticore_knn.so
+/usr/share/manticore/modules/lib_manticore_secondary.so
