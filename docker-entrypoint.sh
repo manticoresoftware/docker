@@ -218,8 +218,6 @@ _main() {
     docker_setup_env "$@"
   fi
 
-  _replace_conf_from_env
-
   BACKUP_INIT_FOLDER="/docker-entrypoint-initdb.d"
 
   if [ -f "${BACKUP_INIT_FOLDER}/versions.json" ]; then
@@ -247,46 +245,6 @@ _main() {
   exec "$@"
 }
 
-_replace_conf_from_env() {
-  # we exit in case a custom config is provided
-  if [ "$(md5sum /etc/manticoresearch/manticore.conf | awk '{print $1}')" != "$(cat /manticore.conf.md5)" ]; then return; fi
-
-  sed_query=""
-
-  while IFS='=' read -r oldname value; do
-    if [[ $oldname == 'searchd_'* || $oldname == 'common_'* ]]; then
-      value=$(echo ${!oldname} | sed 's/\//\\\//g')
-      oldname=$(echo $oldname | sed "s/searchd_//g;s/common_//g;")
-      newname=$oldname
-
-      if [[ $newname == 'listen' ]]; then
-        oldname="listen_env"
-        IFS='|' read -ra LISTEN_VALUES <<<"$value"
-        count=0
-
-        for i in "${LISTEN_VALUES[@]}"; do
-          if [[ $count == 0 ]]; then
-            value=$i
-          else
-            value="$value\n    listen = $i"
-          fi
-          count=$((count + 1))
-        done
-      fi
-
-      if [[ -z $sed_query ]]; then
-        sed_query="s/(#\s)*?$oldname\s?=\s?.*?$/$newname = $value/g"
-      else
-        sed_query="$sed_query;s/(#\s)*?$oldname\s?=\s?.*?$/$newname = $value/g"
-      fi
-
-    fi
-  done < <(env)
-
-  if [[ ! -z $sed_query ]]; then
-    sed -i -E "$sed_query" /etc/manticoresearch/manticore.conf
-  fi
-}
 # If we are sourced from elsewhere, don't perform any further actions
 if ! _is_sourced; then
   _main "$@"
