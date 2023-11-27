@@ -37,7 +37,7 @@ sleep 1;docker run --rm -e EXTRA=1 --name manticore -v /tmp/idx:/var/lib/mantico
 ––– input –––
 timeout 10 docker logs -f manticore 2>1 | grep -qm1 "Install extra packages" || echo 'Packages installation skipped'
 ––– output –––
-packages was not installed
+Packages installation skipped
 ––– input –––
 docker exec manticore manticore-executor -v
 ––– output –––
