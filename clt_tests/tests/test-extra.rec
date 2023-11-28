@@ -4,7 +4,7 @@ docker run --rm -e EXTRA=0 --name manticore -d manticoresoftware/manticore:curre
 ––– output –––
 #!/[0-9a-z]{40}$/!#
 ––– input –––
-timeout 10 docker logs -f manticore 2>1 | grep -qm1 "accepting connections" && echo 'accepting connections' || echo 'Сonnection failed'
+timeout 10 docker logs -f manticore 2>1 | grep -qm1 "accepting connections" && echo 'accepting connections' || echo 'Docker failed to start properly in 10 seconds'
 ––– output –––
 accepting connections
 ––– input –––
