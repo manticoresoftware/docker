@@ -4,7 +4,7 @@ docker run -d -e QUERY_LOG_TO_STDOUT=true --name manticore manticoresoftware/man
 ––– output –––
 #!/[0-9a-z]+/!#
 ––– input –––
-sleep 5;docker logs manticore | grep "accepting connections"
+timeout 5 docker logs -f manticore | grep -qm1 "accepting connections" && echo 'accepting connections' || echo 'Timeout failed'
 ––– output –––
 accepting connections
 ––– input –––
