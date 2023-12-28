@@ -91,7 +91,7 @@ docker_setup_env() {
 
     searchd -v | grep -i error | egrep "trying to load" &&
       rm $LIB_MANTICORE_COLUMNAR $LIB_MANTICORE_SECONDARY $LIB_MANTICORE_KNN &&
-      echo "WARNING: wrong MCL version was removed, installing the correct one"
+      echo "WARNING: wrong MCL version has been removed, installing the correct one"
 
     if ! searchd --version | head -n 1 | grep $COLUMNAR_VERSION; then
       echo "Columnar version mismatch"
@@ -228,7 +228,7 @@ _main() {
     fi
 
     [[ $(which manticore-backup) ]] || \
-      { echo -e "${RED}Manticore backup doesn't installed${NC}"; exit 1; }
+      { echo -e "${RED}Manticore backup isn't installed${NC}"; exit 1; }
 
     find ${BACKUP_INIT_FOLDER}/config -type f -exec sh -c 'rm -f "${1#/docker-entrypoint-initdb.d/config}"' sh {} \;
     find ${BACKUP_INIT_FOLDER}/state -type f -exec sh -c 'rm -f "${1#/docker-entrypoint-initdb.d/state}"' sh {} \;
@@ -237,7 +237,7 @@ _main() {
     manticore-backup --force --backup-dir='/' --restore='docker-entrypoint-initdb.d'
 
     if [ -z "$START_AFTER_RESTORE" ]; then
-        echo -e "${GREEN}Dump successfully restored.${NC} Run container again without mount anything to docker-entrypoint-initdb.d"
+        echo -e "${GREEN}Dump successfully restored.${NC} Run container again without mounting anything to docker-entrypoint-initdb.d"
         exit 0
     fi
   fi
