@@ -12,3 +12,10 @@ To ensure the robustness of our Docker commands within the image, we generate th
 docker run -e EXTRA=1 --name manticore --rm -d manticoresearch/manticore:current
 ```
 This command will help you launch and manage the Manticore image with the necessary environment variables.
+
+## Run test example
+
+```bash
+docker build -t manticoresoftware/manticore-docker-test-kit:latest ./clt_tests/testkit/
+RUN_ARGS="-v $(pwd):/docker --privileged" clt test -d -t ./clt_tests/tests/simple.rec manticoresoftware/manticore-docker-test-kit:latest
+```
