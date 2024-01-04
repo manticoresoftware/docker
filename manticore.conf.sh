@@ -42,7 +42,13 @@ searchd {
 }"
 fi
 
-hostip=$(hostname -i|rev|cut -d\  -f 1|rev)
+if hostname -i >/dev/null; then
+  hostip=$(hostname -i|rev|cut -d\  -f 1|rev)
+elif hostname -I >/dev/null; then
+  hostip=$(hostname -I|cut -d\  -f 1)
+else
+  hostip="0.0.0.0"
+fi
 
 while IFS='=' read -r envVariable value; do
 
