@@ -11,7 +11,9 @@ RUN groupadd -r manticore && useradd -r -g manticore manticore
 
 ENV GOSU_VERSION 1.11
 
-ENV MCL_URL=${MCL_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-columnar-lib_2.2.4-230822-5aec342__ARCH_64.deb"}
+ENV MCL_URL=${MCL_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-columnar-lib_2.2.4-230822-5aec342__ARCH_64.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-galera_3.37__ARCH_64.deb"}
+
 ENV DAEMON_URL=${DAEMON_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-server_6.2.12-230822-dc5144d35__ARCH_64.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-server-core_6.2.12-230822-dc5144d35__ARCH_64.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-backup_1.0.8-23080408-f7638f9_all.deb \
@@ -68,7 +70,7 @@ RUN set -x \
 ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 
 # Add any .deb or .ddeb packages in the current dir to install them all later
-ADD *deb /packages/
+#ADD *deb /packages/
 
 RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else export ARCH="amd"; fi \
     && if [ "${DEV}" = "1" ]; then \
@@ -77,7 +79,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
       && dpkg -i manticore-dev-repo.noarch.deb \
       && apt-key adv --fetch-keys 'https://repo.manticoresearch.com/GPG-KEY-manticore' && apt-get -y update && apt-get -y install manticore \
       && apt-get -y update  \
-      && echo $(apt-get -y download --print-uris manticore-columnar-lib | cut -d" " -f1 | cut -d "'" -f 2) > /mcl.url \
+      && echo $(apt-get -y download --print-uris manticore-columnar-lib manticore-galera | cut -d" " -f1 | cut -d "'" -f 2) > /mcl.url \
       && echo $(apt-get -y download --print-uris manticore-executor | cut -d" " -f1 | cut -d "'" -f 2) > /extra.url ;\
     elif [ ! -z "$DAEMON_URL" ]; then \
       echo "2nd step of building release image for linux/${ARCH}64 architecture" \
@@ -91,6 +93,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
     fi
 RUN if [ -d "/packages/" ]; then apt -y install /packages/*deb; fi \
     && mkdir -p /var/run/manticore \
+    && mkdir -p /usr/share/doc/manticore-galera \
     && mkdir -p /var/lib/manticore/replication \
     && mkdir /docker-entrypoint-initdb.d \
     && apt-get -y purge --auto-remove \
@@ -99,7 +102,7 @@ RUN if [ -d "/packages/" ]; then apt -y install /packages/*deb; fi \
     && rm -f /usr/bin/spelldump /usr/bin/wordbreaker \
     && mkdir -p /var/run/mysqld/ \
     && chown -R manticore:manticore /docker-entrypoint-initdb.d /var/lib/manticore/ /var/run/mysqld/ /usr/share/manticore/ \
-    /usr/share/manticore/modules/ /var/run/manticore \
+    /usr/share/manticore/modules/ /usr/share/doc/manticore-galera/ /var/run/manticore \
     && echo "\n[mysql]\nsilent\nwait\ntable\n" >> /etc/mysql/my.cnf \
     && wget -q https://repo.manticoresearch.com/repository/morphology/en.pak.tgz?docker_build=1 -O /tmp/en.pak.tgz \
     && wget -q https://repo.manticoresearch.com/repository/morphology/de.pak.tgz?docker_build=1 -O /tmp/de.pak.tgz \
