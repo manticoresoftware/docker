@@ -42,9 +42,9 @@ searchd {
 }"
 fi
 
-if hostname -i >/dev/null; then
+if hostname -i > /dev/null 2>&1; then
   hostip=$(hostname -i|rev|cut -d\  -f 1|rev)
-elif hostname -I >/dev/null; then
+elif hostname -I > /dev/null 2>&1; then
   hostip=$(hostname -I|cut -d\  -f 1)
 else
   hostip="0.0.0.0"
