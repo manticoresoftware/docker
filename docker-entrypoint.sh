@@ -58,13 +58,14 @@ docker_setup_env() {
 
     if [ ! -f $EXTRA_INSTALLED_VERSION_PATH ]; then
       # Extra was never be installed
-      echo "Install extra packages"
+      echo -e "${GREEN}Install extra packages${NC}"
+
       install_extra $EXTRA_URL $EXTRA_INSTALLED_VERSION_PATH $NEW_EXTRA_VERSION $EXTRA_DIR
     else
       INSTALLED_EXTRA_VERSION=$(cat $EXTRA_INSTALLED_VERSION_PATH)
 
       if [[ $INSTALLED_EXTRA_VERSION != $NEW_EXTRA_VERSION ]]; then
-        echo "Extra packages version mismatch. Updating..."
+        echo -e "${RED}Extra packages version mismatch. Updating...${NC}"
         install_extra $EXTRA_URL $EXTRA_INSTALLED_VERSION_PATH $NEW_EXTRA_VERSION $EXTRA_DIR 1
       fi
     fi
@@ -103,9 +104,10 @@ docker_setup_env() {
       rm $LIB_MANTICORE_KNN > /dev/null 2>&1  || echo "KNN lib is not installed"
     fi
 
-    if ! strings /usr/share/manticore/modules/libgalera_manticore.so | grep -E '^[0-9]+\.[0-9]+\([a-z0-9]+\)' | grep $GALERA_VERSION; then
+    if [[ -f /usr/share/manticore/modules/libgalera_manticore.so && \
+    ! $(strings /usr/share/manticore/modules/libgalera_manticore.so | grep -E '^[0-9]+\.[0-9]+\([a-z0-9]+\)' | grep $GALERA_VERSION) ]]; then
           echo "Galera version mismatch"
-          rm $$LIB_MANTICORE_GALERA > /dev/null 2>&1  || echo "Galera lib is not installed"
+          rm $$LIB_MANTICORE_GALERA > /dev/null 2>&1 || echo "Galera lib is not installed"
     fi
 
 
@@ -116,25 +118,26 @@ docker_setup_env() {
       fi
 
       MCL_URL=$(cat /mcl.url)
-      wget -P /tmp $MCL_URL
+      wget --show-progress -q -P /tmp $MCL_URL
 
       LAST_PATH=$(pwd)
-      cd /tmp
-      PACKAGE_NAME=$(ls | grep manticore-columnar | head -n 1)
 
-      mkdir columnar && mv "$PACKAGE_NAME" columnar/ && cd columnar
-      ar -x $PACKAGE_NAME && tar -xf data.tar.gz && find . -name '*.so' -exec cp {} ${MCL_DIR} \;
+      for package in columnar galera; do
+        cd /tmp
 
-      cd ..
+        PACKAGE_NAME=$(ls | grep "manticore-${package}" | head -n 1)
 
-      PACKAGE_NAME=$(ls | grep manticore-galera | head -n 1)
-      mkdir galera && cp "$PACKAGE_NAME" galera/ && cd galera
-
-      ar -x $PACKAGE_NAME && tar -xf data.tar.gz
-      mv usr/share/doc/manticore-galera/* /usr/share/doc/manticore-galera
-      find . -name '*.so' -exec cp {} ${MCL_DIR} \;
+        mkdir ${package} && mv "$PACKAGE_NAME" ${package} && cd ${package}
+        ar -x $PACKAGE_NAME
+        tar -xf data.tar.gz
+        if [ ${package} = "galera" ]; then
+          mv usr/share/doc/manticore-galera/* /usr/share/doc/manticore-galera
+        fi
+        find . -name '*.so' -exec cp {} ${MCL_DIR} \;
+      done;
 
       cd $LAST_PATH
+
     fi
   fi
 
@@ -201,7 +204,7 @@ install_extra() {
   fi
 
   if [[ -z $(find $4 -name 'manticore-executor') ]]; then
-    wget -P $4 $1
+    wget --show-progress -q -P $4 $1
     cd $4
     PACKAGE_NAME=$(ls | grep manticore-executor | head -n 1)
     ar -x $PACKAGE_NAME

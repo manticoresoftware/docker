@@ -70,7 +70,7 @@ RUN set -x \
 ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 
 # Add any .deb or .ddeb packages in the current dir to install them all later
-#ADD *deb /packages/
+ADD *deb /packages/
 
 RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else export ARCH="amd"; fi \
     && if [ "${DEV}" = "1" ]; then \
