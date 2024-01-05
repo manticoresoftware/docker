@@ -10,6 +10,7 @@ accepting connections
 ––– input –––
 docker exec manticore mysql -e "create cluster abc"
 ––– output –––
+ERROR 1064 (42000) at line 1: failed to make cluster: replication init failed: 10 'feature not implemented'
 ––– input –––
 docker stop manticore
 ––– output –––
@@ -23,8 +24,9 @@ timeout 60 docker logs -f manticore 2>&1 | grep -qEm1 "columnar.*?secondary.*?kn
 ––– output –––
 Done
 ––– input –––
-docker exec manticore mysql -e "create cluster abc"
+docker exec manticore mysql -e "create cluster abc"; echo $?
 ––– output –––
+0
 ––– input –––
 docker stop manticore
 ––– output –––
