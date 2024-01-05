@@ -58,13 +58,14 @@ docker_setup_env() {
 
     if [ ! -f $EXTRA_INSTALLED_VERSION_PATH ]; then
       # Extra was never be installed
-      echo "Install extra packages"
+      echo -e "${GREEN}Install extra packages${NC}"
+
       install_extra $EXTRA_URL $EXTRA_INSTALLED_VERSION_PATH $NEW_EXTRA_VERSION $EXTRA_DIR
     else
       INSTALLED_EXTRA_VERSION=$(cat $EXTRA_INSTALLED_VERSION_PATH)
 
       if [[ $INSTALLED_EXTRA_VERSION != $NEW_EXTRA_VERSION ]]; then
-        echo "Extra packages version mismatch. Updating..."
+        echo -e "${RED}Extra packages version mismatch. Updating...${NC}"
         install_extra $EXTRA_URL $EXTRA_INSTALLED_VERSION_PATH $NEW_EXTRA_VERSION $EXTRA_DIR 1
       fi
     fi
@@ -83,14 +84,17 @@ docker_setup_env() {
     LIB_MANTICORE_COLUMNAR="${MCL_DIR}lib_manticore_columnar.so"
     LIB_MANTICORE_SECONDARY="${MCL_DIR}lib_manticore_secondary.so"
     LIB_MANTICORE_KNN="${MCL_DIR}lib_manticore_knn.so"
-    COLUMNAR_VERSION=$(cat /mcl.url | cut -d"-" -f6 | cut -d"_" -f1)
+    LIB_MANTICORE_GALERA="${MCL_DIR}libgalera_manticore.so"
+    COLUMNAR_VERSION=$(cat /mcl.url | cut -d" " -f1 | cut -d"-" -f6 | cut -d"_" -f1)
+    GALERA_VERSION=$(cat /mcl.url | cut -d" " -f2 | cut -d"-" -f3 | cut -d"_" -f2)
 
     [ -L /usr/share/manticore/modules/lib_manticore_columnar.so ] || ln -s $LIB_MANTICORE_COLUMNAR /usr/share/manticore/modules/lib_manticore_columnar.so
     [ -L /usr/share/manticore/modules/lib_manticore_secondary.so ] || ln -s $LIB_MANTICORE_SECONDARY /usr/share/manticore/modules/lib_manticore_secondary.so
     [ -L /usr/share/manticore/modules/lib_manticore_knn.so ] || ln -s $LIB_MANTICORE_KNN /usr/share/manticore/modules/lib_manticore_knn.so
+    [ -L /usr/share/manticore/modules/libgalera_manticore.so ] || ln -s $LIB_MANTICORE_GALERA /usr/share/manticore/modules/libgalera_manticore.so
 
     searchd -v | grep -i error | egrep "trying to load" &&
-      rm $LIB_MANTICORE_COLUMNAR $LIB_MANTICORE_SECONDARY $LIB_MANTICORE_KNN &&
+      rm $LIB_MANTICORE_COLUMNAR $LIB_MANTICORE_SECONDARY $LIB_MANTICORE_KNN $LIB_MANTICORE_GALERA &&
       echo "WARNING: wrong MCL version has been removed, installing the correct one"
 
     if ! searchd --version | head -n 1 | grep $COLUMNAR_VERSION; then
@@ -100,22 +104,40 @@ docker_setup_env() {
       rm $LIB_MANTICORE_KNN > /dev/null 2>&1  || echo "KNN lib is not installed"
     fi
 
-    if [[ ! -f "$LIB_MANTICORE_COLUMNAR" || ! -f "$LIB_MANTICORE_SECONDARY" || ! -f "$LIB_MANTICORE_KNN" ]]; then
+    if [[ -f /usr/share/manticore/modules/libgalera_manticore.so && \
+    ! $(strings /usr/share/manticore/modules/libgalera_manticore.so | grep -E '^[0-9]+\.[0-9]+\([a-z0-9]+\)' | grep $GALERA_VERSION) ]]; then
+          echo "Galera version mismatch"
+          rm $$LIB_MANTICORE_GALERA > /dev/null 2>&1 || echo "Galera lib is not installed"
+    fi
+
+
+    if [[ ! -f "$LIB_MANTICORE_COLUMNAR" || ! -f "$LIB_MANTICORE_SECONDARY" || ! -f "$LIB_MANTICORE_KNN" || ! -f "$LIB_MANTICORE_GALERA"  ]]; then
       if ! mkdir -p ${MCL_DIR}; then
         echo "ERROR: Manticore Columnar Library is inaccessible: couldn't create ${MCL_DIR}."
         exit
       fi
 
       MCL_URL=$(cat /mcl.url)
-      wget -P /tmp $MCL_URL
+      wget --show-progress -q -P /tmp $MCL_URL
 
       LAST_PATH=$(pwd)
-      cd /tmp
-      PACKAGE_NAME=$(ls | grep manticore-columnar | head -n 1)
-      ar -x $PACKAGE_NAME
-      tar -xf data.tar.gz
-      find . -name '*.so' -exec cp {} ${MCL_DIR} \;
+
+      for package in columnar galera; do
+        cd /tmp
+
+        PACKAGE_NAME=$(ls | grep "manticore-${package}" | head -n 1)
+
+        mkdir ${package} && mv "$PACKAGE_NAME" ${package} && cd ${package}
+        ar -x $PACKAGE_NAME
+        tar -xf data.tar.gz
+        if [ ${package} = "galera" ]; then
+          mv usr/share/doc/manticore-galera/* /usr/share/doc/manticore-galera
+        fi
+        find . -name '*.so' -exec cp {} ${MCL_DIR} \;
+      done;
+
       cd $LAST_PATH
+
     fi
   fi
 
@@ -182,7 +204,7 @@ install_extra() {
   fi
 
   if [[ -z $(find $4 -name 'manticore-executor') ]]; then
-    wget -P $4 $1
+    wget --show-progress -q -P $4 $1
     cd $4
     PACKAGE_NAME=$(ls | grep manticore-executor | head -n 1)
     ar -x $PACKAGE_NAME

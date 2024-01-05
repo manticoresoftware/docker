@@ -1,0 +1,33 @@
+––– block: ./base/init –––
+––– input –––
+docker run --rm -e EXTRA=0 --name manticore -d manticoresoftware/manticore:current
+––– output –––
+#!/[0-9a-z]{40}$/!#
+––– input –––
+timeout 10 docker logs -f manticore 2>1 | grep -qm1 "accepting connections" && echo 'accepting connections' || echo 'Docker failed to start properly in 10 seconds'
+––– output –––
+accepting connections
+––– input –––
+docker exec manticore mysql -e "create cluster abc"
+––– output –––
+ERROR 1064 (42000) at line 1: failed to make cluster: replication init failed: 10 'feature not implemented'
+––– input –––
+docker stop manticore
+––– output –––
+manticore
+––– input –––
+sleep 1;docker run --rm -e EXTRA=1 --name manticore -v /tmp/idx:/var/lib/manticore -d manticoresoftware/manticore:current
+––– output –––
+#!/[0-9a-z]{40}$/!#
+––– input –––
+timeout 60 docker logs -f manticore 2>&1 | grep -qEm1 "columnar.*?secondary.*?knn" && echo 'Done' || echo 'Not found'
+––– output –––
+Done
+––– input –––
+docker exec manticore mysql -e "create cluster abc"; echo $?
+––– output –––
+0
+––– input –––
+docker stop manticore
+––– output –––
+manticore
