@@ -4,7 +4,7 @@ docker run -d -e "CREATE_PLAIN_TABLES=idx1:* * * * *;idx2" --name manticore -v $
 ––– output –––
 #!/[0-9a-z]+/!#
 ––– input –––
-timeout 5 docker logs -f manticore | grep -qm1 "accepting connections" && echo 'accepting connections' || echo 'Timeout failed'
+if timeout 5 grep -qm1 'accepting connections' <(docker logs -f manticore); then echo 'accepting connections'; else echo 'Timeout failed'; fi
 ––– output –––
 accepting connections
 ––– input –––
@@ -34,8 +34,9 @@ idx2.spm
 idx2.spp
 idx2.spt
 ––– input –––
-sleep 65
+if timeout 65 grep -qm1 'Indexer_idx1: rotating tables: successfully sent SIGHUP to searchd' <(docker logs -f manticore); then echo 'Cron job done'; else echo 'Cron job not run in 65 seconds'; fi
 ––– output –––
+Cron job done
 ––– input –––
 docker exec manticore ls | grep idx | sort
 ––– output –––
