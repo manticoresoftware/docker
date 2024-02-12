@@ -34,8 +34,9 @@ idx1.spm
 idx1.spp
 idx1.spt
 ––– input –––
-sleep 65
+if timeout 65 grep -qm1 'Indexer_idx2: rotating tables: successfully sent SIGHUP to searchd' <(docker logs -f manticore); then echo 'Cron job done'; else echo 'Cron job not run in 65 seconds'; fi
 ––– output –––
+Cron job done
 ––– input –––
 docker exec manticore ls | grep idx
 ––– output –––
