@@ -4,13 +4,13 @@ docker run --rm -e EXTRA=0 --name manticore -d manticoresoftware/manticore:curre
 ––– output –––
 #!/[0-9a-z]{40}$/!#
 ––– input –––
-timeout 10 docker logs -f manticore 2>1 | grep -qm1 "accepting connections" && echo 'accepting connections' || echo 'Docker failed to start properly in 10 seconds'
+if timeout 10 grep -qm1 'accepting connections' <(docker logs -f manticore); then echo 'accepting connections'; else echo 'Docker failed to start properly in 10 seconds'; fi
 ––– output –––
 accepting connections
 ––– input –––
 docker exec manticore searchd --version
 ––– output –––
-Manticore %{SEMVER} #!/[a-z0-9]{7,9}@[0-9]{6}/!# dev
+Manticore %{SEMVER} #!/[a-z0-9]{7,9}@[0-9]{8}/!# dev
 Copyright (c) 2001-2016, Andrew Aksyonoff
 Copyright (c) 2008-2016, Sphinx Technologies Inc (http://sphinxsearch.com)
 Copyright (c) 2017-%{YEAR}, Manticore Software LTD (https://manticoresearch.com)
@@ -23,7 +23,7 @@ sleep 1;docker run --rm -e EXTRA=1 --name manticore -v /tmp/idx:/var/lib/mantico
 ––– output –––
 #!/[0-9a-z]{40}$/!#
 ––– input –––
-timeout 60 docker logs -f manticore 2>&1 | grep -qEm1 "columnar.*?secondary.*?knn" && echo 'Done' || echo 'Not found'
+if timeout 60 grep -qEm1 "columnar.*?secondary.*?knn" <(docker logs -f manticore 2>&1); then echo 'Done'; else echo 'Not found'; fi
 ––– output –––
 Done
 ––– input –––
