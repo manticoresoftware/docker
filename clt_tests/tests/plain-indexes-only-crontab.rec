@@ -4,7 +4,7 @@ docker run -d -e "CREATE_PLAIN_TABLES=idx1:* * * * *" --name manticore -v $(pwd)
 ––– output –––
 #!/[0-9a-z]+/!#
 ––– input –––
-timeout 5 docker logs -f manticore | grep -qm1 "accepting connections" && echo 'accepting connections' || echo 'Timeout failed'
+if timeout 5 grep -qm1 'accepting connections' <(docker logs -f manticore); then echo 'accepting connections'; else echo 'Timeout failed'; fi
 ––– output –––
 accepting connections
 ––– input –––

@@ -4,7 +4,7 @@ docker run --rm -e EXTRA=0 --name manticore -d manticoresoftware/manticore:curre
 ––– output –––
 #!/[0-9a-z]{40}$/!#
 ––– input –––
-timeout 10 docker logs -f manticore 2>1 | grep -qm1 "accepting connections" && echo 'accepting connections' || echo 'Docker failed to start properly in 10 seconds'
+if timeout 10 grep -qm1 'accepting connections' <(docker logs -f manticore); then echo 'accepting connections'; else echo 'Docker failed to start properly in 10 seconds'; fi
 ––– output –––
 accepting connections
 ––– input –––
@@ -23,7 +23,7 @@ sleep 1;docker run --rm -e EXTRA=1 --name manticore -v /tmp/idx:/var/lib/mantico
 ––– output –––
 #!/[0-9a-z]{40}$/!#
 ––– input –––
-timeout 60 docker logs -f manticore 2>&1 | grep -qEm1 "columnar.*?secondary.*?knn" && echo 'Done' || echo 'Not found'
+if timeout 60 grep -qEm1 "columnar.*?secondary.*?knn" <(docker logs -f manticore); then echo 'Done'; else echo 'Not found'; fi
 ––– output –––
 Done
 ––– input –––
@@ -35,7 +35,7 @@ sleep 1;docker run --rm -e EXTRA=1 --name manticore -v /tmp/idx:/var/lib/mantico
 ––– output –––
 #!/[0-9a-z]{40}$/!#
 ––– input –––
-timeout 10 docker logs -f manticore 2>1 | grep -qm1 "Install extra packages" || echo 'Packages installation skipped'
+if timeout 10 grep -qm1 'Install extra packages' <(docker logs -f manticore); then echo 'Install extra packages'; else echo 'Packages installation skipped'; fi
 ––– output –––
 Packages installation skipped
 ––– input –––
