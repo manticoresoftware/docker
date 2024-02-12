@@ -10,7 +10,7 @@ accepting connections
 ––– input –––
 docker exec manticore searchd --version
 ––– output –––
-Manticore %{SEMVER} #!/[a-z0-9]{7,9}@[0-9]{6}/!# dev
+Manticore %{SEMVER} #!/[a-z0-9]{7,9}@[0-9]{8}/!# dev
 Copyright (c) 2001-2016, Andrew Aksyonoff
 Copyright (c) 2008-2016, Sphinx Technologies Inc (http://sphinxsearch.com)
 Copyright (c) 2017-%{YEAR}, Manticore Software LTD (https://manticoresearch.com)
@@ -23,7 +23,7 @@ sleep 1;docker run --rm -e EXTRA=1 --name manticore -v /tmp/idx:/var/lib/mantico
 ––– output –––
 #!/[0-9a-z]{40}$/!#
 ––– input –––
-if timeout 60 grep -qEm1 "columnar.*?secondary.*?knn" <(docker logs -f manticore); then echo 'Done'; else echo 'Not found'; fi
+if timeout 60 grep -qEm1 "columnar.*?secondary.*?knn" <(docker logs -f manticore 2>&1); then echo 'Done'; else echo 'Not found'; fi
 ––– output –––
 Done
 ––– input –––
@@ -35,7 +35,7 @@ sleep 1;docker run --rm -e EXTRA=1 --name manticore -v /tmp/idx:/var/lib/mantico
 ––– output –––
 #!/[0-9a-z]{40}$/!#
 ––– input –––
-if timeout 10 grep -qm1 'Install extra packages' <(docker logs -f manticore); then echo 'Install extra packages'; else echo 'Packages installation skipped'; fi
+timeout 10 docker logs -f manticore 2>1 | grep -qm1 "Install extra packages" || echo 'Packages installation skipped'
 ––– output –––
 Packages installation skipped
 ––– input –––

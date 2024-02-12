@@ -11,8 +11,9 @@ accepting connections
 docker exec manticore ls | grep idx | sort
 ––– output –––
 ––– input –––
-sleep 65
+if timeout 65 grep -qm1 'Indexer_idx1: rotating tables: successfully sent SIGHUP to searchd' <(docker logs -f manticore); then echo 'Cron job done'; else echo 'Cron job not run in 65 seconds'; fi
 ––– output –––
+Cron job done
 ––– input –––
 docker exec manticore ls | grep idx | sort
 ––– output –––
