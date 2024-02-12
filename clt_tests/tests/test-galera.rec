@@ -10,7 +10,7 @@ accepting connections
 ––– input –––
 docker exec manticore mysql -e "create cluster abc"
 ––– output –––
-ERROR 1064 (42000) at line 1: failed to make cluster: replication init failed: 10 'feature not implemented'
+ERROR 1064 (42000) at line 1: failed to make cluster: Wrong galera interface version. Got -1
 ––– input –––
 docker stop manticore
 ––– output –––
@@ -20,7 +20,7 @@ sleep 1;docker run --rm -e EXTRA=1 --name manticore -v /tmp/idx:/var/lib/mantico
 ––– output –––
 #!/[0-9a-z]{40}$/!#
 ––– input –––
-if timeout 60 grep -qEm1 "columnar.*?secondary.*?knn" <(docker logs -f manticore); then echo 'Done'; else echo 'Not found'; fi
+if timeout 60 grep -qEm1 "columnar.*?secondary.*?knn" <(docker logs -f manticore 2>1); then echo 'Done'; else echo 'Not found'; fi
 ––– output –––
 Done
 ––– input –––
