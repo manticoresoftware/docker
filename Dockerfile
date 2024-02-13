@@ -109,7 +109,8 @@ RUN if [ -d "/packages/" ]; then apt -y install /packages/*deb; fi \
     && wget -q https://repo.manticoresearch.com/repository/morphology/ru.pak.tgz?docker_build=1 -O /tmp/ru.pak.tgz \
     && tar -xf /tmp/en.pak.tgz -C /usr/share/manticore/ \
     && tar -xf /tmp/de.pak.tgz -C /usr/share/manticore/ \
-    && tar -xf /tmp/ru.pak.tgz -C /usr/share/manticore/
+    && tar -xf /tmp/ru.pak.tgz -C /usr/share/manticore/ \
+    && rm /tmp/*.pak.tgz
 
 COPY manticore.conf.sh /etc/manticoresearch/
 RUN md5sum /etc/manticoresearch/manticore.conf | awk '{print $1}' > /manticore.conf.md5
