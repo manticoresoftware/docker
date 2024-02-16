@@ -337,10 +337,10 @@ Inside this folder, you will find your backup.
 
 
 To restore your full backup on startup, you need to mount your backup to the `/docker-entrypoint-initdb.d` folder. 
+
 Please note that you should mount the content of your backup, not the backup folder itself (e.g., `backup-202307..`).
 
-The restore process temporarily prevents the regular `searchd` start. 
-If you wish to avoid this behavior, you can set the flag `-e START_AFTER_RESTORE=true`.
+The backup will be restored if the daemon wasn't initialized before (first start). Otherwise, it will be skipped, even if it's mounted on the second launch or any other time. Once the backup is restored, the daemon will start.
 
 ### Creating SQL dumps
 
