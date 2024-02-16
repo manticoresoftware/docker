@@ -340,7 +340,7 @@ To restore your full backup on startup, you need to mount your backup to the `/d
 
 Please note that you should mount the content of your backup, not the backup folder itself (e.g., `backup-202307..`).
 
-The backup will be restored if the daemon wasn't initialized before (first start). Otherwise, it will be skipped, even if it's mounted on the second launch or any other time. Once the backup is restored, the daemon will start.
+The backup will be restored if the data directory is empty. Otherwise, it will be skipped, even if it's mounted on the second launch or any other time. Once the backup is restored, the daemon will start.
 
 ### Creating SQL dumps
 

@@ -258,7 +258,7 @@ _main() {
 
       # Check if manticore-backup is installed
       if ! command -v manticore-backup > /dev/null; then
-        echo -e "${RED}Manticore backup isn't installed${NC}"
+        echo -e "${RED}manticore-backup isn't installed${NC}"
         exit 1
       fi
 
