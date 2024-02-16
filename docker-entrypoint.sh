@@ -241,10 +241,14 @@ _main() {
   fi
 
   BACKUP_INIT_FOLDER="/docker-entrypoint-initdb.d"
-  INIT_PATH="/var/lib/manticore/.inited"
+  INITED=""
+  for f in /var/lib/manticore/*; do
+    INITED=1
+    break
+  done 
 
   if [ -f "${BACKUP_INIT_FOLDER}/versions.json" ]; then
-    if [ -f "$INIT_PATH" ]; then
+    if [ -n "$INITED" ]; then
       echo "Warning: Backup is available for restore, but it's being skipped because it's already initialized."
     else
       if [ ! -s "/usr/bin/manticore-executor" ]; then
@@ -265,9 +269,6 @@ _main() {
       manticore-backup --force --backup-dir='/' --restore='docker-entrypoint-initdb.d'
     fi
   fi
-
-  # Mark as initialized
-  touch "$INIT_PATH"
 
   exec "$@"
 }
