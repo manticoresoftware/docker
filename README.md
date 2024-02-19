@@ -40,7 +40,7 @@ Also, the mysql client has several sample queries in its history that you can ru
 
 For data persistence the folder `/var/lib/manticore/` should be mounted to local storage or other desired storage engine.
 
-The configuration file within the instance can be found at `/etc/manticoresearch/manticore.conf`. To apply custom settings, ensure that this file is mounted to your own configuration file. Additionally, configuration parameters can be set through environment variables.
+The configuration file within the instance can be found at `/etc/manticoresearch/manticore.conf`. To apply custom settings, ensure that this file is mounted to your own configuration file. Additionally, configuration parameters can be set [through environment variables](#configuring-manticore-search-with-docker).
 
 It is **important to note** that configuring certain parameters through environment variables takes precedence. 
 For example, if you set `-e searchd_listen='19306:mysql'` via environments and concurrently include `listen = 9306:mysql` in the configuration, the search functionality will ultimately listen on port `19306` for SQL connections.
