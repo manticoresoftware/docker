@@ -327,7 +327,7 @@ The `manticore-backup` package utilizes the `manticore-executor`, which is insta
 Creating a **full backup** is a straightforward process. Simply run the following command:
 
 ```bash
-docker exec -it CONTAINER-ID manticore-backup --config=/etc/manticoresearch/manticore.conf.sh --backup-dir=/tmp
+docker exec -it CONTAINER-ID manticore-backup --backup-dir=/tmp
 ```
 This command will generate a backup in your `/tmp/` directory.
 
