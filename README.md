@@ -40,7 +40,10 @@ Also, the mysql client has several sample queries in its history that you can ru
 
 For data persistence the folder `/var/lib/manticore/` should be mounted to local storage or other desired storage engine.
 
-The configuration file inside the instance is located at   `/etc/manticoresearch/manticore.conf`. For custom settings, this file should be mounted to your own configuration file.
+The configuration file within the instance can be found at `/etc/manticoresearch/manticore.conf`. To apply custom settings, ensure that this file is mounted to your own configuration file. Additionally, configuration parameters can be set through environment variables.
+
+It is **important to note** that configuring certain parameters through environment variables takes precedence. 
+For example, if you set `-e searchd_listen='19306:mysql'` via environments and concurrently include `listen = 9306:mysql` in the configuration, the search functionality will ultimately listen on port `19306` for SQL connections.
 
 The ports are 9306/9308/9312 for SQL/HTTP/Binary, expose them depending on how you are going to use Manticore. For example:
 
@@ -274,13 +277,14 @@ an SQL VIP listener on port `5443` operating solely on the instance's IP (such a
 **Attention**: Setting this variable overrides default listeners!
 
 ```bash
-$ docker run -e EXTRA=1 --rm -p 1188:9307  -e searchd_mysql_version_string='5.5.0' -e searchd_listen='9316:http|9307:mysql|$ip:5443:mysql_vip'  manticore
-[Mon Aug 17 07:31:58.719 2020] [1] using config file '/etc/manticoresearch/manticore.conf' (9130 chars)...
-listening on all interfaces for http, port=9316
+$ docker run -e EXTRA=1 --rm -p 1188:9307  -e searchd_mysql_version_string='5.5.0' -e searchd_listen='9316:http|9307:mysql|$ip:5443:mysql_vip' manticoresearch/manticore
+[Mon Feb 19 10:12:20.501 2024] [1] using config file '/etc/manticoresearch/manticore.conf.sh' (297 chars)...
+starting daemon version '6.2.13 56aaf1f55@24021713 dev (columnar 2.2.5 8c90c1f@240217) (secondary 2.2.5 8c90c1f@240217) (knn 2.2.5 8c90c1f@240217)' ...
+listening on all interfaces for sphinx and http(s), port=9316
 listening on all interfaces for mysql, port=9307
-listening on 172.17.0.17:5443 for VIP mysql
-prereading 0 indexes
-prereaded 0 indexes in 0.000 sec
+listening on 172.17.0.2:5443 for VIP mysql
+prereading 0 tables
+preread 0 tables in 0.000 sec
 accepting connections
 ```
 
@@ -323,7 +327,7 @@ The `manticore-backup` package utilizes the `manticore-executor`, which is insta
 Creating a **full backup** is a straightforward process. Simply run the following command:
 
 ```bash
-docker exec -it CONTAINER-ID manticore-backup --backup-dir=/tmp
+docker exec -it CONTAINER-ID manticore-backup --config=/etc/manticoresearch/manticore.conf.sh --backup-dir=/tmp
 ```
 This command will generate a backup in your `/tmp/` directory.
 
