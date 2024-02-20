@@ -241,26 +241,32 @@ _main() {
   fi
 
   BACKUP_INIT_FOLDER="/docker-entrypoint-initdb.d"
+  INITED=""
+  for f in /var/lib/manticore/*; do
+    INITED=1
+    break
+  done 
 
   if [ -f "${BACKUP_INIT_FOLDER}/versions.json" ]; then
+    if [ -n "$INITED" ]; then
+      echo "Warning: Backup is available for restore, but it's being skipped because it's already initialized or the data directory is not empty."
+    else
+      if [ ! -s "/usr/bin/manticore-executor" ]; then
+          echo -e "${RED}Can't run manticore-backup. Use env. var. EXTRA=1 to install the missing packages.${NC}"
+          exit 1
+      fi
 
-    if [ ! -s /usr/bin/manticore-executor ]; then
-        echo -e "${RED}Can't run manticore-backup. Use env. var. EXTRA=1 to install the missing packages.${NC}"
+      # Check if manticore-backup is installed
+      if ! command -v manticore-backup > /dev/null; then
+        echo -e "${RED}manticore-backup isn't installed${NC}"
         exit 1
-    fi
+      fi
 
-    [[ $(which manticore-backup) ]] || \
-      { echo -e "${RED}Manticore backup isn't installed${NC}"; exit 1; }
+      find ${BACKUP_INIT_FOLDER}/config -type f -exec sh -c 'rm -f "${1#/docker-entrypoint-initdb.d/config}"' sh {} \;
+      find ${BACKUP_INIT_FOLDER}/state -type f -exec sh -c 'rm -f "${1#/docker-entrypoint-initdb.d/state}"' sh {} \;
 
-    find ${BACKUP_INIT_FOLDER}/config -type f -exec sh -c 'rm -f "${1#/docker-entrypoint-initdb.d/config}"' sh {} \;
-    find ${BACKUP_INIT_FOLDER}/state -type f -exec sh -c 'rm -f "${1#/docker-entrypoint-initdb.d/state}"' sh {} \;
-
-    manticore-backup --version
-    manticore-backup --force --backup-dir='/' --restore='docker-entrypoint-initdb.d'
-
-    if [ -z "$START_AFTER_RESTORE" ]; then
-        echo -e "${GREEN}Dump successfully restored.${NC} Run container again without mounting anything to docker-entrypoint-initdb.d"
-        exit 0
+      manticore-backup --version
+      manticore-backup --force --backup-dir='/' --restore='docker-entrypoint-initdb.d'
     fi
   fi
 
