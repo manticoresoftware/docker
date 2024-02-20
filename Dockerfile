@@ -94,7 +94,6 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
 RUN if [ -d "/packages/" ]; then apt -y install /packages/*deb; fi \
     && mkdir -p /var/run/manticore \
     && mkdir -p /usr/share/doc/manticore-galera \
-    && mkdir -p /var/lib/manticore/replication \
     && mkdir /docker-entrypoint-initdb.d \
     && apt-get -y purge --auto-remove \
     && rm -rf /var/lib/apt/lists/* \
