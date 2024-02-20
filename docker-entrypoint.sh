@@ -249,7 +249,7 @@ _main() {
 
   if [ -f "${BACKUP_INIT_FOLDER}/versions.json" ]; then
     if [ -n "$INITED" ]; then
-      echo "Warning: Backup is available for restore, but it's being skipped because it's already initialized."
+      echo "Warning: Backup is available for restore, but it's being skipped because it's already initialized or the data directory is not empty."
     else
       if [ ! -s "/usr/bin/manticore-executor" ]; then
           echo -e "${RED}Can't run manticore-backup. Use env. var. EXTRA=1 to install the missing packages.${NC}"
