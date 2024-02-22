@@ -126,6 +126,7 @@ RUN touch /etc/cron.d/manticore /var/run/crond.pid && \
 FROM scratch
 COPY --from=initial / /
 WORKDIR /var/lib/manticore
+VOLUME /usr/local/lib/manticore
 ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 9306
 EXPOSE 9308
