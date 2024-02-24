@@ -133,7 +133,7 @@ EXPOSE 9308
 EXPOSE 9312
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
-ENV MANTICORE_CONFIG="/etc/manticoresearch/manticore.conf.sh"
+ENV MANTICORE_CONFIG="/etc/manticoresearch/manticore.conf.sh|/etc/manticoresearch/manticore.conf"
 CMD ["searchd", "-c", "/etc/manticoresearch/manticore.conf.sh", "--nodetach"]
 
 # How to build manually:
