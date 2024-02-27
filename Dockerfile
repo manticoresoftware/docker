@@ -11,8 +11,8 @@ RUN groupadd -r manticore && useradd -r -g manticore manticore
 
 ENV GOSU_VERSION 1.11
 
-ENV MCL_URL=${MCL_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-columnar-lib_2.2.4-230822-5aec342__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-galera_3.37__ARCH_64.deb"}
+ENV MCL_URL=${MCL_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-galera_3.37__ARCH_64.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-columnar-lib_2.2.4-230822-5aec342__ARCH_64.deb"}
 
 ENV DAEMON_URL=${DAEMON_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-server_6.2.12-230822-dc5144d35__ARCH_64.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-server-core_6.2.12-230822-dc5144d35__ARCH_64.deb \
@@ -79,7 +79,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
       && dpkg -i manticore-dev-repo.noarch.deb \
       && apt-key adv --fetch-keys 'https://repo.manticoresearch.com/GPG-KEY-manticore' && apt-get -y update && apt-get -y install manticore \
       && apt-get -y update  \
-      && echo $(apt-get -y download --print-uris manticore-columnar-lib manticore-galera | cut -d" " -f1 | cut -d "'" -f 2) > /mcl.url \
+      && echo $(apt-get -y download --print-uris manticore-galera manticore-columnar-lib | cut -d" " -f1 | cut -d "'" -f 2) > /mcl_galera.url \
       && echo $(apt-get -y download --print-uris manticore-executor | cut -d" " -f1 | cut -d "'" -f 2) > /extra.url ;\
     elif [ ! -z "$DAEMON_URL" ]; then \
       echo "2nd step of building release image for linux/${ARCH}64 architecture" \
@@ -87,7 +87,8 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
       && echo $DAEMON_URL | sed "s/_ARCH_/$ARCH/g" \
       && wget -q $(echo $DAEMON_URL | sed "s/_ARCH_/$ARCH/g") \
       && apt-get -y install ./manticore*deb \
-      && echo $MCL_URL | sed "s/_ARCH_/$ARCH/g" > /mcl.url \
+      && echo $MCL_URL | sed "s/_ARCH_/$ARCH/g" > /mcl_galera.url \
+      && echo $GALERA_URL | sed "s/_ARCH_/$ARCH/g" > /galera.url \
       && echo $EXTRA_URL | sed "s/_ARCH_/$ARCH/g" > /extra.url \
       && rm *.deb ; \
     fi
