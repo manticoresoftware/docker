@@ -79,7 +79,8 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
       && dpkg -i manticore-dev-repo.noarch.deb \
       && apt-key adv --fetch-keys 'https://repo.manticoresearch.com/GPG-KEY-manticore' && apt-get -y update && apt-get -y install manticore \
       && apt-get -y update  \
-      && echo $(apt-get -y download --print-uris manticore-columnar-lib manticore-galera | cut -d" " -f1 | cut -d "'" -f 2) > /mcl.url \
+      && echo $(apt-get -y download --print-uris manticore-columnar-lib | cut -d" " -f1 | cut -d "'" -f 2) > /mcl.url \
+      && echo $(apt-get -y download --print-uris manticore-galera | cut -d" " -f1 | cut -d "'" -f 2) > /galera.url \
       && echo $(apt-get -y download --print-uris manticore-executor | cut -d" " -f1 | cut -d "'" -f 2) > /extra.url ;\
     elif [ ! -z "$DAEMON_URL" ]; then \
       echo "2nd step of building release image for linux/${ARCH}64 architecture" \
@@ -88,6 +89,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
       && wget -q $(echo $DAEMON_URL | sed "s/_ARCH_/$ARCH/g") \
       && apt-get -y install ./manticore*deb \
       && echo $MCL_URL | sed "s/_ARCH_/$ARCH/g" > /mcl.url \
+      && echo $GALERA_URL | sed "s/_ARCH_/$ARCH/g" > /galera.url \
       && echo $EXTRA_URL | sed "s/_ARCH_/$ARCH/g" > /extra.url \
       && rm *.deb ; \
     fi
