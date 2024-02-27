@@ -85,8 +85,8 @@ docker_setup_env() {
     LIB_MANTICORE_SECONDARY="${MCL_DIR}lib_manticore_secondary.so"
     LIB_MANTICORE_KNN="${MCL_DIR}lib_manticore_knn.so"
     LIB_MANTICORE_GALERA="${MCL_DIR}libgalera_manticore.so"
-    COLUMNAR_VERSION=$(cat /mcl.url | cut -d" " -f1 | cut -d"-" -f6 | cut -d"_" -f1)
-    GALERA_VERSION=$(cat /mcl.url | cut -d" " -f2 | cut -d"-" -f3 | cut -d"_" -f2)
+    GALERA_VERSION=$(cat /mcl_galera.url | cut -d" " -f1 | cut -d"-" -f3 | cut -d"_" -f2)
+    COLUMNAR_VERSION=$(cat /mcl_galera.url | cut -d" " -f2 | cut -d"-" -f6 | cut -d"_" -f1)
 
     [ -L /usr/share/manticore/modules/lib_manticore_columnar.so ] || ln -s $LIB_MANTICORE_COLUMNAR /usr/share/manticore/modules/lib_manticore_columnar.so
     [ -L /usr/share/manticore/modules/lib_manticore_secondary.so ] || ln -s $LIB_MANTICORE_SECONDARY /usr/share/manticore/modules/lib_manticore_secondary.so
@@ -117,7 +117,7 @@ docker_setup_env() {
         exit
       fi
 
-      MCL_URL=$(cat /mcl.url)
+      MCL_URL=$(cat /mcl_galera.url)
       wget --show-progress -q -P /tmp $MCL_URL
 
       LAST_PATH=$(pwd)
