@@ -2,7 +2,7 @@
 
 This is the git repo of official [Docker image](https://hub.docker.com/r/manticoresearch/manticore/) for [Manticore Search](https://github.com/manticoresoftware/manticoresearch).
 
-❗ Please note: This is a development version repo. For the latest release's information, refer to the readme at https://github.com/manticoresoftware/docker/tree/docker-6.2.12
+❗ Please note: This is a development version repo. For the latest release's information, refer to the readme at https://github.com/manticoresoftware/docker/tree/docker-6.3.0
 
 Manticore Search is an easy to use open source fast database for search. It helps thousands of companies from small to large, such as Craigslist, to search and filter petabytes of text data on a single or hundreds of nodes, do stream full-text filtering, add auto-complete, spell correction, more-like-this, faceting and other search-related technologies to their websites and applications.
 
