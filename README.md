@@ -2,8 +2,6 @@
 
 This is the git repo of official [Docker image](https://hub.docker.com/r/manticoresearch/manticore/) for [Manticore Search](https://github.com/manticoresoftware/manticoresearch).
 
-❗ Please note: This is a development version repo. For the latest release's information, refer to the readme at https://github.com/manticoresoftware/docker/tree/docker-6.2.12
-
 Manticore Search is an easy to use open source fast database for search. It helps thousands of companies from small to large, such as Craigslist, to search and filter petabytes of text data on a single or hundreds of nodes, do stream full-text filtering, add auto-complete, spell correction, more-like-this, faceting and other search-related technologies to their websites and applications.
 
 The default configuration includes a sample Real-Time index and listens on the default ports:
@@ -42,7 +40,7 @@ For data persistence the folder `/var/lib/manticore/` should be mounted to local
 
 The configuration file within the instance can be found at `/etc/manticoresearch/manticore.conf`. To apply custom settings, ensure that this file is mounted to your own configuration file. Additionally, configuration parameters can be set [through environment variables](#configuring-manticore-search-with-docker).
 
-It is **important to note** that configuring certain parameters through environment variables takes precedence. 
+It is **important to note** that configuring certain parameters through environment variables takes precedence.
 For example, if you set `-e searchd_listen='19306:mysql'` via environments and concurrently include `listen = 9306:mysql` in the configuration, the search functionality will ultimately listen on port `19306` for SQL connections.
 
 The ports are 9306/9308/9312 for SQL/HTTP/Binary, expose them depending on how you are going to use Manticore. For example:
@@ -271,7 +269,7 @@ If you intend to enable the own `listen` directive, utilize the `searchd_listen`
 
 You can specify multiple interfaces separated by a semicolon (`|`). To exclusively listen on a network address, employ the `$ip` variable (internally retrieved from `hostname -i`) as an address alias.
 
-For instance, using `-e searchd_listen='9316:http|9307:mysql|$ip:5443:mysql_vip'` will incorporate an additional SQL interface on port `9307`, 
+For instance, using `-e searchd_listen='9316:http|9307:mysql|$ip:5443:mysql_vip'` will incorporate an additional SQL interface on port `9307`,
 an SQL VIP listener on port `5443` operating solely on the instance's IP (such as 172.17.0.2), and an HTTP listener on port `9316`.
 
 **Attention**: Setting this variable overrides default listeners!
@@ -321,7 +319,7 @@ There are several methods to build plain tables from your custom configuration f
 
 ### Full backup
 
-To create a **full backup**, you need to include the `-e EXTRA=1` flag. 
+To create a **full backup**, you need to include the `-e EXTRA=1` flag.
 The `manticore-backup` package utilizes the `manticore-executor`, which is installed with the EXTRA packages.
 
 Creating a **full backup** is a straightforward process. Simply run the following command:
@@ -340,7 +338,7 @@ Inside this folder, you will find your backup.
 ### Restore full dump
 
 
-To restore your full backup on startup, you need to mount your backup to the `/docker-entrypoint-initdb.d` folder. 
+To restore your full backup on startup, you need to mount your backup to the `/docker-entrypoint-initdb.d` folder.
 
 Please note that you should mount the content of your backup, not the backup folder itself (e.g., `backup-202307..`).
 
