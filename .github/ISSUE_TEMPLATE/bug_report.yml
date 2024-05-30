@@ -26,14 +26,14 @@ body:
         Provide the version of Manticore Search docker image you are using.
     validations:
       required: true
-  - type: checkboxes
+  - type: dropdown
     id: dev
     attributes:
       label: "Have you tried the latest development version?"
-      description: >
-        Consider testing with the latest development image version `manticoresearch/manticore:dev`, which often includes fixes and improvements. Check the box below if you have already tried it.
+      multiple: false
       options:
-        - label: "Yes"
+        - "Yes"
+        - "No"
   - type: markdown
     attributes:
       value: "## Thank you for completing the form! For an expedited solution, consider our [professional services](https://manticoresearch.com/services/)."
@@ -47,14 +47,12 @@ body:
         <sup>To be completed by the assignee. Check off tasks that have been completed or are not applicable.</sup>
         <details>
 
-        - [ ] Task estimated
-        - [ ] Specification created, reviewed, and approved
         - [ ] Implementation completed
         - [ ] Tests developed
         - [ ] Documentation updated
-        - [ ] Documentation proofread
+        - [ ] Documentation reviewed
         - [ ] Changelog updated
-
+        
         </details>
     validations:
       required: true
