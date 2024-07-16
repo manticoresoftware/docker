@@ -1,0 +1,210 @@
+––– block: ./base/init –––
+––– input –––
+sleep 1;docker run --rm -e EXTRA=1 --name manticore -v /tmp/idx:/var/lib/manticore -d manticoresoftware/manticore:current
+––– output –––
+#!/[0-9a-z]{40}$/!#
+––– input –––
+if timeout 60 grep -qEm1 "columnar.*?secondary.*?knn" <(docker logs -f manticore 2>&1); then echo 'Done'; else echo 'Not found'; fi
+––– output –––
+Done
+––– input –––
+docker exec manticore manticore-executor -v
+––– output –––
+PHP %{SEMVER} (cli) (built: #!/[a-zA-Z]{3}/!# #!/[0-9]+/!# %{YEAR} #!/[0-9]{2}:[0-9]{2}:[0-9]{2}/!#) (NTS)
+Copyright (c) The PHP Group
+Zend Engine #!/v[0-9]+\.[0-9]+\.[0-9]+/!#, Copyright (c) Zend Technologies
+––– input –––
+docker exec manticore wget -q https://raw.githubusercontent.com/manticoresoftware/manticoresearch-backup/main/test/clt-tests/dumps/tables.sql
+––– output –––
+––– input –––
+docker exec manticore bash -c "mysql < ./tables.sql"
+––– output –––
+––– input –––
+docker exec manticore mysql -e "show tables"
+––– output –––
++---------------------+-------------+
+| Index               | Type        |
++---------------------+-------------+
+| distributed_index   | distributed |
+| rt_with_columnar    | rt          |
+| rt_without_columnar | rt          |
+| test                | rt          |
++---------------------+-------------+
+––– input –––
+docker exec manticore mysql -e "show create table distributed_index"
+––– output –––
++-------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Table             | Create Table                                                                                                                                                              |
++-------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| distributed_index | CREATE TABLE distributed_index type='distributed' local='rt_with_columnar' local='rt_without_columnar' agent='127.0.0.1:9312:plain_with_columnar, plain_without_columnar' |
++-------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+––– input –––
+docker exec manticore mysql -e "show create table rt_with_columnar"
+––– output –––
++------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Table            | Create Table                                                                                                                                                           |
++------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| rt_with_columnar | CREATE TABLE rt_with_columnar (
+id bigint,
+title text,
+category_id integer,
+price float,
+description string attribute engine='columnar',
+tags multi,
+attributes json
+) |
++------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+––– input –––
+docker exec manticore mysql -e "show create table rt_without_columnar"
+––– output –––
++---------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Table               | Create Table                                                                                                                                            |
++---------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------+
+| rt_without_columnar | CREATE TABLE rt_without_columnar (
+id bigint,
+title text,
+category_id integer,
+price float,
+description string attribute,
+tags multi,
+attributes json
+) |
++---------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------+
+––– input –––
+docker exec manticore mysql -e "show create table test"
+––– output –––
++-------+--------------------------------------------------------------------------------------------------------------------------+
+| Table | Create Table                                                                                                             |
++-------+--------------------------------------------------------------------------------------------------------------------------+
+| test  | CREATE TABLE test (
+id bigint,
+title text,
+image_vector float_vector knn_type='hnsw' knn_dims='4' hnsw_similarity='L2'
+) |
++-------+--------------------------------------------------------------------------------------------------------------------------+
+––– input –––
+docker exec -it manticore manticore-backup --backup-dir=/tmp
+––– output –––
+Copyright (c) %{YEAR}-%{YEAR}, Manticore Software LTD (https://manticoresearch.com)
+Manticore config file: /etc/manticoresearch/manticore.conf.sh
+Tables to backup: all tables
+Backup dir: /tmp
+Manticore config
+endpoint =  http://127.0.0.1:9308
+Manticore config
+endpoint =  http://127.0.0.1:9312
+Manticore versions:
+manticore: %{SEMVER} %{COMMITDATE} dev
+columnar: %{SEMVER} %{COMMITDATE}
+secondary: %{SEMVER} %{COMMITDATE}
+knn: %{SEMVER} %{COMMITDATE}
+buddy: %{SEMVER}
+[93m%{DATETIME}[0m [Info] Starting the backup...
+[93m%{DATETIME}[0m [Info] Backing up config files...
+[93m%{DATETIME}[0m [Info]   config files - [92mOK[0m
+[93m%{DATETIME}[0m [Info] Backing up global state files...
+[93m%{DATETIME}[0m [Info]   global state files – [92mOK[0m
+[93m%{DATETIME}[0m [Info] Backing up tables...
+[93m%{DATETIME}[0m [Info]   distributed_index (distributed)...
+[93m%{DATETIME}[0m [Info]   [93mSKIP[0m
+[93m%{DATETIME}[0m [Info]   rt_with_columnar (rt) [#!/[0-9]{1}\.[0-9]{3}/!#K]...
+[93m%{DATETIME}[0m [Info]    [92mOK[0m
+[93m%{DATETIME}[0m [Info]   rt_without_columnar (rt) [#!/[0-9]{1}\.[0-9]{3}/!#K]...
+[93m%{DATETIME}[0m [Info]    [92mOK[0m
+[93m%{DATETIME}[0m [Info]   test (rt) [%{NUMBER}B]...
+[93m%{DATETIME}[0m [Info]    [92mOK[0m
+[93m%{DATETIME}[0m [Info] Running sync
+[93m%{DATETIME}[0m [Info]  [92mOK[0m
+[93m%{DATETIME}[0m [Info] You can find backup here: /tmp/backup-%{NUMBER}
+[93m%{DATETIME}[0m [Info] Elapsed time: #!/([0-9]+\.[0-9]+|0)/!#s
+[93m%{DATETIME}[0m [Info] Done
+––– input –––
+BACKUP_NAME=$(docker exec manticore ls /tmp/ | grep backup-*)
+––– output –––
+––– input –––
+docker cp manticore:/tmp/$BACKUP_NAME /tmp/$BACKUP_NAME > /dev/null 2>&1; echo $?
+––– output –––
+0
+––– input –––
+docker stop manticore
+––– output –––
+manticore
+––– input –––
+docker ps
+––– output –––
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+––– input –––
+docker run --rm -v /tmp/idx:/var/lib/manticore -it alpine rm -rf /var/lib/manticore/*  > /dev/null 2>&1; echo $?
+––– output –––
+0
+––– input –––
+docker run -d -e EXTRA=1 --name manticore -v /tmp/$BACKUP_NAME/config:/docker-entrypoint-initdb.d/config -v /tmp/$BACKUP_NAME/data:/docker-entrypoint-initdb.d/data -v /tmp/$BACKUP_NAME/state:/docker-entrypoint-initdb.d/state -v /tmp/idx:/var/lib/manticore manticoresoftware/manticore:current
+––– output –––
+#!/[0-9a-z]{40}$/!#
+––– input –––
+if timeout 60 grep -qEm1 "accepting connections" <(docker logs -f manticore 2>&1); then echo 'Manticore is running'; else echo 'Failed to start Manticore'; fi
+––– output –––
+Manticore is running
+––– input –––
+docker exec manticore mysql -e "show tables"
+––– output –––
++---------------------+-------------+
+| Index               | Type        |
++---------------------+-------------+
+| distributed_index   | distributed |
+| rt_with_columnar    | rt          |
+| rt_without_columnar | rt          |
+| test                | rt          |
++---------------------+-------------+
+––– input –––
+docker exec manticore mysql -e "show create table distributed_index"
+––– output –––
++-------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Table             | Create Table                                                                                                                                                              |
++-------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| distributed_index | CREATE TABLE distributed_index type='distributed' local='rt_with_columnar' local='rt_without_columnar' agent='127.0.0.1:9312:plain_with_columnar, plain_without_columnar' |
++-------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+––– input –––
+docker exec manticore mysql -e "show create table rt_with_columnar"
+––– output –––
++------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Table            | Create Table                                                                                                                                                           |
++------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| rt_with_columnar | CREATE TABLE rt_with_columnar (
+id bigint,
+title text,
+category_id integer,
+price float,
+description string attribute engine='columnar',
+tags multi,
+attributes json
+) |
++------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+––– input –––
+docker exec manticore mysql -e "show create table rt_without_columnar"
+––– output –––
++---------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Table               | Create Table                                                                                                                                            |
++---------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------+
+| rt_without_columnar | CREATE TABLE rt_without_columnar (
+id bigint,
+title text,
+category_id integer,
+price float,
+description string attribute,
+tags multi,
+attributes json
+) |
++---------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------+
+––– input –––
+docker exec manticore mysql -e "show create table test"
+––– output –––
++-------+--------------------------------------------------------------------------------------------------------------------------+
+| Table | Create Table                                                                                                             |
++-------+--------------------------------------------------------------------------------------------------------------------------+
+| test  | CREATE TABLE test (
+id bigint,
+title text,
+image_vector float_vector knn_type='hnsw' knn_dims='4' hnsw_similarity='L2'
+) |
++-------+--------------------------------------------------------------------------------------------------------------------------+
