@@ -137,6 +137,10 @@ docker ps
 ––– output –––
 CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 ––– input –––
+if timeout 60 sh -c 'while docker ps -a | grep -qE "Up"; do sleep 1; done'; then echo 'successful'; else echo 'not successful'; fi
+––– output –––
+successful
+––– input –––
 docker run -d -e EXTRA=1 --name manticore -v /tmp/$BACKUP_NAME:/docker-entrypoint-initdb.d manticoresoftware/manticore:current
 ––– output –––
 #!/[0-9a-z]{40}$/!#
