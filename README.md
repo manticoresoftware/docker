@@ -1,4 +1,4 @@
-# Manticore Search Docker image version 6.3.4
+# Manticore Search Docker image version 6.3.6
 
 Manticore Search is an easy to use open source fast database for search. It helps thousands of companies from small to large, such as Craigslist, to search and filter petabytes of text data on a single or hundreds of nodes, do stream full-text filtering, add auto-complete, spell correction, more-like-this, faceting and other search-related technologies to their websites and applications.
 
