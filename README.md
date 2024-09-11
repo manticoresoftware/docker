@@ -271,10 +271,9 @@ If you intend to enable the own `listen` directive, utilize the `searchd_listen`
 
 You can specify multiple interfaces separated by a semicolon (`|`). To exclusively listen on a network address, employ the `$ip` variable (internally retrieved from `hostname -i`) as an address alias.
 
-For instance, using `-e searchd_listen='9316:http|9307:mysql|$ip:5443:mysql_vip'` will incorporate an additional SQL interface on port `9307`, 
-an SQL VIP listener on port `5443` operating solely on the instance's IP (such as 172.17.0.2), and an HTTP listener on port `9316`.
+For example, using `-e searchd_listen='9312|9316:http|9307:mysql|$ip:5443:mysql_vip'` will configure the instance to listen for binary/replication on port `9312`, SQL on port `9307`, SQL VIP on port `5443` (restricted to the instance's IP, such as 172.17.0.2), and HTTP JSON on port `9316`.
 
-**Attention**: Setting this variable overrides default listeners!
+**Attention**: Setting this variable overrides the default listeners, so make sure to enable all the types of listeners you may need, including the binary listener for replication (it won't work without it).
 
 ```bash
 $ docker run -e EXTRA=1 --rm -p 1188:9307  -e searchd_mysql_version_string='5.5.0' -e searchd_listen='9316:http|9307:mysql|$ip:5443:mysql_vip' manticoresearch/manticore
