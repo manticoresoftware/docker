@@ -1,0 +1,65 @@
+You can use regex in the output sections.
+More info here: https://github.com/manticoresoftware/clt#refine
+Time taken for test: 130986ms
+––– input –––
+(dockerd > /var/log/dockerd.log 2>&1 &) > /dev/null
+––– output –––
+––– duration: 11ms (0.01%) –––
+––– input –––
+if timeout 60 grep -qm1 'API listen on /var/run/docker.sock' <(tail -n 0 -f /var/log/dockerd.log); then echo 'Done'; else echo 'Timeout failed'; fi
+––– output –––
+Done
+––– duration: 2075ms (1.58%) –––
+––– input –––
+docker ps
+––– output –––
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+––– duration: 21ms (0.02%) –––
+––– input –––
+docker build --build-arg="DEV=1" -t manticoresoftware/manticore:current /docker/ > /dev/null 2>&1; echo $?
+––– output –––
+0
+––– duration: 108115ms (82.54%) –––
+––– input –––
+docker network create app-network --driver bridge > /dev/null; echo $?
+––– output –––
+0
+––– duration: 90ms (0.07%) –––
+––– input –––
+docker run -d --name postgres --network app-network -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=qazQASD! -e POSTGRES_DB=api_db -p 5432:5432 -v $(pwd)/clt_tests/tests/base/init.sql:/docker-entrypoint-initdb.d/init.sql postgres:latest > /dev/null 2>&1; echo $?
+––– output –––
+0
+––– duration: 15041ms (11.48%) –––
+––– input –––
+sleep 5; timeout 30 grep -m2 'database system is ready to accept connections' <(docker logs -f postgres 2>&1)
+––– output –––
+2024-09-11 20:43:41.832 UTC [48] LOG:  database system is ready to accept connections
+2024-09-11 20:43:42.145 UTC [1] LOG:  database system is ready to accept connections
+––– duration: 5053ms (3.86%) –––
+––– input –––
+docker run -d -e CREATE_PLAIN_TABLES=1 --name manticore --network app-network -v $(pwd)/clt_tests/tests/base/manticore-indexer-postgres.conf:/etc/manticoresearch/manticore.conf manticoresoftware/manticore:current
+––– output –––
+94514fa9f4d8715f12f6342894ad2eea4ae6abafd01b22ba2336a41d119a2932
+––– duration: 269ms (0.21%) –––
+––– input –––
+if timeout 60 grep -qm1 'accepting connections' <(docker logs -f manticore); then echo 'accepting connections'; else echo 'Manticore failed to start properly in 60 seconds'; fi
+––– output –––
+accepting connections
+––– duration: 222ms (0.17%) –––
+––– input –––
+docker exec manticore mysql -h0 -P9306 -e "SHOW TABLES\G;"
+––– output –––
+*************************** 1. row ***************************
+Index: text_idx
+Type: local
+––– duration: 43ms (0.03%) –––
+––– input –––
+docker exec manticore mysql -h0 -P9306 -e "SELECT * FROM text_idx\G;"
+––– output –––
+*************************** 1. row ***************************
+id: 1
+name: Element 1
+*************************** 2. row ***************************
+id: 2
+name: Element 2
+––– duration: 46ms (0.04%) –––
