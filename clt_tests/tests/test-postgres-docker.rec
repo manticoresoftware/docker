@@ -8,7 +8,7 @@ docker run -d --name postgres --network app-network -e POSTGRES_USER=postgres -e
 ––– output –––
 0
 ––– input –––
-sleep 5; timeout 30 grep -m2 'database system is ready to accept connections' <(docker logs -f postgres 2>&1)
+timeout 35 grep -m2 'database system is ready to accept connections' <(docker logs -f postgres 2>&1)
 ––– output –––
 #!/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d{3}/!# UTC [%{NUMBER}] LOG:  database system is ready to accept connections
 #!/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d{3}/!# UTC [%{NUMBER}] LOG:  database system is ready to accept connections
