@@ -1,0 +1,37 @@
+––– block: ./base/init –––
+––– input –––
+docker network create app-network --driver bridge > /dev/null; echo $?
+––– output –––
+0
+––– input –––
+docker run -d --name postgres --network app-network -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=qazQASD! -e POSTGRES_DB=api_db -p 5432:5432 -v $(pwd)/clt_tests/tests/base/init.sql:/docker-entrypoint-initdb.d/init.sql postgres:latest > /dev/null 2>&1; echo $?
+––– output –––
+0
+––– input –––
+timeout 35 grep -m2 'database system is ready to accept connections' <(docker logs -f postgres 2>&1)
+––– output –––
+#!/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d{3}/!# UTC [%{NUMBER}] LOG:  database system is ready to accept connections
+#!/\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d{3}/!# UTC [%{NUMBER}] LOG:  database system is ready to accept connections
+––– input –––
+docker run -d -e CREATE_PLAIN_TABLES=1 --name manticore --network app-network -v $(pwd)/clt_tests/tests/base/manticore-indexer-postgres.conf:/etc/manticoresearch/manticore.conf manticoresoftware/manticore:current
+––– output –––
+#!/[0-9a-z]+/!#
+––– input –––
+if timeout 60 grep -qm1 'accepting connections' <(docker logs -f manticore); then echo 'accepting connections'; else echo 'Manticore failed to start properly in 60 seconds'; fi
+––– output –––
+accepting connections
+––– input –––
+docker exec manticore mysql -h0 -P9306 -e "SHOW TABLES\G;"
+––– output –––
+*************************** 1. row ***************************
+Index: text_idx
+Type: local
+––– input –––
+docker exec manticore mysql -h0 -P9306 -e "SELECT * FROM text_idx\G;"
+––– output –––
+*************************** 1. row ***************************
+id: 1
+name: Element 1
+*************************** 2. row ***************************
+id: 2
+name: Element 2
