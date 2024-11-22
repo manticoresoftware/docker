@@ -23,7 +23,7 @@ docker exec manticore bash -c "mysql < ./tables.sql"
 docker exec manticore mysql -e "show tables"
 ––– output –––
 +---------------------+-------------+
-| Index               | Type        |
+| Table               | Type        |
 +---------------------+-------------+
 | distributed_index   | distributed |
 | rt_with_columnar    | rt          |
@@ -152,7 +152,7 @@ Manticore is running
 docker exec manticore mysql -e "show tables"
 ––– output –––
 +---------------------+-------------+
-| Index               | Type        |
+| Table               | Type        |
 +---------------------+-------------+
 | distributed_index   | distributed |
 | rt_with_columnar    | rt          |
