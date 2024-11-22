@@ -24,7 +24,7 @@ accepting connections
 docker exec manticore mysql -h0 -P9306 -e "SHOW TABLES\G;"
 ––– output –––
 *************************** 1. row ***************************
-Index: text_idx
+Table: text_idx
 Type: local
 ––– input –––
 docker exec manticore mysql -h0 -P9306 -e "SELECT * FROM text_idx\G;"

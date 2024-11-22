@@ -12,7 +12,7 @@ docker exec manticore mysql -e "source /sandbox.sql"
 docker exec manticore mysql -e "SHOW TABLES\G"
 ––– output –––
 *************************** 1. row ***************************
-Index: films
+Table: films
 Type: rt
 ––– input –––
 docker exec manticore mysql -e "SELECT * FROM films LIMIT 3\G"
