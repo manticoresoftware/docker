@@ -315,6 +315,17 @@ There are several methods to build plain tables from your custom configuration f
 
 4) **Combining scheduled and startup table rebuilding:**  
    To combine scheduled building with the indexing of desired tables on startup, use this format: `CREATE_PLAIN_TABLES=tbl:* * * * *;tbl2:*/5 2 * * *;deltaTable;tbl3`.
+   
+### Microsoft SQL Server ODBC
+Microsoft SQL ODBC DSN Driver name `ODBC Driver 18 for SQL Server`
+
+Example connection string:
+```
+odbc_dsn = Driver={ODBC Driver 18 for SQL Server};Server=192.168.0.1,1433;UID=username;PWD=password;Database=database
+```
+
+Full list of the keywords that may be used with an ODBC connection string is available [here](https://learn.microsoft.com/en-us/sql/relational-databases/native-client/applications/using-connection-string-keywords-with-sql-server-native-client?view=sql-server-ver15#odbc-driver-connection-string-keywords)
+
 
 # Backup and restore
 
