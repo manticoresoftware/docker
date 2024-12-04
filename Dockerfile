@@ -80,7 +80,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
       && dpkg -i manticore-dev-repo.noarch.deb \
       && apt-key adv --fetch-keys 'https://repo.manticoresearch.com/GPG-KEY-manticore' && apt-get -y update && apt-get -y install manticore \
       && apt-get -y update  \
-      && echo $(apt-get -y download --print-uris manticore-galera manticore-columnar-lib | cut -d" " -f1 | cut -d "'" -f 2) > /mcl_galera.url \
+      && echo $(apt-get -y download --print-uris manticore-galera manticore-columnar-lib | cut -d" " -f1 | cut -d "'" -f 2 | sort -r) > /mcl_galera.url \
       && echo $(apt-get -y download --print-uris manticore-executor | cut -d" " -f1 | cut -d "'" -f 2) > /extra.url ;\
     elif [ ! -z "$DAEMON_URL" ]; then \
       echo "2nd step of building release image for linux/${ARCH}64 architecture" \
