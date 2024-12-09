@@ -118,12 +118,14 @@ docker_setup_env() {
       fi
 
       MCL_URL=$(cat /mcl_galera.url)
-      wget --show-progress -q -P /tmp $MCL_URL
+      mkdir /tmp/mcl
+      wget --show-progress -q -P /tmp/mcl $MCL_URL
 
       LAST_PATH=$(pwd)
 
+
       for package in columnar galera; do
-        cd /tmp
+        cd /tmp/mcl
 
         PACKAGE_NAME=$(ls | grep "manticore-${package}" | head -n 1)
 
@@ -135,7 +137,7 @@ docker_setup_env() {
         fi
         find . -name '*.so' -exec cp {} ${MCL_DIR} \;
       done;
-
+      rm -rf /tmp/mcl
       cd $LAST_PATH
 
     fi
@@ -194,7 +196,7 @@ install_extra() {
   # $FORCE $5
 
   # In case force update
-  if [ $5=1 ]; then
+  if [ ! -z "$5" ]; then
     rm -rf "${4}"
   fi
 
@@ -217,8 +219,8 @@ install_extra() {
 
   cd $LAST_PATH
 
-  rm -rf "${4}*"
-  cp /usr/bin/manticore-executor ${4}
+  rm -rf ${4}*
+  cp /usr/bin/manticore-executor "${4}"
 }
 
 _main() {
