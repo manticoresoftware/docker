@@ -2,7 +2,7 @@
 (dockerd > /var/log/dockerd.log 2>&1 &) > /dev/null
 ––– output –––
 ––– input –––
-if timeout 60 grep -qm1 'API listen on /var/run/docker.sock' <(tail -n 500 -f /var/log/dockerd.log); then echo 'Done'; else echo 'Timeout failed'; cat /var/log/dockerd.log; which iptables; iptables --help; fi
+if timeout 60 grep -qm1 'API listen on /var/run/docker.sock' <(tail -n 500 -f /var/log/dockerd.log); then echo 'Done'; else echo 'Timeout failed'; cat /var/log/dockerd.log; which iptables; iptables --help; echo "checking in sbin"; /usr/sbin/iptables --help; fi
 ––– output –––
 Done
 ––– input –––
