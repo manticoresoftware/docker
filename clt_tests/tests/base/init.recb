@@ -1,3 +1,6 @@
+--- input ---
+export PATH=$PATH:/usr/sbin
+--- output ---
 ––– input –––
 (dockerd > /var/log/dockerd.log 2>&1 &) > /dev/null
 ––– output –––
