@@ -1,3 +1,3 @@
 FROM docker:dind
 
-RUN apk update && apk add bash procps
+RUN apk update && apk add bash procps iptables
