@@ -24,6 +24,7 @@ https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/ma
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-dev_6.3.8-24112202-d17bd2b6b_all.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-icudata-65l.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-tzdata_1.0.0-240522-a8aa66e_all.deb"}
+# TODO: add manticore-load to the next release
 
 # If you set EXTRA=1, MCL=1 will automatically be invoked.
 # We're only providing the executor URL here because the columnar-lib included in the package will be installed via the MCL=1 flag.
@@ -78,7 +79,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
       echo "2nd step of building dev image for linux/${ARCH}64 architecture" \
       && wget -q https://repo.manticoresearch.com/manticore-dev-repo.noarch.deb \
       && dpkg -i manticore-dev-repo.noarch.deb \
-      && apt-key adv --fetch-keys 'https://repo.manticoresearch.com/GPG-KEY-manticore' && apt-get -y update && apt-get -y install manticore \
+      && apt-key adv --fetch-keys 'https://repo.manticoresearch.com/GPG-KEY-manticore' && apt-get -y update && apt-get -y install manticore manticore-load \
       && apt-get -y update  \
       && echo $(apt-get -y download --print-uris manticore-galera manticore-columnar-lib | cut -d" " -f1 | cut -d "'" -f 2 | sort -r) > /mcl_galera.url \
       && echo $(apt-get -y download --print-uris manticore-executor | cut -d" " -f1 | cut -d "'" -f 2) > /extra.url ;\
