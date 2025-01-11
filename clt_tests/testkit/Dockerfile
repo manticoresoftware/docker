@@ -1,3 +1,3 @@
-FROM docker:27.4.0-dind
+FROM docker:dind
 
 RUN apk update && apk add bash procps
