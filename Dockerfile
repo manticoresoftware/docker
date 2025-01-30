@@ -24,6 +24,7 @@ https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/ma
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-dev_7.0.0-25013002-92c650401_all.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-icudata-65l.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-load_1.16.1%2B25012511-d0cc8f55_all.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-language-packs_1.0.0-230804-9be63f0_all.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-tzdata_1.0.0-240522-a8aa66e_all.deb"}
 # TODO: add manticore-load to the next release
 
