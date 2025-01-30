@@ -12,23 +12,24 @@ RUN groupadd -r manticore && useradd -r -g manticore manticore
 ENV GOSU_VERSION 1.11
 
 ENV MCL_URL=${MCL_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-galera_3.37__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-columnar-lib_2.3.0-24052206-88a01c3__ARCH_64.deb"}
+https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-columnar-lib_4.0.0-25012409-5aa8e43__ARCH_64.deb"}
 
-ENV DAEMON_URL=${DAEMON_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-server_6.3.8-24112202-d17bd2b6b__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-server-core_6.3.8-24112202-d17bd2b6b__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-backup_1.3.8-24052208-57fc406_all.deb \
+ENV DAEMON_URL=${DAEMON_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-server_7.0.0-25013002-92c650401__ARCH_64.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-server-core_7.0.0-25013002-92c650401__ARCH_64.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-backup_1.7.4+25012416-be8f7625_all.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-buddy_2.3.12-24071807-45f6b91_all.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-tools_6.3.8-24112202-d17bd2b6b__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-common_6.3.8-24112202-d17bd2b6b_all.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore_6.3.8-24112202-d17bd2b6b__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-dev_6.3.8-24112202-d17bd2b6b_all.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-tools_7.0.0-25013002-92c650401__ARCH_64.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-common_7.0.0-25013002-92c650401_all.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore_7.0.0-25013002-92c650401__ARCH_64.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-dev_7.0.0-25013002-92c650401_all.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-icudata-65l.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-load_1.16.1%2B25012511-d0cc8f55_all.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-tzdata_1.0.0-240522-a8aa66e_all.deb"}
 # TODO: add manticore-load to the next release
 
 # If you set EXTRA=1, MCL=1 will automatically be invoked.
 # We're only providing the executor URL here because the columnar-lib included in the package will be installed via the MCL=1 flag.
-ENV EXTRA_URL=${EXTRA_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-executor_1.1.12-24071807-0565a65__ARCH_64.deb"}
+ENV EXTRA_URL=${EXTRA_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-executor_1.3.2-25012408-1856ac9__ARCH_64.deb"}
 
 RUN if [ -z "$MCL_URL" ] ; then \
     echo "WARNING: MCL_URL is empty"; \
