@@ -402,3 +402,16 @@ since user `manticore` has ID 999 inside the container.
 # Issues
 
 For reporting issues, please use the [issue tracker](https://github.com/manticoresoftware/docker/issues).
+
+## License Notice
+
+This Docker image includes multiple independent components, each with its own license:
+
+1. [Manticore Search](https://github.com/manticoresoftware/manticoresearch), [Manticore Buddy](https://github.com/manticoresoftware/manticoresearch-buddy), [Manticore Backup](http://github.com/manticoresoftware/manticoresearch-backup): [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html)
+2. [Manticore Columnar Library](http://github.com/manticoresoftware/columnar): [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)
+3. [Manticore Executor](http://github.com/manticoresoftware/executor): [PHP License 3.01](https://www.php.net/license/3_01.txt)
+4. Docker image packaging (Dockerfile, entrypoint scripts, and related files) (MIT License)
+
+Each component group operates as a standalone module, and its respective license applies.
+
+More info the [component licenses](./component-licenses/NOTICE).
