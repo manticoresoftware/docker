@@ -98,7 +98,7 @@ manticore: %{SEMVER} %{COMMITDATE} dev
 columnar: %{SEMVER} %{COMMITDATE}
 secondary: %{SEMVER} %{COMMITDATE}
 knn: %{SEMVER} %{COMMITDATE}
-buddy: %{SEMVER}
+buddy: %{SEMVER}+#!/[0-9]{8}-[a-z0-9]{8}(-dev)*/!#
 [93m%{DATETIME}[0m [Info] Starting the backup...
 [93m%{DATETIME}[0m [Info] Backing up config files...
 [93m%{DATETIME}[0m [Info]   config files - [92mOK[0m
