@@ -8,7 +8,7 @@ if timeout 5 grep -qm1 'accepting connections' <(docker logs -f manticore); then
 ––– output –––
 accepting connections
 ––– input –––
-docker exec manticore cat /etc/manticoresearch/manticore.conf.debug
+docker exec manticore cat /etc/manticoresearch/manticore.conf.debug | sort
 ––– output –––
 searchd {
 secondary_indexes = 0
