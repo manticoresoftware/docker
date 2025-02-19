@@ -20,7 +20,7 @@ id: 2
 id: 3
  f: abc abc
 ––– input –––
-docker exec manticore ls | grep idx
+docker exec manticore ls | grep idx | sort
 ––– output –––
 idx1.spa
 idx1.spd
@@ -38,7 +38,7 @@ if timeout 65 grep -qm1 'Indexer_idx2: rotating tables: successfully sent SIGHUP
 ––– output –––
 Cron job done
 ––– input –––
-docker exec manticore ls | grep idx
+docker exec manticore ls | grep idx | sort
 ––– output –––
 idx1.spa
 idx1.spd
