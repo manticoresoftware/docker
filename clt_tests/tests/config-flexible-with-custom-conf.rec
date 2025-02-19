@@ -14,14 +14,15 @@ accepting connections
 ––– input –––
 docker exec manticore cat /etc/manticoresearch/manticore.conf.debug | sort
 ––– output –––
-searchd {
-listen = 9306:mysql41
-listen = /var/run/mysqld/mysqld.sock:mysql41
-listen = 9308:http
-listen = 172.17.0.2:9312
-listen = 172.17.0.2:9315-9325:replication
-log = /var/log/manticore/searchd.log
-query_log = /var/log/manticore/query.log
-pid_file = /var/run/manticore/searchd.pid
 data_dir = /var/lib/manticore
+listen = /var/run/mysqld/mysqld.sock:mysql41
+listen = 0.0.0.0:9308:http
+listen = 172.18.0.2:9315-9325:replication
+listen = 9306:mysql41
+listen = 9312
+log = /var/log/manticore/searchd.log
+max_packet_size = 128M
+pid_file = /var/run/manticore/searchd.pid
+query_log_format = sphinxql
+searchd {
 }
