@@ -26,7 +26,7 @@ We have two arch for builds (`amd` & `arm`)
 * `buildx` command passed to Dockerfile additional argument `TARGETPLATFORM`
     which we used for deciding which arch we want to build `linux/arm64` or `linux/amd64`
 * For `dev` builds we call `apt install` so switching between architectures happens automatically
-* For `release` builds we passed into `build` variables like `DAEMON_URL`, `MCL_URL` and `EXTRA_URL`. 
+* For `release` builds we passed into `build` variables like `DAEMON_URL`. 
     Very important that each of that links has `_ARCH_` placeholder. Like: 
     ```
     https://repo.manticoreseatch.com/tarball_location/manticore_ARCH_.tgz
