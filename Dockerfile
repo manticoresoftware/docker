@@ -11,22 +11,26 @@ RUN groupadd -r manticore && useradd -r -g manticore manticore
 
 ENV GOSU_VERSION 1.11
 
-ENV MCL_URL=${MCL_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-columnar-lib_2.2.4-230822-5aec342__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-galera_3.37__ARCH_64.deb"}
+ENV MCL_URL=${MCL_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-galera_3.37__ARCH_64.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-columnar-lib_4.0.0-25012409-5aa8e43__ARCH_64.deb"}
 
-ENV DAEMON_URL=${DAEMON_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-server_6.2.12-230822-dc5144d35__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-server-core_6.2.12-230822-dc5144d35__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-backup_1.0.8-23080408-f7638f9_all.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-buddy_1.0.18-23080408-2befdbe_all.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-tools_6.2.12-230822-dc5144d35__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-common_6.2.12-230822-dc5144d35_all.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore_6.2.12-230822-dc5144d35__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-dev_6.2.12-230822-dc5144d35_all.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-icudata-65l.deb"}
+ENV DAEMON_URL=${DAEMON_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-server_7.0.0-25013002-92c650401__ARCH_64.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-server-core_7.0.0-25013002-92c650401__ARCH_64.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-backup_1.7.4+25012416-be8f7625_all.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-buddy_3.17.1+25012911-51758b05_all.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-tools_7.0.0-25013002-92c650401__ARCH_64.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-common_7.0.0-25013002-92c650401_all.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore_7.0.0-25013002-92c650401__ARCH_64.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-dev_7.0.0-25013002-92c650401_all.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-icudata-65l.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-load_1.16.1%2B25012511-d0cc8f55_all.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-language-packs_1.0.0-230804-9be63f0_all.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-tzdata_1.0.0-240522-a8aa66e_all.deb"}
+# TODO: add manticore-load to the next release
 
 # If you set EXTRA=1, MCL=1 will automatically be invoked.
 # We're only providing the executor URL here because the columnar-lib included in the package will be installed via the MCL=1 flag.
-ENV EXTRA_URL=${EXTRA_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-executor_0.7.8-23082210-810d7d3__ARCH_64.deb"}
+ENV EXTRA_URL=${EXTRA_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-executor_1.3.2-25012408-1856ac9__ARCH_64.deb"}
 
 RUN if [ -z "$MCL_URL" ] ; then \
     echo "WARNING: MCL_URL is empty"; \
@@ -48,7 +52,7 @@ RUN set -x \
     && mkdir /etc/ssl/ && touch /usr/bin/manticore-executor \
     && chown -R manticore:manticore /usr/bin/manticore-executor /etc/ssl/ \
     && chmod +x /usr/bin/manticore-executor \
-    && apt-get -y update && apt-get -y install --no-install-recommends ca-certificates binutils wget gnupg xz-utils dirmngr locales cron && rm -rf /var/lib/apt/lists/* \
+    && apt-get -y update && apt-get -y install --no-install-recommends ca-certificates binutils wget gnupg xz-utils dirmngr locales tzdata cron && rm -rf /var/lib/apt/lists/* \
     && locale-gen --lang en_US \
     && wget -q -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
     && wget -q -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
@@ -77,9 +81,9 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
       echo "2nd step of building dev image for linux/${ARCH}64 architecture" \
       && wget -q https://repo.manticoresearch.com/manticore-dev-repo.noarch.deb \
       && dpkg -i manticore-dev-repo.noarch.deb \
-      && apt-key adv --fetch-keys 'https://repo.manticoresearch.com/GPG-KEY-manticore' && apt-get -y update && apt-get -y install manticore \
+      && apt-key adv --fetch-keys 'https://repo.manticoresearch.com/GPG-KEY-manticore' && apt-get -y update && apt-get -y install manticore manticore-load \
       && apt-get -y update  \
-      && echo $(apt-get -y download --print-uris manticore-columnar-lib manticore-galera | cut -d" " -f1 | cut -d "'" -f 2) > /mcl.url \
+      && echo $(apt-get -y download --print-uris manticore-galera manticore-columnar-lib | cut -d" " -f1 | cut -d "'" -f 2 | sort -r) > /mcl_galera.url \
       && echo $(apt-get -y download --print-uris manticore-executor | cut -d" " -f1 | cut -d "'" -f 2) > /extra.url ;\
     elif [ ! -z "$DAEMON_URL" ]; then \
       echo "2nd step of building release image for linux/${ARCH}64 architecture" \
@@ -87,14 +91,14 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
       && echo $DAEMON_URL | sed "s/_ARCH_/$ARCH/g" \
       && wget -q $(echo $DAEMON_URL | sed "s/_ARCH_/$ARCH/g") \
       && apt-get -y install ./manticore*deb \
-      && echo $MCL_URL | sed "s/_ARCH_/$ARCH/g" > /mcl.url \
+      && echo $MCL_URL | sed "s/_ARCH_/$ARCH/g" > /mcl_galera.url \
+      && echo $GALERA_URL | sed "s/_ARCH_/$ARCH/g" > /galera.url \
       && echo $EXTRA_URL | sed "s/_ARCH_/$ARCH/g" > /extra.url \
       && rm *.deb ; \
     fi
 RUN if [ -d "/packages/" ]; then apt -y install /packages/*deb; fi \
     && mkdir -p /var/run/manticore \
     && mkdir -p /usr/share/doc/manticore-galera \
-    && mkdir -p /var/lib/manticore/replication \
     && mkdir /docker-entrypoint-initdb.d \
     && apt-get -y purge --auto-remove \
     && rm -rf /var/lib/apt/lists/* \
@@ -109,7 +113,8 @@ RUN if [ -d "/packages/" ]; then apt -y install /packages/*deb; fi \
     && wget -q https://repo.manticoresearch.com/repository/morphology/ru.pak.tgz?docker_build=1 -O /tmp/ru.pak.tgz \
     && tar -xf /tmp/en.pak.tgz -C /usr/share/manticore/ \
     && tar -xf /tmp/de.pak.tgz -C /usr/share/manticore/ \
-    && tar -xf /tmp/ru.pak.tgz -C /usr/share/manticore/
+    && tar -xf /tmp/ru.pak.tgz -C /usr/share/manticore/ \
+    && rm /tmp/*.pak.tgz
 
 COPY manticore.conf.sh /etc/manticoresearch/
 RUN md5sum /etc/manticoresearch/manticore.conf | awk '{print $1}' > /manticore.conf.md5
@@ -126,12 +131,15 @@ RUN touch /etc/cron.d/manticore /var/run/crond.pid && \
 FROM scratch
 COPY --from=initial / /
 WORKDIR /var/lib/manticore
+VOLUME /usr/local/lib/manticore
+VOLUME /var/lib/manticore
 ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 9306
 EXPOSE 9308
 EXPOSE 9312
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
+ENV MANTICORE_CONFIG="/etc/manticoresearch/manticore.conf.sh|/etc/manticoresearch/manticore.conf"
 CMD ["searchd", "-c", "/etc/manticoresearch/manticore.conf.sh", "--nodetach"]
 
 # How to build manually:
@@ -144,7 +152,7 @@ CMD ["searchd", "-c", "/etc/manticoresearch/manticore.conf.sh", "--nodetach"]
 #     Build multi-arch and push to remote registry:
 #       docker buildx build --progress=plain --build-arg DEV=1 --push --platform linux/amd64,linux/arm64 --tag username/manticore:dev .
 #   Release version:
-#     docker buildx build --progress=plain --build-arg --push --platform linux/amd64,linux/arm64 --tag username/manticore:dev .
+#     docker buildx build --build-arg DEV=0 --progress plain --push --platform linux/arm64,linux/amd64 --tag manticoresearch/manticore:6.3.2 --tag manticoresearch/manticore:latest .
 #
 #   With empty urls assuming *deb in the local dir:
 #     docker buildx build --progress=plain --build-arg DEV=0 --build-arg DAEMON_URL="" --build-arg  MCL_URL="" --load --platform linux/amd64 --tag username/manticore:local .
