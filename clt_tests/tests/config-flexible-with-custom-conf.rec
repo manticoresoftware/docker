@@ -12,19 +12,17 @@ if timeout 5 grep -qm1 'accepting connections' <(docker logs -f manticore); then
 ––– output –––
 accepting connections
 ––– input –––
-docker exec manticore cat /etc/manticoresearch/manticore.conf.debug
+docker exec manticore cat /etc/manticoresearch/manticore.conf.debug | sort
 ––– output –––
-searchd {
-query_log_format = sphinxql
-log = /var/log/manticore/searchd.log
-secondary_indexes = 0
-buddy_path =
-pid_file = /var/run/manticore/searchd.pid
-listen = 9306:mysql41
+data_dir = /var/lib/manticore
 listen = /var/run/mysqld/mysqld.sock:mysql41
-listen = 9312
 listen = 0.0.0.0:9308:http
 listen = 172.18.0.2:9315-9325:replication
-data_dir = /var/lib/manticore
+listen = 9306:mysql41
+listen = 9312
+log = /var/log/manticore/searchd.log
 max_packet_size = 128M
+pid_file = /var/run/manticore/searchd.pid
+query_log_format = sphinxql
+searchd {
 }

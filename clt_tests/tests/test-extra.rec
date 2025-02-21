@@ -1,43 +1,12 @@
 ––– block: ./base/init –––
 ––– input –––
-docker run --rm -e EXTRA=0 --name manticore -d manticoresoftware/manticore:current
-––– output –––
-#!/[0-9a-z]{40}$/!#
-––– input –––
-if timeout 10 grep -qm1 'accepting connections' <(docker logs -f manticore); then echo 'accepting connections'; else echo 'Docker failed to start properly in 10 seconds'; fi
-––– output –––
-accepting connections
-––– input –––
-docker exec manticore searchd --version
-––– output –––
-Manticore %{SEMVER} #!/[a-z0-9]{7,9}@[0-9]{8}/!# dev
-Copyright (c) 2001-2016, Andrew Aksyonoff
-Copyright (c) 2008-2016, Sphinx Technologies Inc (http://sphinxsearch.com)
-Copyright (c) 2017-%{YEAR}, Manticore Software LTD (https://manticoresearch.com)
-––– input –––
-docker stop manticore
-––– output –––
-manticore
-––– input –––
-sleep 1;docker run --rm -e EXTRA=1 --name manticore -v /tmp/idx:/var/lib/manticore -d manticoresoftware/manticore:current
+docker run --rm --name manticore -v /tmp/idx:/var/lib/manticore -d manticoresoftware/manticore:current
 ––– output –––
 #!/[0-9a-z]{40}$/!#
 ––– input –––
 if timeout 60 grep -qEm1 "columnar.*?secondary.*?knn" <(docker logs -f manticore 2>&1); then echo 'Done'; else echo 'Not found'; fi
 ––– output –––
 Done
-––– input –––
-docker stop manticore
-––– output –––
-manticore
-––– input –––
-sleep 1;docker run --rm -e EXTRA=1 --name manticore -v /tmp/idx:/var/lib/manticore -d manticoresoftware/manticore:current
-––– output –––
-#!/[0-9a-z]{40}$/!#
-––– input –––
-timeout 10 docker logs -f manticore 2>1 | grep -qm1 "Install extra packages" || echo 'Packages installation skipped'
-––– output –––
-Packages installation skipped
 ––– input –––
 docker exec manticore manticore-executor -v
 ––– output –––
@@ -51,3 +20,7 @@ docker exec manticore ls /usr/share/manticore/modules/lib_manticore_columnar.so 
 /usr/share/manticore/modules/lib_manticore_knn.so
 /usr/share/manticore/modules/lib_manticore_secondary.so
 /usr/share/manticore/modules/libgalera_manticore.so
+––– input –––
+docker exec manticore mysql -e "create cluster abc"; echo $?
+––– output –––
+0

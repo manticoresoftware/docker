@@ -20,7 +20,7 @@ The image comes with libraries for easy indexing data from MySQL, PostgreSQL XML
 The below is the simplest way to start Manticore in a container and log in to it via the mysql client:
 
 ```bash
-docker run -e EXTRA=1 --name manticore --rm -d manticoresearch/manticore && echo "Waiting for Manticore docker to start. Consider mapping the data_dir to make it start faster next time" && until docker logs manticore 2>&1 | grep -q "accepting connections"; do sleep 1; echo -n .; done && echo && docker exec -it manticore mysql && docker stop manticore
+docker run --name manticore --rm -d manticoresearch/manticore && echo "Waiting for Manticore docker to start. Consider mapping the data_dir to make it start faster next time" && until docker logs manticore 2>&1 | grep -q "accepting connections"; do sleep 1; echo -n .; done && echo && docker exec -it manticore mysql && docker stop manticore
 ```
 
 Note that upon exiting the MySQL client, the Manticore container will be stopped and removed, resulting in no saved data. For information on using Manticore in a production environment, please see below.
@@ -48,24 +48,19 @@ For example, if you set `-e searchd_listen='19306:mysql'` via environments and c
 The ports are 9306/9308/9312 for SQL/HTTP/Binary, expose them depending on how you are going to use Manticore. For example:
 
 ```bash
-docker run -e EXTRA=1 --name manticore -v $(pwd)/data:/var/lib/manticore -p 127.0.0.1:9306:9306 -p 127.0.0.1:9308:9308 -d manticoresearch/manticore
+docker run --name manticore -v $(pwd)/data:/var/lib/manticore -p 127.0.0.1:9306:9306 -p 127.0.0.1:9308:9308 -d manticoresearch/manticore
 ```
 
 or
 
 ```bash
-docker run -e EXTRA=1 --name manticore -v $(pwd)/manticore.conf:/etc/manticoresearch/manticore.conf -v $(pwd)/data:/var/lib/manticore/ -p 127.0.0.1:9306:9306 -p 127.0.0.1:9308:9308 -d manticoresearch/manticore
+docker run --name manticore -v $(pwd)/manticore.conf:/etc/manticoresearch/manticore.conf -v $(pwd)/data:/var/lib/manticore/ -p 127.0.0.1:9306:9306 -p 127.0.0.1:9308:9308 -d manticoresearch/manticore
 ```
 
 Make sure to remove `127.0.0.1:` if you want the ports to be available for external hosts.
 
-### Manticore Columnar Library and Manticore Buddy
 
-The Manticore Search Docker image doesn't come with the [Manticore Columnar Library](https://github.com/manticoresoftware/columnar) pre-installed, which is necessary if you require columnar storage and secondary indexes. However, it can easily be enabled during runtime by setting the environment variable `EXTRA=1`. For example, `docker run -e EXTRA=1 ... manticoresearch/manticore`. This will download and install the library in the data directory (which is typically mapped as a volume in production environments) and it won't be re-downloaded unless the Manticore Search version is changed.
-
-Using `EXTRA=1` also activates [Manticore Buddy](https://github.com/manticoresoftware/manticoresearch-buddy), which is used for processing certain commands. For more information, refer to the [changelog](https://manual.manticoresearch.com/Changelog#Version-6.0.0).
-
-If you only need the MCL, you can use the environment variable `MCL=1`.
+The Manticore Search Docker image comes with pre-installed [Manticore Columnar Library](https://github.com/manticoresoftware/columnar) and [Manticore Buddy](https://github.com/manticoresoftware/manticoresearch-buddy)
 
 ### Docker-compose
 
@@ -78,8 +73,6 @@ services:
   manticore:
     container_name: manticore
     image: manticoresearch/manticore
-    environment:
-      - EXTRA=1
     restart: always
     ports:
       - 127.0.0.1:9306:9306
@@ -104,7 +97,7 @@ Besides using the exposed ports 9306 and 9308, you can log into the instance by 
 HTTP protocol is exposed on port 9308. You can map the port locally and connect using curl.:
 
 ```bash
-docker run -e EXTRA=1 --name manticore -p 9308:9308 -d manticoresearch/manticore
+docker run --name manticore -p 9308:9308 -d manticoresearch/manticore
 ```
 
 <!-- example create -->
@@ -155,8 +148,6 @@ services:
 
   manticore-1:
     image: manticoresearch/manticore
-    environment:
-      - EXTRA=1
     restart: always
     ulimits:
       nproc: 65535
@@ -170,8 +161,6 @@ services:
       - manticore
   manticore-2:
     image: manticoresearch/manticore
-    environment:
-      - EXTRA=1
     restart: always
     ulimits:
       nproc: 65535
@@ -249,7 +238,7 @@ For best performance, table components can be "mlocked" into memory. When Mantic
 If you want to run Manticore with a custom configuration that includes table definitions, you will need to mount the configuration to the instance:
 
 ```bash
-docker run -e EXTRA=1 --name manticore -v $(pwd)/manticore.conf:/etc/manticoresearch/manticore.conf -v $(pwd)/data/:/var/lib/manticore -p 127.0.0.1:9306:9306 -d manticoresearch/manticore
+docker run --name manticore -v $(pwd)/manticore.conf:/etc/manticoresearch/manticore.conf -v $(pwd)/data/:/var/lib/manticore -p 127.0.0.1:9306:9306 -d manticoresearch/manticore
 ```
 
 Take into account that Manticore search inside the container is run under user `manticore`. Performing operations with table files (like creating or rotating plain tables) should be also done under `manticore`. Otherwise the files will be created under `root` and the search daemon won't have rights to open them. For example here is how you can rotate all tables:
@@ -264,7 +253,7 @@ The settings must be prefixed with their section name, example for in case of `m
 
 
 ```bash
-docker run -e EXTRA=1 --name manticore  -p 127.0.0.1:9306:9306  -e searchd_mysql_version_string='5.5.0' -d manticoresearch/manticore
+docker run --name manticore  -p 127.0.0.1:9306:9306  -e searchd_mysql_version_string='5.5.0' -d manticoresearch/manticore
 ```
 
 If you intend to enable the own `listen` directive, utilize the `searchd_listen` environment variable.
@@ -276,7 +265,7 @@ For example, using `-e searchd_listen='9312|9316:http|9307:mysql|$ip:5443:mysql_
 **Attention**: Setting this variable overrides the default listeners, so make sure to enable all the types of listeners you may need, including the binary listener for replication (it won't work without it).
 
 ```bash
-$ docker run -e EXTRA=1 --rm -p 1188:9307  -e searchd_mysql_version_string='5.5.0' -e searchd_listen='9316:http|9307:mysql|$ip:5443:mysql_vip' manticoresearch/manticore
+$ docker run --rm -p 1188:9307  -e searchd_mysql_version_string='5.5.0' -e searchd_listen='9316:http|9307:mysql|$ip:5443:mysql_vip' manticoresearch/manticore
 [Mon Feb 19 10:12:20.501 2024] [1] using config file '/etc/manticoresearch/manticore.conf.sh' (297 chars)...
 starting daemon version '6.2.13 56aaf1f55@24021713 dev (columnar 2.2.5 8c90c1f@240217) (secondary 2.2.5 8c90c1f@240217) (knn 2.2.5 8c90c1f@240217)' ...
 listening on all interfaces for sphinx and http(s), port=9316
@@ -291,7 +280,7 @@ accepting connections
 
 To start Manticore with custom startup flags, specify them as arguments when using docker run. Ensure you do not include the `searchd` command and include the `--nodetach` flag. Here's an example:
 ```bash
-docker run -e EXTRA=1 --name manticore --rm manticoresearch/manticore:latest --replay-flags=ignore-trx-errors --nodetach
+docker run --name manticore --rm manticoresearch/manticore:latest --replay-flags=ignore-trx-errors --nodetach
 ```
 
 ### Running under non-root
@@ -320,8 +309,6 @@ There are several methods to build plain tables from your custom configuration f
 
 ### Full backup
 
-To create a **full backup**, you need to include the `-e EXTRA=1` flag. 
-The `manticore-backup` package utilizes the `manticore-executor`, which is installed with the EXTRA packages.
 
 Creating a **full backup** is a straightforward process. Simply run the following command:
 
@@ -385,13 +372,6 @@ In case you are running Manticore Search docker under non-root (using `docker ..
 ```bash
 FATAL: directory /var/lib/manticore write error: failed to open /var/lib/manticore/tmp: Permission denied
 ```
-
-or in case you are using `-e EXTRA=1`:
-
-```bash
-mkdir: cannot create directory ‘/var/lib/manticore/.mcl/’: Permission denied
-```
-
 This can happen because the user which is used to run processes inside the container may have no permissions to modify the directory you have mounted to the container. To fix it you can `chown` or `chmod` the mounted directory. If you run the container under user `manticore` you need to do:
 ```bash
 chown -R 999:999 data
@@ -402,3 +382,16 @@ since user `manticore` has ID 999 inside the container.
 # Issues
 
 For reporting issues, please use the [issue tracker](https://github.com/manticoresoftware/docker/issues).
+
+## License Notice
+
+This Docker image includes multiple independent components, each with its own license:
+
+1. [Manticore Search](https://github.com/manticoresoftware/manticoresearch), [Manticore Buddy](https://github.com/manticoresoftware/manticoresearch-buddy), [Manticore Backup](http://github.com/manticoresoftware/manticoresearch-backup): [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html)
+2. [Manticore Columnar Library](http://github.com/manticoresoftware/columnar): [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)
+3. [Manticore Executor](http://github.com/manticoresoftware/executor): [PHP License 3.01](https://www.php.net/license/3_01.txt)
+4. Docker image packaging scripts (Dockerfile, entrypoint scripts, and related files) (MIT License)
+
+Each component group operates as a standalone module, and its respective license applies.
+
+More info in the [component licenses](./component-licenses/NOTICE).

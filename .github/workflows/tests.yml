@@ -13,10 +13,10 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: false
-          tags: manticoresoftware/manticore-docker-test-kit:latest
-          context: ./clt_tests/testkit/
+          tags: manticoresoftware/manticore-dind:latest
+          context: ./clt_tests/dind/
       - uses: manticoresoftware/clt@0.1.9
         with:
-          image: manticoresoftware/manticore-docker-test-kit:latest
+          image: manticoresoftware/manticore-dind:latest
           test_prefix: clt_tests/tests/
           run_args: --privileged -v ".:/docker/"
