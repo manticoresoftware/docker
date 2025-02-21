@@ -310,7 +310,6 @@ There are several methods to build plain tables from your custom configuration f
 
 ### Full backup
 
-The `manticore-backup` package utilizes the `manticore-executor`, which is installed with the extra packages.
 
 Creating a **full backup** is a straightforward process. Simply run the following command:
 
