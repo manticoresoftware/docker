@@ -16,7 +16,6 @@ All rights reserved.
 
 ## Manticore Columnar Library
 
-**Website:** [Manticore Columnar Library](https://github.com/manticoresoftware/columnar)  
 **Source:** [GitHub Repository](https://github.com/manticoresoftware/columnar)
 
 Manticore Search can leverage the **Manticore Columnar Library** to enhance storage efficiency and query performance. The library is dynamically loaded at runtime
