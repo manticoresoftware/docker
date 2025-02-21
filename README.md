@@ -59,7 +59,6 @@ docker run --name manticore -v $(pwd)/manticore.conf:/etc/manticoresearch/mantic
 
 Make sure to remove `127.0.0.1:` if you want the ports to be available for external hosts.
 
-### Manticore Columnar Library and Manticore Buddy
 
 The Manticore Search Docker image comes with pre-installed [Manticore Columnar Library](https://github.com/manticoresoftware/columnar) and [Manticore Buddy](https://github.com/manticoresoftware/manticoresearch-buddy)
 
