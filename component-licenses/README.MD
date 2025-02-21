@@ -44,7 +44,7 @@ Manticore Search Backup is a tool used for managing Manticore Search backups.
 
 ---
 
-### Manticore Search Buddy
+## Manticore Search Buddy
 
 **Source:** [GitHub Repository](https://github.com/manticoresoftware/manticoresearch-buddy)
 
