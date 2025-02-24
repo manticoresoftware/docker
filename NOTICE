@@ -1,0 +1,9 @@
+Manticore Search docker image includes:
+- Manticore Search (GPLv3)
+- Manticore Columnar Library (Apache 2.0)
+- Manticore Executor (PHP License 3.01)
+- Docker image packaging scripts (entrypoint scripts and related files) (MIT License)
+
+Each component operates independently, and its original license applies.
+
+For full license details, see the ./component-licenses/README.md file.
