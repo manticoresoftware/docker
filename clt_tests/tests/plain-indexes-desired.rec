@@ -28,7 +28,7 @@ id: 2
 *************************** 3. row ***************************
 id: 3
  f: abc abc
- ––– input –––
+––– input –––
 docker exec manticore mysql -e "SELECT * FROM idx2\G;"
 ––– output –––
 *************************** 1. row ***************************
