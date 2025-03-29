@@ -94,7 +94,7 @@ endpoint =  http://127.0.0.1:9308
 Manticore config
 endpoint =  http://127.0.0.1:9312
 Manticore versions:
-manticore: %{SEMVER} %{COMMITDATE} dev
+manticore: %{SEMVER} %{COMMITDATE}(\s*dev)*
 columnar: %{SEMVER} %{COMMITDATE}
 secondary: %{SEMVER} %{COMMITDATE}
 knn: %{SEMVER} %{COMMITDATE}
