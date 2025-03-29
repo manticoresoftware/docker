@@ -83,7 +83,7 @@ image_vector float_vector knn_type='hnsw' knn_dims='4' hnsw_similarity='L2'
 ) |
 +-------+--------------------------------------------------------------------------------------------------------------------------+
 ––– input –––
-docker exec -it manticore manticore-backup --backup-dir=/tmp
+docker exec manticore manticore-backup --backup-dir=/tmp
 ––– output –––
 Copyright (c) %{YEAR}-%{YEAR}, Manticore Software LTD (https://manticoresearch.com)
 Manticore config file: /etc/manticoresearch/manticore.conf.sh
@@ -94,7 +94,7 @@ endpoint =  http://127.0.0.1:9308
 Manticore config
 endpoint =  http://127.0.0.1:9312
 Manticore versions:
-manticore: %{SEMVER} %{COMMITDATE}(\s*dev)*
+manticore: %{SEMVER} %{COMMITDATE}#!/(\s*dev)*/!#
 columnar: %{SEMVER} %{COMMITDATE}
 secondary: %{SEMVER} %{COMMITDATE}
 knn: %{SEMVER} %{COMMITDATE}
