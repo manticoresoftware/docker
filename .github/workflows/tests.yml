@@ -15,7 +15,7 @@ jobs:
           push: false
           tags: manticoresoftware/manticore-dind:latest
           context: ./clt_tests/dind/
-      - uses: manticoresoftware/clt@0.1.9
+      - uses: manticoresoftware/clt@0.6.5
         with:
           image: manticoresoftware/manticore-dind:latest
           test_prefix: clt_tests/tests/
