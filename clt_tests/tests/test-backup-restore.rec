@@ -83,7 +83,7 @@ image_vector float_vector knn_type='hnsw' knn_dims='4' hnsw_similarity='L2'
 ) |
 +-------+--------------------------------------------------------------------------------------------------------------------------+
 ––– input –––
-docker exec -it manticore manticore-backup --backup-dir=/tmp
+docker exec manticore manticore-backup --backup-dir=/tmp
 ––– output –––
 Copyright (c) %{YEAR}-%{YEAR}, Manticore Software LTD (https://manticoresearch.com)
 Manticore config file: /etc/manticoresearch/manticore.conf.sh
@@ -94,30 +94,30 @@ endpoint =  http://127.0.0.1:9308
 Manticore config
 endpoint =  http://127.0.0.1:9312
 Manticore versions:
-manticore: %{SEMVER} %{COMMITDATE}(\s*dev)*
+manticore: %{SEMVER} %{COMMITDATE}#!/(\s*dev)*/!#
 columnar: %{SEMVER} %{COMMITDATE}
 secondary: %{SEMVER} %{COMMITDATE}
 knn: %{SEMVER} %{COMMITDATE}
 buddy: %{SEMVER_EXT}
-[93m%{DATETIME}[0m [Info] Starting the backup...
-[93m%{DATETIME}[0m [Info] Backing up config files...
-[93m%{DATETIME}[0m [Info]   config files - [92mOK[0m
-[93m%{DATETIME}[0m [Info] Backing up global state files...
-[93m%{DATETIME}[0m [Info]   global state files – [92mOK[0m
-[93m%{DATETIME}[0m [Info] Backing up tables...
-[93m%{DATETIME}[0m [Info]   distributed_index (distributed)...
-[93m%{DATETIME}[0m [Info]   [93mSKIP[0m
-[93m%{DATETIME}[0m [Info]   rt_with_columnar (rt) [#!/[0-9]{1}\.[0-9]{3}/!#K]...
-[93m%{DATETIME}[0m [Info]    [92mOK[0m
-[93m%{DATETIME}[0m [Info]   rt_without_columnar (rt) [#!/[0-9]{1}\.[0-9]{3}/!#K]...
-[93m%{DATETIME}[0m [Info]    [92mOK[0m
-[93m%{DATETIME}[0m [Info]   test (rt) [%{NUMBER}B]...
-[93m%{DATETIME}[0m [Info]    [92mOK[0m
-[93m%{DATETIME}[0m [Info] Running sync
-[93m%{DATETIME}[0m [Info]  [92mOK[0m
-[93m%{DATETIME}[0m [Info] You can find backup here: /tmp/backup-%{NUMBER}
-[93m%{DATETIME}[0m [Info] Elapsed time: #!/([0-9]+\.[0-9]+|0)/!#s
-[93m%{DATETIME}[0m [Info] Done
+%{DATETIME} [Info] Starting the backup...
+%{DATETIME} [Info] Backing up config files...
+%{DATETIME} [Info]   config files - OK
+%{DATETIME} [Info] Backing up global state files...
+%{DATETIME} [Info]   global state files – OK
+%{DATETIME} [Info] Backing up tables...
+%{DATETIME} [Info]   distributed_index (distributed)...
+%{DATETIME} [Info]   SKIP
+%{DATETIME} [Info]   rt_with_columnar (rt) [#!/[0-9]{1}\.[0-9]{3}/!#K]...
+%{DATETIME} [Info]    OK
+%{DATETIME} [Info]   rt_without_columnar (rt) [#!/[0-9]{1}\.[0-9]{3}/!#K]...
+%{DATETIME} [Info]    OK
+%{DATETIME} [Info]   test (rt) [%{NUMBER}B]...
+%{DATETIME} [Info]    OK
+%{DATETIME} [Info] Running sync
+%{DATETIME} [Info]  OK
+%{DATETIME} [Info] You can find backup here: /tmp/backup-%{NUMBER}
+%{DATETIME} [Info] Elapsed time: #!/([0-9]+\.[0-9]+|0)/!#s
+%{DATETIME} [Info] Done
 ––– input –––
 BACKUP_NAME=$(docker exec manticore ls /tmp/ | grep backup-*)
 ––– output –––
