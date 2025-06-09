@@ -1,4 +1,4 @@
-FROM ubuntu:jammy as initial
+FROM ubuntu:noble as initial
 
 ARG TARGETPLATFORM
 
@@ -10,21 +10,21 @@ RUN groupadd -r manticore && useradd -r -g manticore manticore
 
 ENV GOSU_VERSION 1.11
 
-ENV DAEMON_URL=${DAEMON_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-server_9.2.14-25032816-23296c0f8__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-server-core_9.2.14-25032816-23296c0f8__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-backup_1.7.4+25012416-be8f7625_all.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-buddy_3.26.5+25032712-234c30c2_all.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-tools_9.2.14-25032816-23296c0f8__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-common_9.2.14-25032816-23296c0f8_all.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore_9.2.14-25032816-23296c0f8__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-dev_9.2.14-25032816-23296c0f8_all.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-icudata-65l.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-load_1.18.0+25031816-ecbb7e88_all.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-language-packs_1.0.12-250208-d9baee7_all.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-tzdata_1.0.0-240522-a8aa66e_all.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-executor_1.3.2-25012408-1856ac9__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-galera_3.37__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-columnar-lib_4.2.0-25032808-417f074__ARCH_64.deb"}
+ENV DAEMON_URL=${DAEMON_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-server_9.2.14-25032816-23296c0f8__ARCH_64.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-server-core_9.2.14-25032816-23296c0f8__ARCH_64.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-backup_1.7.4+25012416-be8f7625_all.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-buddy_3.26.5+25032712-234c30c2_all.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-tools_9.2.14-25032816-23296c0f8__ARCH_64.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-common_9.2.14-25032816-23296c0f8_all.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore_9.2.14-25032816-23296c0f8__ARCH_64.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-dev_9.2.14-25032816-23296c0f8_all.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-icudata-65l.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-load_1.18.0+25031816-ecbb7e88_all.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-language-packs_1.0.12-250208-d9baee7_all.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-tzdata_1.0.0-240522-a8aa66e_all.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-executor_1.3.2-25012408-1856ac9__ARCH_64.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-galera_3.37__ARCH_64.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_focal/dists/focal/main/binary-_ARCH_64/manticore-columnar-lib_4.2.0-25032808-417f074__ARCH_64.deb"}
 # TODO: add manticore-load to the next release
 
 RUN if [ -z "$DAEMON_URL" ] ; then \
@@ -51,7 +51,7 @@ RUN set -x \
     && rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
     && chmod +x /usr/local/bin/gosu \
     && gosu nobody true \
-    && apt-get update && apt-get -y install libexpat1 libodbc1 libpq5 openssl libcurl4 libcrypto++8 libmysqlclient21 mysql-client \
+    && apt-get update && apt-get -y install libexpat1 libodbc2 libpq5 openssl libcurl4 libcrypto++8 libmysqlclient21 mysql-client \
     && apt-get -y purge --auto-remove \
     && rm -f /usr/bin/mariabackup /usr/bin/mysqlslap /usr/bin/mysqladmin /usr/bin/mysqlimport  \
     /usr/bin/mysqlshow /usr/bin/mbstream /usr/bin/mysql_waitpid /usr/bin/innotop /usr/bin/mysqlaccess /usr/bin/mytop  \
