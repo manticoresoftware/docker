@@ -51,7 +51,7 @@ RUN set -x \
     && rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
     && chmod +x /usr/local/bin/gosu \
     && gosu nobody true \
-    && apt-get update && apt-get -y install libexpat1 libodbc1 libpq5 openssl libcurl4 libcrypto++8 libmysqlclient21 mysql-client \
+    && apt-get update && apt-get -y install libexpat1 libodbc2 libpq5 openssl libcurl4 libcrypto++8 libmysqlclient21 mysql-client \
     && apt-get -y purge --auto-remove \
     && rm -f /usr/bin/mariabackup /usr/bin/mysqlslap /usr/bin/mysqladmin /usr/bin/mysqlimport  \
     /usr/bin/mysqlshow /usr/bin/mbstream /usr/bin/mysql_waitpid /usr/bin/innotop /usr/bin/mysqlaccess /usr/bin/mytop  \
