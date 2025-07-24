@@ -99,6 +99,7 @@ RUN if [ -d "/packages/" ]; then apt -y install /packages/*deb; fi \
     && rm /tmp/*.pak.tgz
 
 COPY manticore.conf.sh /etc/manticoresearch/
+RUN sed -i '/log = \/var\/log\/manticore\/searchd.log/d;/query_log = \/var\/log\/manticore\/query.log/d' /etc/manticoresearch/manticore.conf
 RUN md5sum /etc/manticoresearch/manticore.conf | awk '{print $1}' > /manticore.conf.md5
 COPY sandbox.sql /sandbox.sql
 COPY .mysql_history /root/.mysql_history
