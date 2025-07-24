@@ -17,10 +17,8 @@ listen = 172.18.0.2:9312
 listen = 172.18.0.2:9315-9325:replication
 listen = 9306:mysql41
 listen = 9308:http
-log = /var/log/manticore/searchd.log
 max_packet_size = 64m
 pid_file = /var/run/manticore/searchd.pid
-query_log = /var/log/manticore/query.log
 common {
 searchd {
 }
