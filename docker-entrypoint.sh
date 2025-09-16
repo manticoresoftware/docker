@@ -26,7 +26,7 @@ docker_setup_env() {
   RED='\033[0;31m'
   NC='\033[0m' # No Color
 
-  if [ -n "$QUERY_LOG_TO_STDOUT" ]; then
+  if [ "$QUERY_LOG_TO_STDOUT" = "true" ] || [ "$QUERY_LOG_TO_STDOUT" = "1" ]; then
     export searchd_query_log=/var/log/manticore/query.log
     [ ! -f /var/log/manticore/query.log ] && ln -sf /dev/stdout /var/log/manticore/query.log
   fi

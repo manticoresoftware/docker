@@ -14,3 +14,120 @@ docker exec manticore mysql -e "CREATE TABLE a; SELECT * FROM a;"
 docker logs manticore | grep "SELECT \* FROM a;"
 ––– output –––
 /* #!/[A-Za-z]+/!# #!/[A-Za-z]+/!# %{NUMBER} #!/[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}/!# %{YEAR} conn %{NUMBER} ((local)) real #!/[0-9]{1}\.[0-9]{3}/!# wall #!/[0-9]{1}\.[0-9]{3}/!# found %{NUMBER} */ SELECT * FROM a;
+––– input –––
+docker stop manticore && docker rm manticore
+––– output –––
+#!/[0-9a-z]+/!#
+#!/[0-9a-z]+/!#
+––– input –––
+docker run -d -e QUERY_LOG_TO_STDOUT=1 --name manticore manticoresoftware/manticore:current
+––– output –––
+#!/[0-9a-z]+/!#
+––– input –––
+if timeout 60 grep -qm1 'accepting connections' <(docker logs -f manticore); then echo 'accepting connections'; else echo 'Timeout failed'; fi
+––– output –––
+accepting connections
+––– input –––
+docker exec manticore mysql -e "CREATE TABLE a; SELECT * FROM a;"
+––– output –––
+––– input –––
+docker logs manticore | grep "SELECT \* FROM a;"
+––– output –––
+/* #!/[A-Za-z]+/!# #!/[A-Za-z]+/!# %{NUMBER} #!/[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}/!# %{YEAR} conn %{NUMBER} ((local)) real #!/[0-9]{1}\.[0-9]{3}/!# wall #!/[0-9]{1}\.[0-9]{3}/!# found %{NUMBER} */ SELECT * FROM a;
+––– input –––
+docker stop manticore && docker rm manticore
+––– output –––
+#!/[0-9a-z]+/!#
+#!/[0-9a-z]+/!#
+––– input –––
+docker run -d -e QUERY_LOG_TO_STDOUT="true" --name manticore manticoresoftware/manticore:current
+––– output –––
+#!/[0-9a-z]+/!#
+––– input –––
+if timeout 60 grep -qm1 'accepting connections' <(docker logs -f manticore); then echo 'accepting connections'; else echo 'Timeout failed'; fi
+––– output –––
+accepting connections
+––– input –––
+docker exec manticore mysql -e "CREATE TABLE a; SELECT * FROM a;"
+––– output –––
+––– input –––
+docker logs manticore | grep "SELECT \* FROM a;"
+––– output –––
+/* #!/[A-Za-z]+/!# #!/[A-Za-z]+/!# %{NUMBER} #!/[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}/!# %{YEAR} conn %{NUMBER} ((local)) real #!/[0-9]{1}\.[0-9]{3}/!# wall #!/[0-9]{1}\.[0-9]{3}/!# found %{NUMBER} */ SELECT * FROM a;
+––– input –––
+docker stop manticore && docker rm manticore
+––– output –––
+#!/[0-9a-z]+/!#
+#!/[0-9a-z]+/!#
+––– input –––
+docker run -d -e QUERY_LOG_TO_STDOUT="1" --name manticore manticoresoftware/manticore:current
+––– output –––
+#!/[0-9a-z]+/!#
+––– input –––
+if timeout 60 grep -qm1 'accepting connections' <(docker logs -f manticore); then echo 'accepting connections'; else echo 'Timeout failed'; fi
+––– output –––
+accepting connections
+––– input –––
+docker exec manticore mysql -e "CREATE TABLE a; SELECT * FROM a;"
+––– output –––
+––– input –––
+docker logs manticore | grep "SELECT \* FROM a;"
+––– output –––
+/* #!/[A-Za-z]+/!# #!/[A-Za-z]+/!# %{NUMBER} #!/[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}/!# %{YEAR} conn %{NUMBER} ((local)) real #!/[0-9]{1}\.[0-9]{3}/!# wall #!/[0-9]{1}\.[0-9]{3}/!# found %{NUMBER} */ SELECT * FROM a;
+––– input –––
+docker stop manticore && docker rm manticore
+––– output –––
+#!/[0-9a-z]+/!#
+#!/[0-9a-z]+/!#
+––– input –––
+docker run -d -e QUERY_LOG_TO_STDOUT=false --name manticore manticoresoftware/manticore:current
+––– output –––
+#!/[0-9a-z]+/!#
+––– input –––
+if timeout 60 grep -qm1 'accepting connections' <(docker logs -f manticore); then echo 'accepting connections'; else echo 'Timeout failed'; fi
+––– output –––
+accepting connections
+––– input –––
+docker exec manticore mysql -e "CREATE TABLE a; SELECT * FROM a;"
+––– output –––
+––– input –––
+docker logs manticore | grep "SELECT \* FROM a;"
+––– output –––
+––– input –––
+docker stop manticore && docker rm manticore
+––– output –––
+#!/[0-9a-z]+/!#
+#!/[0-9a-z]+/!#
+––– input –––
+docker run -d -e QUERY_LOG_TO_STDOUT=abc --name manticore manticoresoftware/manticore:current
+––– output –––
+#!/[0-9a-z]+/!#
+––– input –––
+if timeout 60 grep -qm1 'accepting connections' <(docker logs -f manticore); then echo 'accepting connections'; else echo 'Timeout failed'; fi
+––– output –––
+accepting connections
+––– input –––
+docker exec manticore mysql -e "CREATE TABLE a; SELECT * FROM a;"
+––– output –––
+––– input –––
+docker logs manticore | grep "SELECT \* FROM a;"
+––– output –––
+––– input –––
+docker stop manticore && docker rm manticore
+––– output –––
+#!/[0-9a-z]+/!#
+#!/[0-9a-z]+/!#
+––– input –––
+docker run -d --name manticore manticoresoftware/manticore:current
+––– output –––
+#!/[0-9a-z]+/!#
+––– input –––
+if timeout 60 grep -qm1 'accepting connections' <(docker logs -f manticore); then echo 'accepting connections'; else echo 'Timeout failed'; fi
+––– output –––
+accepting connections
+––– input –––
+docker exec manticore mysql -e "CREATE TABLE a; SELECT * FROM a;"
+––– output –––
+––– input –––
+docker logs manticore | grep "SELECT \* FROM a;"
+––– output –––
