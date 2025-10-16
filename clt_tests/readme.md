@@ -17,5 +17,5 @@ This command will help you launch and manage the Manticore image with the necess
 
 ```bash
 docker build -t manticoresoftware/manticore-dind:latest ./clt_tests/dind/
-RUN_ARGS="-v $(pwd):/docker --privileged" clt test -d -t ./clt_tests/tests/simple.rec manticoresoftware/manticore-dind:latest
+CLT_RUN_ARGS="-v $(pwd):/docker --privileged" clt test -d -t ./clt_tests/tests/simple.rec manticoresoftware/manticore-dind:latest
 ```

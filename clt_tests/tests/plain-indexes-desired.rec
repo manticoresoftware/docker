@@ -12,10 +12,10 @@ docker exec manticore mysql -e "SHOW TABLES\G;"
 ––– output –––
 *************************** 1. row ***************************
 Table: idx1
-Type: local
+ Type: local
 *************************** 2. row ***************************
 Table: idx2
-Type: local
+ Type: local
 ––– input –––
 docker exec manticore mysql -e "SELECT * FROM idx1\G;"
 ––– output –––

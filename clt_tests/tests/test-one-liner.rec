@@ -13,28 +13,28 @@ docker exec manticore mysql -e "SHOW TABLES\G"
 ––– output –––
 *************************** 1. row ***************************
 Table: films
-Type: rt
+ Type: rt
 ––– input –––
 docker exec manticore mysql -e "SELECT * FROM films LIMIT 3\G"
 ––– output –––
 *************************** 1. row ***************************
-id: 19
-title: AMADEUS HOLY
-description: A Emotional Display of a Pioneer And a Technical Writer who must Battle a Man in A Baloon
-category_id: 1
+          id: 19
+       title: AMADEUS HOLY
+ description: A Emotional Display of a Pioneer And a Technical Writer who must Battle a Man in A Baloon
+ category_id: 1
 release_year: 2008
-rental_rate: 0.990000
+ rental_rate: 0.990000
 *************************** 2. row ***************************
-id: 21
-title: AMERICAN CIRCUS
-description: A Insightful Drama of a Girl And a Astronaut who must Face a Database Administrator in A Shark Tank
-category_id: 1
+          id: 21
+       title: AMERICAN CIRCUS
+ description: A Insightful Drama of a Girl And a Astronaut who must Face a Database Administrator in A Shark Tank
+ category_id: 1
 release_year: 2009
-rental_rate: 4.990000
+ rental_rate: 4.990000
 *************************** 3. row ***************************
-id: 29
-title: ANTITRUST TOMATOES
-description: A Fateful Yarn of a Womanizer And a Feminist who must Succumb a Database Administrator in Ancient India
-category_id: 1
+          id: 29
+       title: ANTITRUST TOMATOES
+ description: A Fateful Yarn of a Womanizer And a Feminist who must Succumb a Database Administrator in Ancient India
+ category_id: 1
 release_year: 2005
-rental_rate: 2.990000
+ rental_rate: 2.990000
