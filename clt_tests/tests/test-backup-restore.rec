@@ -90,15 +90,15 @@ Manticore config file: /etc/manticoresearch/manticore.conf.sh
 Tables to backup: all tables
 Backup dir: /tmp
 Manticore config
-endpoint =  http://127.0.0.1:9308
+  endpoint =  http://127.0.0.1:9308
 Manticore config
-endpoint =  http://127.0.0.1:9312
+  endpoint =  http://127.0.0.1:9312
 Manticore versions:
-manticore: %{SEMVER} %{COMMITDATE}#!/(\s*dev)*/!#
-columnar: %{SEMVER} %{COMMITDATE}
-secondary: %{SEMVER} %{COMMITDATE}
-knn: %{SEMVER} %{COMMITDATE}
-buddy: %{SEMVER_EXT}
+  manticore: %{SEMVER} %{COMMITDATE}#!/(\s*dev)*/!#
+  columnar: %{SEMVER} %{COMMITDATE}
+  secondary: %{SEMVER} %{COMMITDATE}
+  knn: %{SEMVER} %{COMMITDATE}
+  buddy: %{SEMVER_EXT}
 %{DATETIME} [Info] Starting the backup...
 %{DATETIME} [Info] Backing up config files...
 %{DATETIME} [Info]   config files - OK
