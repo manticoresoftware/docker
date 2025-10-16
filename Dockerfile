@@ -10,7 +10,7 @@ RUN groupadd -r manticore && useradd -r -g manticore manticore
 
 ENV GOSU_VERSION 1.11
 
-ENV DAEMON_URL=${DAEMON_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-server_13.13.0-25100704-e5465fe44__ARCH_64.deb \
+ENV DAEMON_URL ${DAEMON_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-server_13.13.0-25100704-e5465fe44__ARCH_64.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-server-core_13.13.0-25100704-e5465fe44__ARCH_64.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-backup_1.9.6+25070510-5247d066_all.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-buddy_3.35.1+25090418-41d9811f_all.deb \
@@ -98,46 +98,14 @@ RUN if [ -d "/packages/" ]; then apt -y install /packages/*deb; fi \
     && tar -xf /tmp/ru.pak.tgz -C /usr/share/manticore/ \
     && rm /tmp/*.pak.tgz
 
-# Installing the Ukrainian Lettimizer
-# Installing dependencies for building Python
-RUN cd /tmp && \
-    apt-get update
-
-RUN apt-get install -y \
-    build-essential \
-    libreadline-dev \
-    libncursesw5-dev \
-    libssl-dev \
-    libsqlite3-dev \
-    tk-dev \
-    libgdbm-dev \
-    libc6-dev \
-    libbz2-dev \
-    libffi-dev \
-    zlib1g-dev
-
-# Download and compile Python 3.9
-WORKDIR /tmp
-RUN wget https://www.python.org/ftp/python/3.9.4/Python-3.9.4.tgz && \
-    tar xzf Python-3.9.4.tgz
-
-WORKDIR /tmp/Python-3.9.4
-RUN ./configure --enable-optimizations --enable-shared && \
-    make -j$(nproc) altinstall
-
-# Updating the linker cache
-RUN ldconfig
-
-# Installing pymorphy2 and the Ukrainian dictionary
-RUN LD_LIBRARY_PATH=/tmp/Python-3.9.4 pip3.9 install pymorphy2[fast] && \
-    LD_LIBRARY_PATH=/tmp/Python-3.9.4 pip3.9 install pymorphy2-dicts-uk
-
-RUN rm -rf /tmp/Python-3.9.4* /tmp/manticore-repo.noarch.deb && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-WORKDIR /var/lib/manticore
-# END: Installing the Ukrainian Lettimizer
+# Installing the Ukrainian Lemmatizer using the working Jammy approach
+RUN apt-get update && apt-get install -y software-properties-common curl && \
+    add-apt-repository -y ppa:deadsnakes/ppa && \
+    apt-get update && \
+    apt-get install -y python3.9 python3.9-dev python3.9-distutils && \
+    curl https://bootstrap.pypa.io/get-pip.py | python3.9 && \
+    python3.9 -m pip install pymorphy2 pymorphy2-dicts-uk && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY manticore.conf.sh /etc/manticoresearch/
 RUN sed -i '/log = \/var\/log\/manticore\/searchd.log/d;/query_log = \/var\/log\/manticore\/query.log/d' /etc/manticoresearch/manticore.conf
@@ -163,7 +131,7 @@ EXPOSE 9308
 EXPOSE 9312
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
-ENV MANTICORE_CONFIG="/etc/manticoresearch/manticore.conf.sh|/etc/manticoresearch/manticore.conf"
+ENV MANTICORE_CONFIG "/etc/manticoresearch/manticore.conf.sh|/etc/manticoresearch/manticore.conf"
 CMD ["searchd", "-c", "/etc/manticoresearch/manticore.conf.sh", "--nodetach"]
 
 # How to build manually:

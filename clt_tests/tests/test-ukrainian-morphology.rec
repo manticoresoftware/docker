@@ -1,0 +1,35 @@
+––– block: ./base/init –––
+––– input –––
+docker exec manticore mysql -h0 -P9306 -e "CREATE TABLE test_uk (id bigint, content text) rt_mem_limit = '256M' morphology = 'lemmatize_uk' charset_table = '0..9, A..Z->a..z, _, a..z, U+0410..U+042F->U+0430..U+044F, U+0430..U+044F, U+0454, U+0456, U+0457, U+0491';"
+––– output –––
+––– input –––
+docker exec manticore mysql -h0 -P9306 -e "INSERT INTO test_uk (id, content) VALUES (1, 'бігаю'), (2, 'муркотіти'), (3, 'їжа');"
+––– output –––
+––– input –––
+docker exec manticore mysql -h0 -P9306 -e "CALL KEYWORDS('бігаю', 'test_uk');"
+––– output –––
++------+------------+--------------+
+| qpos | tokenized  | normalized   |
++------+------------+--------------+
+| 1    | бігаю      | бігати       |
++------+------------+--------------+
+––– input –––
+docker exec manticore mysql -h0 -P9306 -e "CALL KEYWORDS('їжа', 'test_uk');"
+––– output –––
++------+-----------+------------+
+| qpos | tokenized | normalized |
++------+-----------+------------+
+| 1    | їжа       | їжа        |
++------+-----------+------------+
+––– input –––
+docker exec manticore mysql -h0 -P9306 -e "SELECT * FROM test_uk WHERE MATCH('бігати');"
+––– output –––
++------+---------+
+| id   | content |
++------+---------+
+|    1 | бігаю   |
++------+---------+
+––– input –––
+docker stop manticore
+––– output –––
+#!/[0-9a-z]+/!#
