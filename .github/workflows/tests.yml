@@ -1,5 +1,8 @@
 name: Testing
-on: push
+on:
+  push:
+    branches: [main, master]
+  pull_request:
 concurrency:
   group: tests_${{ github.ref }}
   cancel-in-progress: true
