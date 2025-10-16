@@ -70,7 +70,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
       && wget -q https://repo.manticoresearch.com/manticore-dev-repo.noarch.deb \
       && dpkg -i manticore-dev-repo.noarch.deb \
       && apt-key adv --fetch-keys 'https://repo.manticoresearch.com/GPG-KEY-manticore' && apt-get -y update \
-      && apt-get -y install manticore manticore-extra manticore-load manticore-language-packs;\
+      && apt-get -y install manticore manticore-extra manticore-load manticore-lemmatizer-uk manticore-language-packs;\
     elif [ ! -z "$DAEMON_URL" ]; then \
       echo "2nd step of building release image for linux/${ARCH}64 architecture" \
       && echo "ARCH: ${ARCH}" \
@@ -97,6 +97,47 @@ RUN if [ -d "/packages/" ]; then apt -y install /packages/*deb; fi \
     && tar -xf /tmp/de.pak.tgz -C /usr/share/manticore/ \
     && tar -xf /tmp/ru.pak.tgz -C /usr/share/manticore/ \
     && rm /tmp/*.pak.tgz
+
+# Installing the Ukrainian Lettimizer
+# Installing dependencies for building Python
+RUN cd /tmp && \
+    apt-get update
+
+RUN apt-get install -y \
+    build-essential \
+    libreadline-dev \
+    libncursesw5-dev \
+    libssl-dev \
+    libsqlite3-dev \
+    tk-dev \
+    libgdbm-dev \
+    libc6-dev \
+    libbz2-dev \
+    libffi-dev \
+    zlib1g-dev
+
+# Download and compile Python 3.9
+WORKDIR /tmp
+RUN wget https://www.python.org/ftp/python/3.9.4/Python-3.9.4.tgz && \
+    tar xzf Python-3.9.4.tgz
+
+WORKDIR /tmp/Python-3.9.4
+RUN ./configure --enable-optimizations --enable-shared && \
+    make -j$(nproc) altinstall
+
+# Updating the linker cache
+RUN ldconfig
+
+# Installing pymorphy2 and the Ukrainian dictionary
+RUN LD_LIBRARY_PATH=/tmp/Python-3.9.4 pip3.9 install pymorphy2[fast] && \
+    LD_LIBRARY_PATH=/tmp/Python-3.9.4 pip3.9 install pymorphy2-dicts-uk
+
+RUN rm -rf /tmp/Python-3.9.4* /tmp/manticore-repo.noarch.deb && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /var/lib/manticore
+# END: Installing the Ukrainian Lettimizer
 
 COPY manticore.conf.sh /etc/manticoresearch/
 RUN sed -i '/log = \/var\/log\/manticore\/searchd.log/d;/query_log = \/var\/log\/manticore\/query.log/d' /etc/manticoresearch/manticore.conf
