@@ -10,15 +10,15 @@ accepting connections
 ––– input –––
 docker exec manticore cat /etc/manticoresearch/manticore.conf.debug | sort
 ––– output –––
-data_dir = /var/lib/manticore
-lemmatizer_base = /usr/share/manticore/
-listen = /var/run/mysqld/mysqld.sock:mysql41
-listen = 172.18.0.2:9312
-listen = 172.18.0.2:9315-9325:replication
-listen = 9306:mysql41
-listen = 9308:http
-max_packet_size = 64m
-pid_file = /var/run/manticore/searchd.pid
+    data_dir = /var/lib/manticore
+    lemmatizer_base = /usr/share/manticore/
+    listen = /var/run/mysqld/mysqld.sock:mysql41
+    listen = 172.18.0.2:9312
+    listen = 172.18.0.2:9315-9325:replication
+    listen = 9306:mysql41
+    listen = 9308:http
+    max_packet_size = 64m
+    pid_file = /run/manticore/searchd.pid
 common {
 searchd {
 }
