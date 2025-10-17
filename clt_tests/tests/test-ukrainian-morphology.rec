@@ -1,5 +1,13 @@
 ––– block: ./base/init –––
 ––– input –––
+docker run -d --name manticore manticoresoftware/manticore:current
+––– output –––
+#!/[0-9a-z]+/!#
+––– input –––
+if timeout 5 grep -qm1 'accepting connections' <(docker logs -f manticore); then echo 'accepting connections'; else echo 'Manticore failed to start properly in 10 seconds'; fi
+––– output –––
+accepting connections
+––– input –––
 docker exec manticore mysql -h0 -P9306 -e "CREATE TABLE test_uk (id bigint, content text) rt_mem_limit = '256M' morphology = 'lemmatize_uk' charset_table = '0..9, A..Z->a..z, _, a..z, U+0410..U+042F->U+0430..U+044F, U+0430..U+044F, U+0454, U+0456, U+0457, U+0491';"
 ––– output –––
 ––– input –––
@@ -24,11 +32,11 @@ docker exec manticore mysql -h0 -P9306 -e "CALL KEYWORDS('їжа', 'test_uk');"
 ––– input –––
 docker exec manticore mysql -h0 -P9306 -e "SELECT * FROM test_uk WHERE MATCH('бігати');"
 ––– output –––
-+------+---------+
-| id   | content |
-+------+---------+
-|    1 | бігаю   |
-+------+---------+
++------+------------+
+| id   | content    |
++------+------------+
+|    1 | бігаю      |
++------+------------+
 ––– input –––
 docker stop manticore
 ––– output –––
