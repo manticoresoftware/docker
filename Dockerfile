@@ -10,7 +10,7 @@ RUN groupadd -r manticore && useradd -r -g manticore manticore
 
 ENV GOSU_VERSION 1.11
 
-ENV DAEMON_URL=${DAEMON_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-server_13.13.0-25100704-e5465fe44__ARCH_64.deb \
+ENV DAEMON_URL ${DAEMON_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-server_13.13.0-25100704-e5465fe44__ARCH_64.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-server-core_13.13.0-25100704-e5465fe44__ARCH_64.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-backup_1.9.6+25070510-5247d066_all.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-buddy_3.35.1+25090418-41d9811f_all.deb \
@@ -70,7 +70,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
       && wget -q https://repo.manticoresearch.com/manticore-dev-repo.noarch.deb \
       && dpkg -i manticore-dev-repo.noarch.deb \
       && apt-key adv --fetch-keys 'https://repo.manticoresearch.com/GPG-KEY-manticore' && apt-get -y update \
-      && apt-get -y install manticore manticore-extra manticore-load manticore-language-packs;\
+      && apt-get -y install manticore manticore-extra manticore-load manticore-lemmatizer-uk manticore-language-packs;\
     elif [ ! -z "$DAEMON_URL" ]; then \
       echo "2nd step of building release image for linux/${ARCH}64 architecture" \
       && echo "ARCH: ${ARCH}" \
@@ -98,6 +98,15 @@ RUN if [ -d "/packages/" ]; then apt -y install /packages/*deb; fi \
     && tar -xf /tmp/ru.pak.tgz -C /usr/share/manticore/ \
     && rm /tmp/*.pak.tgz
 
+# Installing the Ukrainian Lemmatizer using the working Jammy approach
+RUN apt-get update && apt-get install -y software-properties-common curl && \
+    add-apt-repository -y ppa:deadsnakes/ppa && \
+    apt-get update && \
+    apt-get install -y python3.9 python3.9-dev python3.9-distutils && \
+    curl https://bootstrap.pypa.io/get-pip.py | python3.9 && \
+    python3.9 -m pip install pymorphy2 pymorphy2-dicts-uk && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
 COPY manticore.conf.sh /etc/manticoresearch/
 RUN sed -i '/log = \/var\/log\/manticore\/searchd.log/d;/query_log = \/var\/log\/manticore\/query.log/d' /etc/manticoresearch/manticore.conf
 RUN md5sum /etc/manticoresearch/manticore.conf | awk '{print $1}' > /manticore.conf.md5
@@ -122,7 +131,8 @@ EXPOSE 9308
 EXPOSE 9312
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
-ENV MANTICORE_CONFIG="/etc/manticoresearch/manticore.conf.sh|/etc/manticoresearch/manticore.conf"
+ENV PYTHONWARNINGS "ignore::UserWarning:pymorphy2.analyzer"
+ENV MANTICORE_CONFIG "/etc/manticoresearch/manticore.conf.sh|/etc/manticoresearch/manticore.conf"
 CMD ["searchd", "-c", "/etc/manticoresearch/manticore.conf.sh", "--nodetach"]
 
 # How to build manually:
