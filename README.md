@@ -247,14 +247,34 @@ Take into account that Manticore search inside the container is run under user `
 docker exec -it manticore gosu manticore indexer --all --rotate
 ```
 
-You can also set individual `searchd` and `common` configuration settings using Docker environment variables.  
+You can also set individual configuration settings using Docker environment variables.  
+
+### Setting searchd and common options
 
 The settings must be prefixed with their section name, example for in case of `mysql_version_string` the variable must be named `searchd_mysql_version_string`:
-
 
 ```bash
 docker run --name manticore  -p 127.0.0.1:9306:9306  -e searchd_mysql_version_string='5.5.0' -d manticoresearch/manticore
 ```
+
+### Setting options in other sections (source, index, etc.)
+
+You can also set options in other configuration sections like `source`, `table`, `search`, and `indexer` using environment variables. The format is `{section}_{section_name}_{setting}`.
+
+For example, to set `sql_user` in a `source min` block:
+
+```bash
+docker run --name manticore -e source_min_sql_user='abc' -d manticoresearch/manticore
+```
+
+This will update or add `sql_user = abc` within the `source min { ... }` section. If the section doesn't exist, it will be created automatically.
+
+Similarly, for an index section:
+```bash
+docker run --name manticore -e index_test_path='/var/lib/manticore/test' -d manticoresearch/manticore
+```
+
+**Note**: Section names with spaces (like `source min`) should use underscores in the environment variable name (e.g., `source_min_sql_user`).
 
 If you intend to enable the own `listen` directive, utilize the `searchd_listen` environment variable.
 
