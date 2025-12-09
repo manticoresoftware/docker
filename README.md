@@ -241,6 +241,8 @@ If you want to run Manticore with a custom configuration that includes table def
 docker run --name manticore -v $(pwd)/manticore.conf:/etc/manticoresearch/manticore.conf -v $(pwd)/data/:/var/lib/manticore -p 127.0.0.1:9306:9306 -d manticoresearch/manticore
 ```
 
+**Important**: When mounting a custom configuration file, avoid using `127.0.0.1:` in the `listen` directives within your configuration file. The container might not have `127.0.0.1` available, which can cause connection issues. Instead, use `0.0.0.0` or omit the IP address entirely. For example, use `listen = 9306:mysql` instead of `listen = 127.0.0.1:9306:mysql`. You can still control external access by binding ports when running the container (e.g., `-p 127.0.0.1:9306:9306`).
+
 Take into account that Manticore search inside the container is run under user `manticore`. Performing operations with table files (like creating or rotating plain tables) should be also done under `manticore`. Otherwise the files will be created under `root` and the search daemon won't have rights to open them. For example here is how you can rotate all tables:
 
 ```bash
