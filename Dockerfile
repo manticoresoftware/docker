@@ -111,8 +111,6 @@ RUN apt-get update && apt-get install -y software-properties-common curl && \
 COPY manticore.conf.sh /etc/manticoresearch/
 RUN sed -i '/log = \/var\/log\/manticore\/searchd.log/d;/query_log = \/var\/log\/manticore\/query.log/d' /etc/manticoresearch/manticore.conf
 RUN md5sum /etc/manticoresearch/manticore.conf | awk '{print $1}' > /manticore.conf.md5
-COPY sandbox.sql /sandbox.sql
-COPY .mysql_history /root/.mysql_history
 COPY component-licenses /licenses
 
 COPY docker-entrypoint.sh /usr/local/bin/
