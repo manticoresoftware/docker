@@ -70,6 +70,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
       echo "2nd step of building dev image for linux/${ARCH}64 architecture" \
       && wget -q https://repo.manticoresearch.com/manticore-dev-repo.noarch.deb \
       && dpkg -i manticore-dev-repo.noarch.deb \
+      && sed -i 's|http://repo.manticoresearch.com|https://repo.manticoresearch.com|g' /etc/apt/sources.list.d/*.list \
       && apt-key adv --fetch-keys 'https://repo.manticoresearch.com/GPG-KEY-manticore' && apt-get -y update \
       && apt-get -y install manticore manticore-extra manticore-load manticore-lemmatizer-uk manticore-language-packs;\
     elif [ ! -z "$DAEMON_URL" ]; then \
@@ -99,14 +100,23 @@ RUN if [ -d "/packages/" ]; then apt -y install /packages/*deb; fi \
     && tar -xf /tmp/ru.pak.tgz -C /usr/share/manticore/ \
     && rm /tmp/*.pak.tgz
 
-# Installing the Ukrainian Lemmatizer using the working Jammy approach
-RUN apt-get update && apt-get install -y software-properties-common curl && \
-    add-apt-repository -y ppa:deadsnakes/ppa && \
-    apt-get update && \
-    apt-get install -y python3.9 python3.9-dev python3.9-distutils && \
-    curl https://bootstrap.pypa.io/get-pip.py | python3.9 && \
-    python3.9 -m pip install pymorphy2 pymorphy2-dicts-uk && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+# Install Python deps needed for Ukrainian morphology (lemmatize_uk).
+# Keep it minimal (avoid `python3.9-dev`) and pin/upgrade `cryptography` to avoid HIGH CVEs.
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends software-properties-common ca-certificates; \
+    add-apt-repository -y ppa:deadsnakes/ppa; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends python3.9 python3.9-distutils python3.9-venv libpython3.9; \
+    if dpkg -s python3-cryptography >/dev/null 2>&1; then apt-get purge -y --auto-remove python3-cryptography; fi; \
+    apt-get purge -y --auto-remove software-properties-common; \
+    python3.9 -m ensurepip --upgrade; \
+    python3.9 -m pip install --no-cache-dir --upgrade pip setuptools wheel; \
+    python3.9 -m pip install --no-cache-dir pymorphy2 pymorphy2-dicts-uk; \
+    python3.9 -m pip install --no-cache-dir --upgrade "cryptography>=43.0.1"; \
+    python3.9 -m pip check; \
+    apt-get clean; \
+    rm -rf /var/lib/apt/lists/*
 
 COPY manticore.conf.sh /etc/manticoresearch/
 RUN sed -i '/log = \/var\/log\/manticore\/searchd.log/d;/query_log = \/var\/log\/manticore\/query.log/d' /etc/manticoresearch/manticore.conf
