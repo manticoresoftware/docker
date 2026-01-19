@@ -249,6 +249,32 @@ Take into account that Manticore search inside the container is run under user `
 docker exec -it manticore gosu manticore indexer --all --rotate
 ```
 
+### Dynamic configuration (config as a script)
+
+You can make the mounted config file dynamic by turning it into a script. If `/etc/manticoresearch/manticore.conf` starts with `#!/bin/sh` or `#!/bin/bash`, the container executes it and uses its stdout as the final config. This lets you use environment variables that you pass via `docker run -e` or docker-compose `environment:`. This can be useful for injecting sensitive values at runtime instead of hardcoding them in the file.
+
+Example `manticore.conf`:
+```bash
+#!/bin/bash
+cat <<EOF
+searchd {
+  listen = ${MYSQL_LISTEN:-9306:mysql}
+  listen = ${HTTP_LISTEN:-9308:http}
+}
+EOF
+```
+
+Run with:
+```bash
+docker run --name manticore \
+  -e MYSQL_LISTEN='9307:mysql' \
+  -e HTTP_LISTEN='9316:http' \
+  -v $(pwd)/manticore.conf:/etc/manticoresearch/manticore.conf \
+  -d manticoresearch/manticore
+```
+
+Environment variable overrides like `searchd_*` and `common_*` are applied after the script output is generated.
+
 You can also set individual `searchd` and `common` configuration settings using Docker environment variables.  
 
 The settings must be prefixed with their section name, example for in case of `mysql_version_string` the variable must be named `searchd_mysql_version_string`:
