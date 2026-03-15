@@ -72,7 +72,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
       && dpkg -i manticore-dev-repo.noarch.deb \
       && sed -i 's|http://repo.manticoresearch.com|https://repo.manticoresearch.com|g' /etc/apt/sources.list.d/*.list \
       && apt-key adv --fetch-keys 'https://repo.manticoresearch.com/GPG-KEY-manticore' && apt-get -y update \
-      && apt-get -y install manticore;\
+      && apt-get -y install manticore-server manticore-tools manticore-dev manticore-icudata-65l manticore-buddy manticore-extra manticore-load manticore-lemmatizer-uk manticore-language-packs;\
     elif [ ! -z "$DAEMON_URL" ]; then \
       echo "2nd step of building release image for linux/${ARCH}64 architecture" \
       && echo "ARCH: ${ARCH}" \
