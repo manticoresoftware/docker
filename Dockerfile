@@ -10,23 +10,8 @@ RUN groupadd -r manticore && useradd -r -g manticore manticore
 
 ENV GOSU_VERSION 1.11
 
-ENV DAEMON_URL ${DAEMON_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-server_17.5.1-26020616-d4cc0969e__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-server-core_17.5.1-26020616-d4cc0969e__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-backup_1.9.6+25070510-5247d066_all.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-buddy_3.41.0+26020401-6dae566d_all.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-tools_17.5.1-26020616-d4cc0969e__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-common_17.5.1-26020616-d4cc0969e_all.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore_17.5.1-26020616-d4cc0969e__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-dev_17.5.1-26020616-d4cc0969e_all.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-icudata-65l.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-load_1.24.0+25122422-e5db1c82_all.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-language-packs_1.0.13-250708-1e9c2cd_all.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-tzdata_1.0.1-250708-4dfa71e_all.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-executor_1.4.0+26012715-d7a66c60__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-galera_3.37__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-columnar-lib_10.2.0+26020513-9a5dd2f5__ARCH_64.deb \
+ENV DAEMON_URL ${DAEMON_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore_25.0.0-26032712-ce3c27828__ARCH_64.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-lemmatizer-uk_1.0.3__ARCH_64.deb"}
-# TODO: add manticore-load to the next release
 
 RUN if [ -z "$DAEMON_URL" ] ; then \
     echo "WARNING: DAEMON_URL is empty"; \
