@@ -20,12 +20,11 @@ https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/ma
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-dev_17.5.1-26020616-d4cc0969e_all.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-icudata-65l.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-load_1.24.0+25122422-e5db1c82_all.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-language-packs_1.0.13-250708-1e9c2cd_all.deb \
+https://repo.manticoresearch.com/repository/manticoresearch_jammy_release_candidate/dists/jammy/main/binary-_ARCH_64/manticore-language-packs_1.0.15-260430-eadde16_all.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-tzdata_1.0.1-250708-4dfa71e_all.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-executor_1.4.0+26012715-d7a66c60__ARCH_64.deb \
 https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-galera_3.37__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-columnar-lib_10.2.0+26020513-9a5dd2f5__ARCH_64.deb \
-https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-lemmatizer-uk_1.0.3__ARCH_64.deb"}
+https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore-columnar-lib_10.2.0+26020513-9a5dd2f5__ARCH_64.deb"}
 # TODO: add manticore-load to the next release
 
 RUN if [ -z "$DAEMON_URL" ] ; then \
@@ -72,7 +71,7 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
       && dpkg -i manticore-dev-repo.noarch.deb \
       && sed -i 's|http://repo.manticoresearch.com|https://repo.manticoresearch.com|g' /etc/apt/sources.list.d/*.list \
       && apt-key adv --fetch-keys 'https://repo.manticoresearch.com/GPG-KEY-manticore' && apt-get -y update \
-      && apt-get -y install manticore-server manticore-tools manticore-dev manticore-icudata-65l manticore-buddy manticore-extra manticore-load manticore-lemmatizer-uk manticore-language-packs;\
+      && apt-get -y install manticore-server manticore-tools manticore-dev manticore-icudata-65l manticore-buddy manticore-extra manticore-load manticore-language-packs;\
     elif [ ! -z "$DAEMON_URL" ]; then \
       echo "2nd step of building release image for linux/${ARCH}64 architecture" \
       && echo "ARCH: ${ARCH}" \
@@ -81,7 +80,8 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else expo
       && apt-get -y install ./manticore*deb \
       && rm *.deb ; \
     fi
-RUN if [ -d "/packages/" ]; then apt -y install /packages/*deb; fi \
+RUN set -eux \
+    && if [ -d "/packages/" ]; then apt -y install /packages/*deb; fi \
     && mkdir -p /var/run/manticore \
     && mkdir /docker-entrypoint-initdb.d \
     && apt-get -y purge --auto-remove \
@@ -89,34 +89,8 @@ RUN if [ -d "/packages/" ]; then apt -y install /packages/*deb; fi \
     && rm -fr /packages \
     && rm -f /usr/bin/spelldump /usr/bin/wordbreaker \
     && mkdir -p /var/run/mysqld/ \
-    && chown -R manticore:manticore /docker-entrypoint-initdb.d /var/lib/manticore/ /var/run/mysqld/ /usr/share/manticore/ \
-    /usr/share/manticore/modules/ /usr/share/doc/manticore-galera/ /var/run/manticore \
-    && echo "\n[mysql]\nsilent\nwait\ntable\n" >> /etc/mysql/my.cnf \
-    && wget -q https://repo.manticoresearch.com/repository/morphology/en.pak.tgz?docker_build=1 -O /tmp/en.pak.tgz \
-    && wget -q https://repo.manticoresearch.com/repository/morphology/de.pak.tgz?docker_build=1 -O /tmp/de.pak.tgz \
-    && wget -q https://repo.manticoresearch.com/repository/morphology/ru.pak.tgz?docker_build=1 -O /tmp/ru.pak.tgz \
-    && tar -xf /tmp/en.pak.tgz -C /usr/share/manticore/ \
-    && tar -xf /tmp/de.pak.tgz -C /usr/share/manticore/ \
-    && tar -xf /tmp/ru.pak.tgz -C /usr/share/manticore/ \
-    && rm /tmp/*.pak.tgz
-
-# Install Python deps needed for Ukrainian morphology (lemmatize_uk).
-# Keep it minimal (avoid `python3.9-dev`) and pin/upgrade `cryptography` to avoid HIGH CVEs.
-RUN set -eux; \
-    apt-get update; \
-    apt-get install -y --no-install-recommends software-properties-common ca-certificates; \
-    add-apt-repository -y ppa:deadsnakes/ppa; \
-    apt-get update; \
-    apt-get install -y --no-install-recommends python3.9 python3.9-distutils python3.9-venv libpython3.9; \
-    if dpkg -s python3-cryptography >/dev/null 2>&1; then apt-get purge -y --auto-remove python3-cryptography; fi; \
-    apt-get purge -y --auto-remove software-properties-common; \
-    python3.9 -m ensurepip --upgrade; \
-    python3.9 -m pip install --no-cache-dir --upgrade pip setuptools wheel; \
-    python3.9 -m pip install --no-cache-dir pymorphy2 pymorphy2-dicts-uk; \
-    python3.9 -m pip install --no-cache-dir --upgrade "cryptography>=43.0.1"; \
-    python3.9 -m pip check; \
-    apt-get clean; \
-    rm -rf /var/lib/apt/lists/*
+    && chown -R manticore:manticore /docker-entrypoint-initdb.d /var/lib/manticore/ /var/run/mysqld/ /var/run/manticore \
+    && echo "\n[mysql]\nsilent\nwait\ntable\n" >> /etc/mysql/my.cnf
 
 COPY manticore.conf.sh /etc/manticoresearch/
 RUN sed -i '/log = \/var\/log\/manticore\/searchd.log/d;/query_log = \/var\/log\/manticore\/query.log/d' /etc/manticoresearch/manticore.conf
@@ -140,7 +114,6 @@ EXPOSE 9308
 EXPOSE 9312
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
-ENV PYTHONWARNINGS "ignore::UserWarning:pymorphy2.analyzer"
 ENV MANTICORE_CONFIG "/etc/manticoresearch/manticore.conf.sh|/etc/manticoresearch/manticore.conf"
 CMD ["searchd", "-c", "/etc/manticoresearch/manticore.conf.sh", "--nodetach"]
 
