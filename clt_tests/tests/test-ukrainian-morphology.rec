@@ -8,6 +8,30 @@ if timeout 5 grep -qm1 'accepting connections' <(docker logs -f manticore); then
 ––– output –––
 accepting connections
 ––– input –––
+docker exec manticore sh -c 'test -f /usr/share/manticore/uk.pak && echo "uk.pak present"'
+––– output –––
+uk.pak present
+––– input –––
+docker exec manticore sh -c 'dpkg -L manticore-language-packs | grep -Fx /usr/share/manticore/uk.pak'
+––– output –––
+/usr/share/manticore/uk.pak
+––– input –––
+docker exec manticore sh -c '! dpkg -s manticore-lemmatizer-uk >/dev/null 2>&1 && echo "manticore-lemmatizer-uk absent"'
+––– output –––
+manticore-lemmatizer-uk absent
+––– input –––
+docker exec manticore sh -c 'test ! -e /usr/local/lib/manticore/lemmatize_uk.so && echo "legacy lemmatize_uk plugin absent"'
+––– output –––
+legacy lemmatize_uk plugin absent
+––– input –––
+docker exec manticore sh -c 'if find /usr/local/lib /usr/lib \( -iname "*pymorphy2*" -o -iname "*pymorphy2-dicts-uk*" -o -iname "*pymorphy2_dicts_uk*" \) 2>/dev/null | grep -q .; then exit 1; else echo "pymorphy2 packages absent"; fi'
+––– output –––
+pymorphy2 packages absent
+––– input –––
+docker exec manticore sh -c '! command -v python3.9 >/dev/null 2>&1 && echo "python3.9 absent"'
+––– output –––
+python3.9 absent
+––– input –––
 docker exec manticore mysql -h0 -P9306 -e "CREATE TABLE test_uk (id bigint, content text) rt_mem_limit = '256M' morphology = 'lemmatize_uk' charset_table = '0..9, A..Z->a..z, _, a..z, U+0410..U+042F->U+0430..U+044F, U+0430..U+044F, U+0454, U+0456, U+0457, U+0491';"
 ––– output –––
 ––– input –––
