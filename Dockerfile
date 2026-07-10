@@ -10,7 +10,7 @@ RUN groupadd -r manticore && useradd -r -g manticore manticore
 
 ENV GOSU_VERSION 1.11
 
-ENV DAEMON_URL ${DAEMON_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore_27.1.5-26061911-5a1cf9399__ARCH_64.deb"}
+ENV DAEMON_URL ${DAEMON_URL:-"https://repo.manticoresearch.com/repository/manticoresearch_jammy/dists/jammy/main/binary-_ARCH_64/manticore_28.4.4-26071006-f63d06ecb__ARCH_64.deb"}
 
 RUN if [ -z "$DAEMON_URL" ] ; then \
     echo "WARNING: DAEMON_URL is empty"; \
