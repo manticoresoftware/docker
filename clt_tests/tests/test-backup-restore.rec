@@ -111,7 +111,7 @@ Manticore versions:
 %{DATETIME} [Info]    OK
 %{DATETIME} [Info]   rt_without_columnar (rt) [#!/[0-9]{1}\.[0-9]{3}/!#K]...
 %{DATETIME} [Info]    OK
-%{DATETIME} [Info]   test (rt) [%{NUMBER}B]...
+%{DATETIME} [Info]   test (rt) [#!/[0-9]+(\.[0-9]+)?[BK]/!#]...
 %{DATETIME} [Info]    OK
 %{DATETIME} [Info]
 Unfreezing all tables...
@@ -147,9 +147,9 @@ docker ps
 ––– output –––
 CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 ––– input –––
-if timeout 60 sh -c 'while docker ps -a | grep -qE "Up"; do sleep 1; done'; then echo 'successful'; else echo 'not successful'; fi
+if timeout 60 sh -c 'while docker ps -a --format "{{.Names}}" | grep -Fxq manticore; do sleep 1; done'; then echo 'removed'; else echo 'not removed'; fi
 ––– output –––
-successful
+removed
 ––– input –––
 docker run -d --name manticore -v /tmp/$BACKUP_NAME:/docker-entrypoint-initdb.d manticoresoftware/manticore:current
 ––– output –––
