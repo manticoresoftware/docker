@@ -92,6 +92,15 @@ services:
 
 Besides using the exposed ports 9306 and 9308, you can log into the instance by running `docker-compose exec manticore mysql`.
 
+### Easypanel
+
+[Easypanel](https://easypanel.io) is a self-hosted Docker deployment platform. Manticore Search has a one-click deployment template there:
+
+[![Deploy on Easypanel][easypanel-btn]][easypanel-deploy]
+
+[easypanel-btn]: https://easypanel.io/img/deploy-on-easypanel-40.svg
+[easypanel-deploy]: https://easypanel.io/templates/manticore-search
+
 ### HTTP protocol
 
 HTTP protocol is exposed on port 9308. You can map the port locally and connect using curl.:
