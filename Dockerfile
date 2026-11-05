@@ -19,12 +19,15 @@ elif [ ! -z "${DAEMON_URL##*_ARCH_*}" ] ; then \
     exit 1; \
 fi
 
+# Upgrade APT with retries disabled before installing other packages (CVE-2026-109518).
 RUN set -x \
     && if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else export ARCH="amd"; fi \
     && echo "Start building image for linux/${ARCH}64 architecture" \
     && mkdir /etc/ssl/ \
     && chown -R manticore:manticore /etc/ssl/ \
-    && apt-get -y update && apt-get -y install --no-install-recommends ca-certificates \
+    && apt-get -o Acquire::Retries=0 update \
+    && apt-get -o Acquire::Retries=0 install -y --only-upgrade apt \
+    && apt-get -y install --no-install-recommends ca-certificates \
        binutils wget gnupg xz-utils dirmngr locales tzdata cron && rm -rf /var/lib/apt/lists/* \
     && locale-gen --lang en_US \
     && wget -q -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
@@ -87,6 +90,9 @@ RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh
 RUN touch /etc/cron.d/manticore /var/run/crond.pid && \
     chown manticore:manticore /etc/cron.d/manticore /var/run/crond.pid && \
     chmod gu+s /usr/sbin/cron
+
+# Fail the build if Ubuntu's CVE-2026-109518 fix is missing.
+RUN dpkg --compare-versions "$(dpkg-query -W -f='${Version}' apt)" ge '2.8.4ubuntu0.1'
 
 FROM scratch
 COPY --from=initial / /
