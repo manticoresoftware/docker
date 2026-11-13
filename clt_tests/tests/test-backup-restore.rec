@@ -1,6 +1,6 @@
 ––– block: ./base/init –––
 ––– input –––
-docker run --name manticore -v /tmp/idx:/var/lib/manticore -d manticoresoftware/manticore:current
+docker run --rm --name manticore -v /tmp/idx:/var/lib/manticore -d manticoresoftware/manticore:current
 ––– output –––
 #!/[0-9a-z]{40}$/!#
 ––– input –––
@@ -129,10 +129,6 @@ Unfreezing all tables...
 %{DATETIME} [Info] Elapsed time: #!/([0-9]+\.[0-9]+|0)/!#s
 %{DATETIME} [Info] Done
 ––– input –––
-if [ "$(docker inspect -f '{{.State.Running}}' manticore)" = true ]; then echo 'running'; else docker inspect -f 'exit={{.State.ExitCode}} oom={{.State.OOMKilled}}' manticore; docker logs --tail 80 manticore 2>&1; fi
-––– output –––
-running
-––– input –––
 BACKUP_NAME=$(docker exec manticore ls /tmp/ | grep backup-*)
 ––– output –––
 ––– input –––
@@ -144,10 +140,6 @@ chmod -R 777 /tmp/$BACKUP_NAME
 ––– output –––
 ––– input –––
 docker stop manticore
-––– output –––
-manticore
-––– input –––
-docker rm manticore
 ––– output –––
 manticore
 ––– input –––
