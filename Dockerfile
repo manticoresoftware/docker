@@ -19,6 +19,15 @@ elif [ ! -z "${DAEMON_URL##*_ARCH_*}" ] ; then \
     exit 1; \
 fi
 
+# CVE-2026-109518: disable retries while upgrading the vulnerable APT binary.
+# Ubuntu 24.04 (noble) is fixed in apt 2.8.4ubuntu0.1.
+RUN set -eux \
+    && apt-get -o Acquire::Retries=0 update \
+    && apt-get -o Acquire::Retries=0 install -y --only-upgrade apt \
+    && apt_version="$(dpkg-query -W -f='${Version}' apt)" \
+    && dpkg --compare-versions "$apt_version" ge 2.8.4ubuntu0.1 \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN set -x \
     && if [ "$TARGETPLATFORM" = "linux/arm64" ] ; then export ARCH="arm"; else export ARCH="amd"; fi \
     && echo "Start building image for linux/${ARCH}64 architecture" \
