@@ -8,7 +8,7 @@ if timeout 60 grep -qEm1 "columnar.*?secondary.*?knn" <(docker logs -f manticore
 ––– output –––
 Done
 ––– input –––
-docker exec manticore manticore-executor -v
+docker exec manticore manticore-executor -v | head -n 3
 ––– output –––
 PHP %{SEMVER} (cli) (built: #!/[a-zA-Z]{3}/!# #!/[0-9]+/!# %{YEAR} #!/[0-9]{2}:[0-9]{2}:[0-9]{2}/!#) (NTS)
 Copyright (c) The PHP Group
