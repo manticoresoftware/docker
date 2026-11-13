@@ -1,6 +1,6 @@
 ––– block: ./base/init –––
 ––– input –––
-docker run --rm --name manticore -v /tmp/idx:/var/lib/manticore -d manticoresoftware/manticore:current
+docker run --name manticore -v /tmp/idx:/var/lib/manticore -d manticoresoftware/manticore:current
 ––– output –––
 #!/[0-9a-z]{40}$/!#
 ––– input –––
@@ -8,7 +8,7 @@ if timeout 60 grep -qEm1 "columnar.*?secondary.*?knn" <(docker logs -f manticore
 ––– output –––
 Done
 ––– input –––
-docker exec manticore manticore-executor -v
+docker exec manticore manticore-executor -v | head -n 3
 ––– output –––
 PHP %{SEMVER} (cli) (built: #!/[a-zA-Z]{3}/!# #!/[0-9]+/!# %{YEAR} #!/[0-9]{2}:[0-9]{2}:[0-9]{2}/!#) (NTS)
 Copyright (c) The PHP Group
@@ -129,6 +129,10 @@ Unfreezing all tables...
 %{DATETIME} [Info] Elapsed time: #!/([0-9]+\.[0-9]+|0)/!#s
 %{DATETIME} [Info] Done
 ––– input –––
+if [ "$(docker inspect -f '{{.State.Running}}' manticore)" = true ]; then echo 'running'; else docker inspect -f 'exit={{.State.ExitCode}} oom={{.State.OOMKilled}}' manticore; docker logs --tail 80 manticore 2>&1; fi
+––– output –––
+running
+––– input –––
 BACKUP_NAME=$(docker exec manticore ls /tmp/ | grep backup-*)
 ––– output –––
 ––– input –––
@@ -140,6 +144,10 @@ chmod -R 777 /tmp/$BACKUP_NAME
 ––– output –––
 ––– input –––
 docker stop manticore
+––– output –––
+manticore
+––– input –––
+docker rm manticore
 ––– output –––
 manticore
 ––– input –––
