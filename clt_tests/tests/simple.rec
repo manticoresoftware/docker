@@ -8,6 +8,10 @@ if timeout 5 grep -qm1 'accepting connections' <(docker logs -f manticore); then
 ––– output –––
 accepting connections
 ––– input –––
+docker exec manticore sh -c 'dpkg --compare-versions "$(dpkg-query -W -f="\${Version}" apt)" ge 2.8.4ubuntu0.1 && echo "APT patched"'
+––– output –––
+APT patched
+––– input –––
 docker stop manticore
 ––– output –––
 #!/[0-9a-z]+/!#
