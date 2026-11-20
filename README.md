@@ -1,4 +1,4 @@
-# Manticore Search Docker image
+# Manticore Search Docker image version 32.1.3
 
 This is the git repo of official [Docker image](https://hub.docker.com/r/manticoresearch/manticore/) for [Manticore Search](https://github.com/manticoresoftware/manticoresearch).
 
